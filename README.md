@@ -127,8 +127,8 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 
 ## 👥 Équipe
 
-- [Votre nom] - Développeur principal
-- [Autres contributeurs]
+- [Bensaad Mohammed] - Développeur principal
+
 
 ## 📞 Support
 
