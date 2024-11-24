@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boutique indisponible - {{ parent() }}{% endblock %}
+
+{% block meta_description %}Notre boutique en ligne est temporairement en mode vitrine. Découvrez notre sélection d'artisanat provençal et contactez-nous directement pour plus d'informations.{% endblock %}
+
+{% block meta_robots %}noindex, follow{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="text-center">
+            <svg class="mx-auto h-12 w-12 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Boutique en ligne indisponible
+            </h2>
+        </div>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            <div class="text-center">
+                <p class="text-gray-600">
+                    {{ message|default('Notre boutique en ligne est temporairement indisponible. Nous vous invitons à découvrir nos produits et à nous contacter directement.') }}
+                </p>
+
+                <div class="mt-8 space-y-4">
+                    <a href="{{ path('app_products') }}" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Découvrir nos produits
+                    </a>
+                    
+                    <a href="{{ path('app_contact') }}" class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Nous contacter
+                    </a>
+                </div>
+
+                <div class="mt-6 text-sm text-gray-500">
+                    <p>Pour toute question, n'hésitez pas à nous contacter :</p>
+                    <ul class="mt-2 space-y-1">
+                        <li>
+                            <a href="tel:{{ site_config.contactPhone|default('+33 4 XX XX XX XX') }}" class="text-indigo-600 hover:text-indigo-500">
+                                {{ site_config.contactPhone|default('+33 4 XX XX XX XX') }}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mailto:{{ site_config.contactEmail|default('contact@example.com') }}" class="text-indigo-600 hover:text-indigo-500">
+                                {{ site_config.contactEmail|default('contact@example.com') }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+dashboard:
+  title: Administration E-Commerce
+  welcome: Bienvenue dans l'administration
+
+menu:
+  dashboard: Tableau de bord
+  catalog: Catalogue
+  products: Produits
+  categories: Catégories
+  orders: Commandes
+  media: Médias
+  collections: Collections
+  users: Utilisateurs
+  configuration: Configuration
+  back_to_site: Retour au site
+
+actions:
+  new: Créer
+  edit: Modifier
+  delete: Supprimer
+  save: Enregistrer
+  cancel: Annuler
+  back: Retour
+  search: Rechercher
+
+messages:
+  success:
+    created: L'élément a été créé avec succès
+    updated: L'élément a été mis à jour avec succès
+    deleted: L'élément a été supprimé avec succès
+  error:
+    general: Une erreur est survenue
+    not_found: L'élément n'a pas été trouvé
+    access_denied: Accès refusé
+
+entity:
+  Product:
+    label: Produit
+    list:
+      title: Liste des produits
+    new:
+      title: Nouveau produit
+    edit:
+      title: Modifier le produit
+    fields:
+      name: Nom
+      description: Description
+      price: Prix
+      stock: Stock
+      category: Catégorie
+      active: Actif
+      created_at: Créé le
+      updated_at: Mis à jour le
+
+  Category:
+    label: Catégorie
+    fields:
+      name: Nom
+      description: Description
+      parent: Catégorie parente
+      products: Produits
+
+  Order:
+    label: Commande
+    fields:
+      reference: Référence
+      status: Statut
+      total: Total
+      user: Client
+      created_at: Date de commande
+
+  User:
+    label: Utilisateur
+    fields:
+      email: Email
+      roles: Rôles
+      password: Mot de passe
+      last_login: Dernière connexion

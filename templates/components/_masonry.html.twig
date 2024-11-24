@@ -1,0 +1,72 @@
+{% if collection.media|length > 0 %}
+    <div class="columns-1 sm:columns-2 md:columns-{{ collection.settings.columns }} gap-{{ collection.settings.gap/4 }} space-y-{{ collection.settings.gap/4 }}">
+        {% for media in collection.media %}
+            <div class="relative group break-inside-avoid">
+                <img src="{{ vich_uploader_asset(media, 'imageFile') }}"
+                     class="w-full h-auto rounded-lg transition-all duration-300 group-hover:brightness-90"
+                     alt="{{ media.alt }}"
+                     title="{{ media.title }}">
+                
+                {% if media.title %}
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity duration-300 flex items-end justify-start p-4 rounded-lg">
+                        <h3 class="text-white text-lg font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            {{ media.title }}
+                        </h3>
+                    </div>
+                {% endif %}
+
+                {# Modal pour l'image en grand format #}
+                <div id="masonry-modal-{{ media.id }}" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                    <div class="relative w-full max-w-4xl max-h-full">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                                <h3 class="text-xl font-medium text-gray-900 dark:text-white">
+                                    {{ media.title }}
+                                </h3>
+                                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="masonry-modal-{{ media.id }}">
+                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                    </svg>
+                                    <span class="sr-only">Fermer</span>
+                                </button>
+                            </div>
+                            <div class="p-4 md:p-5 space-y-4">
+                                <img src="{{ vich_uploader_asset(media, 'imageFile') }}"
+                                     class="w-full h-auto"
+                                     alt="{{ media.alt }}">
+                                {% if media.alt %}
+                                    <p class="text-gray-500 dark:text-gray-400">{{ media.alt }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Bouton pour ouvrir le modal #}
+                <button type="button" 
+                        data-modal-target="masonry-modal-{{ media.id }}" 
+                        data-modal-toggle="masonry-modal-{{ media.id }}"
+                        class="absolute inset-0 w-full h-full cursor-zoom-in rounded-lg">
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
+    {# Script pour Masonry.js (optionnel pour un meilleur rendu) #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const masonryGrid = document.querySelector('#masonry-{{ collection.id }}');
+            const masonry = new Masonry(masonryGrid, {
+                itemSelector: '.masonry-item',
+                columnWidth: '.masonry-item',
+                percentPosition: true,
+                gutter: {{ collection.settings.gap }}
+            });
+
+            // Recalculer la disposition après le chargement des images
+            imagesLoaded(masonryGrid).on('progress', function() {
+                masonry.layout();
+            });
+        });
+    </script>
+{% endif %}

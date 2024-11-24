@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Site en maintenance{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 py-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Site en maintenance
+            </h2>
+            <div class="mt-8 text-center">
+                <img src="{{ asset('images/maintenance.svg') }}" alt="Maintenance" class="mx-auto h-48">
+            </div>
+            <p class="mt-6 text-center text-lg text-gray-600">
+                {{ message }}
+            </p>
+        </div>
+
+        {% if contact_email or contact_phone %}
+            <div class="mt-8 border-t border-gray-200 pt-8">
+                <h3 class="text-lg font-medium text-gray-900">Nous contacter</h3>
+                <div class="mt-4 space-y-4">
+                    {% if contact_email %}
+                        <div class="flex items-center">
+                            <svg class="h-6 w-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            <a href="mailto:{{ contact_email }}" class="ml-3 text-gray-600 hover:text-amber-500">
+                                {{ contact_email }}
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    {% if contact_phone %}
+                        <div class="flex items-center">
+                            <svg class="h-6 w-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                            <a href="tel:{{ contact_phone }}" class="ml-3 text-gray-600 hover:text-amber-500">
+                                {{ contact_phone }}
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

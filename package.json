@@ -1,0 +1,20 @@
+{
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15"
+  },
+  "scripts": {
+    "build": "php bin/console asset-map:compile",
+    "watch": "php bin/console asset-map:watch", 
+    "build:dev": "php bin/console asset-map:compile --env=dev",
+    "watch:dev": "php bin/console asset-map:watch --env=dev"
+
+  },
+  "dependencies": {
+    "@stripe/stripe-js": "^5.2.0",
+    "flowbite": "^2.5.2",
+    "imagesloaded": "^5.0.0",
+    "masonry-layout": "^4.2.2"
+  }
+}

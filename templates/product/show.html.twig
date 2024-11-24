@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.name }} - {{ site_name }}{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <nav class="mb-8">
+        <a href="{{ path('app_product_index') }}" class="text-primary hover:text-primary-dark">
+            ← Retour aux produits
+        </a>
+    </nav>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-4">
+            {% if product.media is not empty %}
+                <div class="relative aspect-square">
+                    <img src="{{ asset(product.media.first.path) }}" 
+                         alt="{{ product.name }}" 
+                         class="w-full h-full object-cover rounded-lg shadow-lg">
+                </div>
+                {% if product.media|length > 1 %}
+                    <div class="grid grid-cols-4 gap-2">
+                        {% for media in product.media|slice(1, 4) %}
+                            <img src="{{ asset(media.path) }}" 
+                                 alt="{{ product.name }}" 
+                                 class="w-full aspect-square object-cover rounded cursor-pointer hover:opacity-75 transition">
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <div class="space-y-6">
+            <h1 class="text-4xl font-bold">{{ product.name }}</h1>
+            
+            <div class="text-3xl font-bold text-primary">
+                {{ product.price|number_format(2, ',', ' ') }} €
+            </div>
+
+            <div class="prose max-w-none">
+                {{ product.description|raw }}
+            </div>
+
+            {% if product.stock > 0 %}
+                <div class="text-sm text-gray-600">
+                    En stock : {{ product.stock }} unité(s)
+                </div>
+                <button class="w-full bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition">
+                    Ajouter au panier
+                </button>
+            {% else %}
+                <div class="text-red-600 font-semibold">
+                    Produit temporairement indisponible
+                </div>
+            {% endif %}
+
+            {% if product.category %}
+                <div class="pt-4 border-t">
+                    <h2 class="text-lg font-semibold mb-2">Catégorie</h2>
+                    <a href="{{ path('app_product_category', {categoryId: product.category.id}) }}" 
+                       class="text-primary hover:text-primary-dark">
+                        {{ product.category.name }}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

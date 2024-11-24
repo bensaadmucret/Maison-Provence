@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Email de réinitialisation envoyé{% endblock %}
+
+{% block body %}
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    Email envoyé
+                </h2>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Si un compte existe avec cette adresse email, vous recevrez un email avec un lien pour réinitialiser votre mot de passe.
+                    Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+                </p>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Si vous ne recevez pas d'email, veuillez vérifier vos spams ou <a class="text-indigo-600 hover:text-indigo-500" href="{{ path('app_forgot_password_request') }}">réessayer</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

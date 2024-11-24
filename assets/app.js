@@ -7,4 +7,11 @@ import './bootstrap.js';
  */
 import './styles/app.css';
 
+import { startStimulusApp } from '@symfony/stimulus-bundle';
+import { registerChart } from '@symfony/ux-chartjs';
+
+registerChart();
+
+export const app = startStimulusApp();
+
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

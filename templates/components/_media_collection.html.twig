@@ -1,0 +1,9 @@
+{% if collection is defined %}
+    {% if collection.type == 'carousel' %}
+        {{ include('components/_carousel.html.twig') }}
+    {% elseif collection.type == 'grid' %}
+        {{ include('components/_grid.html.twig') }}
+    {% elseif collection.type == 'masonry' %}
+        {{ include('components/_masonry.html.twig') }}
+    {% endif %}
+{% endif %}
