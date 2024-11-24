@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 class CategorySEO extends SEO
 {
     #[ORM\OneToOne(inversedBy: 'seo', targetEntity: Category::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Category $category = null;
 
     public function getCategory(): ?Category

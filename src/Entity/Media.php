@@ -63,6 +63,11 @@ class Media
         return $this;
     }
 
+    public function getPath(): ?string
+    {
+        return $this->filename;
+    }
+
     public function getTitle(): ?string
     {
         return $this->title;

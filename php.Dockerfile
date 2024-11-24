@@ -7,13 +7,18 @@ RUN apk add --no-cache \
     zip \
     unzip \
     libzip-dev \
-    icu-dev
+    icu-dev \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev
 
 # Installation des extensions PHP
-RUN docker-php-ext-install \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install \
     pdo_pgsql \
     intl \
-    zip
+    zip \
+    gd
 
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
