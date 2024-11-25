@@ -89,7 +89,7 @@ class ProductFixtures extends Fixture
         $imageManager = new ImageManager(new Driver());
 
         // Création du dossier d'upload s'il n'existe pas
-        $uploadDir = __DIR__ . '/../../public/uploads/products';
+        $uploadDir = __DIR__ . '/../../public/uploads/media';
         if (!file_exists($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
@@ -120,11 +120,15 @@ class ProductFixtures extends Fixture
                 $product->setName($productName);
                 $product->setDescription($faker->paragraphs(3, true));
                 $product->setPrice($faker->randomFloat(2, 10, 100));
-                $product->setSlug($this->slugify($productName));
-                $product->setCategory($category);
+                $product->setStock($faker->numberBetween(0, 100));
                 $product->setCreatedAt(new \DateTimeImmutable());
                 $product->setUpdatedAt(new \DateTimeImmutable());
-                $product->setStock($faker->numberBetween(10, 100));
+                $product->setIsActive(true);
+                $product->setCategory($category);
+                
+                $slug = $this->slugify($productName);
+                error_log("Génération du slug pour le produit '{$productName}' : {$slug}");
+                $product->setSlug($slug);
 
                 // SEO pour le produit
                 $productSeo = new ProductSEO();
@@ -166,9 +170,15 @@ class ProductFixtures extends Fixture
                         $font->size(40);
                     });
                     
-                    // Sauvegarde de l'image
-                    $image->save($uploadDir . '/' . $mediaName);
-                    $media->setFilename('uploads/products/' . $mediaName);
+                    // Sauvegarde de l'image temporaire
+                    $tempPath = $uploadDir . '/' . $mediaName;
+                    $image->save($tempPath);
+                    
+                    // Définir le nom du fichier avant de définir le fichier
+                    $media->setFilename($mediaName);
+                    
+                    // Utilisation de VichUploader
+                    $media->setImageFile(new File($tempPath));
                     
                     $manager->persist($media);
                     $product->addMedium($media);

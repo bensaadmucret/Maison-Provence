@@ -62,7 +62,11 @@ class Media
         $this->imageFile = $imageFile;
 
         if (null !== $imageFile) {
+            // C'est nécessaire pour que Doctrine détecte les changements
             $this->updatedAt = new \DateTimeImmutable();
+
+            // Mettre à jour le nom du fichier
+            $this->filename = $imageFile->getFilename();
         }
     }
 

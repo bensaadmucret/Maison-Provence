@@ -12,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class MediaCrudController extends AbstractCrudController
 {
@@ -24,11 +25,12 @@ class MediaCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
+            TextField::new('imageFile', 'Image')
+                ->setFormType(VichImageType::class)
+                ->onlyOnForms(),
             ImageField::new('filename', 'Image')
-                ->setBasePath('uploads/images')
-                ->setUploadDir('public/uploads/images')
-                ->setUploadedFileNamePattern('[randomhash].[extension]')
-                ->setRequired(true),
+                ->setBasePath('uploads/media')
+                ->hideOnForm(),
             TextField::new('title', 'Titre')->setRequired(false),
             TextField::new('alt', 'Texte alternatif')->setRequired(false),
             IntegerField::new('position', 'Position')->setRequired(false),

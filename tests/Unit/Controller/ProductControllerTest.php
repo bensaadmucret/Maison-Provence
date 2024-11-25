@@ -8,16 +8,19 @@ use App\Entity\SiteConfiguration;
 use App\Service\ProductService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 class ProductControllerTest extends TestCase
 {
@@ -35,49 +38,64 @@ class ProductControllerTest extends TestCase
     protected function setUp(): void
     {
         $this->productService = $this->createMock(ProductService::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->serializer = $this->createMock(SerializerInterface::class);
         $this->validator = $this->createMock(ValidatorInterface::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->twig = $this->createMock(Environment::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->session = $this->createMock(Session::class);
         $this->router = $this->createMock(UrlGeneratorInterface::class);
-        
-        $this->siteConfig = new SiteConfiguration();
-        $this->siteConfig->setSiteName('Maison Provence');
 
-        $configRepository = $this->createMock('Doctrine\ORM\EntityRepository');
-        $configRepository->method('findOneBy')->willReturn($this->siteConfig);
-        
+        $this->requestStack->method('getSession')
+            ->willReturn($this->session);
+
+        $this->session->method('getFlashBag')
+            ->willReturn(new FlashBag());
+
+        $siteConfigRepository = $this->createMock(EntityRepository::class);
         $this->entityManager->method('getRepository')
-            ->with(SiteConfiguration::class)
-            ->willReturn($configRepository);
+            ->willReturnCallback(function ($entityClass) use ($siteConfigRepository) {
+                if ($entityClass === SiteConfiguration::class) {
+                    return $siteConfigRepository;
+                }
+                return $this->createMock(EntityRepository::class);
+            });
 
-        // Set up session
-        $this->session = new Session(new MockArraySessionStorage());
-        $this->session->start();
-        
-        $this->requestStack = new RequestStack();
-        $request = new Request();
-        $request->setSession($this->session);
-        $this->requestStack->push($request);
+        $siteConfig = new SiteConfiguration();
+        $siteConfig->setSiteName('Maison Provence');
+        $siteConfigRepository->method('findOneBy')
+            ->willReturn($siteConfig);
 
-        $this->router->method('generate')
-            ->willReturnCallback(function ($route) {
-                return '/' . $route;
+        $product = new Product();
+        $product->setName('Test Product');
+        $product->setSlug('test-product');
+        $product->setIsActive(true);
+
+        $this->productService->method('getProductBySlug')
+            ->willReturnCallback(function ($slug) use ($product) {
+                if ($slug === 'test-product') {
+                    return $product;
+                }
+                if ($slug === 'non-existent') {
+                    return null;
+                }
+                return null;
             });
 
         $this->controller = new ProductController(
             $this->productService,
+            $this->entityManager,
             $this->serializer,
-            $this->validator,
-            $this->entityManager
+            $this->validator
         );
-        $this->controller->setContainer($this->getContainer());
+
+        $container = $this->getContainer();
+        $this->controller->setContainer($container);
     }
 
     private function getContainer(): object
     {
         $container = $this->createMock('Psr\Container\ContainerInterface');
-        $container->method('has')->willReturn(true);
         $container->method('get')
             ->willReturnCallback(function ($id) {
                 if ($id === 'twig') {
@@ -89,7 +107,14 @@ class ProductControllerTest extends TestCase
                 if ($id === 'router') {
                     return $this->router;
                 }
+                if ($id === 'twig.loader.native_filesystem') {
+                    return $this->createMock(FilesystemLoader::class);
+                }
                 return null;
+            });
+        $container->method('has')
+            ->willReturnCallback(function ($id) {
+                return in_array($id, ['twig', 'request_stack', 'router', 'twig.loader.native_filesystem']);
             });
         return $container;
     }
@@ -111,8 +136,8 @@ class ProductControllerTest extends TestCase
                 'product/index.html.twig',
                 $this->callback(function ($params) use ($products) {
                     return $params['products'] === $products &&
-                           isset($params['site']) &&
-                           $params['site']['siteName'] === 'Maison Provence';
+                           isset($params['site_configuration']) &&
+                           $params['site_configuration']->getSiteName() === 'Maison Provence';
                 })
             )
             ->willReturn('rendered template');
@@ -123,47 +148,39 @@ class ProductControllerTest extends TestCase
 
     public function testShow(): void
     {
-        $product = $this->createMock(Product::class);
-
-        $this->productService->expects($this->once())
-            ->method('getProduct')
-            ->with(1)
-            ->willReturn($product);
+        $request = Request::create('/products/test-product', 'GET');
 
         $this->twig->expects($this->once())
             ->method('render')
             ->with(
                 'product/show.html.twig',
-                $this->callback(function ($params) use ($product) {
-                    return $params['product'] === $product &&
-                           isset($params['site']) &&
-                           $params['site']['siteName'] === 'Maison Provence';
+                $this->callback(function ($params) {
+                    return $params['product']->getName() === 'Test Product' &&
+                           isset($params['site_configuration']) &&
+                           $params['site_configuration']->getSiteName() === 'Maison Provence';
                 })
             )
             ->willReturn('rendered template');
 
-        $response = $this->controller->show(1);
+        $response = $this->controller->show($request, 'test-product');
         $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testShowNotFound(): void
     {
-        $this->productService->expects($this->once())
-            ->method('getProduct')
-            ->with(1)
-            ->willThrowException(new \Exception('Product not found'));
+        $request = Request::create('/products/non-existent', 'GET');
 
         $this->router->expects($this->once())
             ->method('generate')
             ->with('app_product_index')
             ->willReturn('/products');
 
-        $response = $this->controller->show(1);
+        $this->session->expects($this->once())
+            ->method('getFlashBag')
+            ->willReturn(new FlashBag());
+
+        $response = $this->controller->show($request, 'non-existent');
         $this->assertEquals(302, $response->getStatusCode());
-        $this->assertTrue($this->session->getFlashBag()->has('error'));
-        $this->assertEquals(
-            ['Le produit demandé n\'existe pas.'],
-            $this->session->getFlashBag()->get('error')
-        );
+        $this->assertEquals('/products', $response->headers->get('Location'));
     }
 }

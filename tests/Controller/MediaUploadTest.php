@@ -8,128 +8,102 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Controller\Admin\MediaCrudController;
 
 class MediaUploadTest extends WebTestCase
 {
     private $client;
     private $entityManager;
-    private $uploadDir;
+    private $mediaRepository;
+    private $userRepository;
+    private $adminUser;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->client = static::createClient();
-        $this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
-        $this->uploadDir = static::getContainer()->getParameter('kernel.project_dir') . '/public/uploads/media/test';
-        
-        if (!is_dir($this->uploadDir)) {
-            mkdir($this->uploadDir, 0777, true);
+        $this->entityManager = $this->client->getContainer()->get('doctrine')->getManager();
+        $this->mediaRepository = $this->entityManager->getRepository(Media::class);
+        $this->userRepository = $this->entityManager->getRepository(User::class);
+
+        $this->adminUser = new User();
+        $this->adminUser->setEmail('admin' . uniqid() . '@test.com');
+        $this->adminUser->setPassword('$2y$13$' . uniqid());
+        $this->adminUser->setRoles(['ROLE_ADMIN']);
+        $this->adminUser->setFirstName('Admin');
+        $this->adminUser->setLastName('Test');
+        $this->entityManager->persist($this->adminUser);
+        $this->entityManager->flush();
+
+        $this->client->loginUser($this->adminUser);
+    }
+
+    public function testUploadImage(): void
+    {
+        $uploadDir = $this->client->getContainer()->getParameter('upload_directory');
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
         }
 
-        // Create a test admin user
-        $this->createTestUser();
+        $crawler = $this->client->request('GET', '/admin?crudAction=new&crudControllerFqcn=App%5CController%5CAdmin%5CMediaCrudController');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('Create')->form();
+        $testFile = __DIR__ . '/../fixtures/test-image.jpg';
+        $form['Media[file]']->upload($testFile);
+        $form['Media[title]'] = 'Test Image';
+        $form['Media[description]'] = 'Test Description';
+
+        $this->client->submit($form);
+        $this->assertResponseRedirects('/admin?crudAction=index&crudControllerFqcn=App%5CController%5CAdmin%5CMediaCrudController');
+
+        $media = $this->mediaRepository->findOneBy(['title' => 'Test Image']);
+        $this->assertNotNull($media);
+        $this->assertEquals('Test Description', $media->getDescription());
+        $this->assertFileExists($uploadDir . '/' . $media->getFilename());
+    }
+
+    public function testUploadInvalidImage(): void
+    {
+        $crawler = $this->client->request('GET', '/admin?crudAction=new&crudControllerFqcn=App%5CController%5CAdmin%5CMediaCrudController');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('Create')->form();
+        $testFile = __DIR__ . '/../fixtures/invalid-file.txt';
+        $form['Media[file]']->upload($testFile);
+        $form['Media[title]'] = 'Invalid File';
+        $form['Media[description]'] = 'Invalid Description';
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('.invalid-feedback', 'Please upload a valid image file');
+
+        $media = $this->mediaRepository->findOneBy(['title' => 'Invalid File']);
+        $this->assertNull($media);
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
 
-        // Clean up uploaded files
-        if (is_dir($this->uploadDir)) {
-            $files = scandir($this->uploadDir);
+        $uploadDir = $this->client->getContainer()->getParameter('upload_directory');
+        if (is_dir($uploadDir)) {
+            $files = glob($uploadDir . '/*');
             foreach ($files as $file) {
-                if ($file !== '.' && $file !== '..') {
-                    unlink($this->uploadDir . '/' . $file);
+                if (is_file($file)) {
+                    unlink($file);
                 }
             }
-            rmdir($this->uploadDir);
         }
 
-        // Reset database
-        $this->entityManager->createQuery('DELETE FROM App\Entity\Media')->execute();
-        $this->entityManager->createQuery('DELETE FROM App\Entity\User')->execute();
+        if ($this->adminUser) {
+            $this->entityManager->remove($this->adminUser);
+            $this->entityManager->flush();
+        }
+
         $this->entityManager->close();
         $this->entityManager = null;
-    }
-
-    private function createTestUser(): UserInterface
-    {
-        $user = new User();
-        $user->setEmail('test@example.com');
-        $user->setPassword('$2y$13$PJzqKVxwJXhfW1P.zT5D8.9CvjWH9cN41ACO7H9JJhqX8URuGBNwO'); // 'password'
-        $user->setRoles(['ROLE_ADMIN']);
-        
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-        
-        return $user;
-    }
-
-    public function testUploadImage(): void
-    {
-        // Login as admin
-        $this->client->loginUser($this->createTestUser());
-
-        // Create a test image
-        $imagePath = $this->uploadDir . '/test.jpg';
-        copy(__DIR__ . '/../fixtures/test.jpg', $imagePath);
-        
-        $uploadedFile = new UploadedFile(
-            $imagePath,
-            'test.jpg',
-            'image/jpeg',
-            null,
-            true
-        );
-
-        // Submit the form with the image
-        $crawler = $this->client->request('GET', '/admin');
-        $this->assertResponseIsSuccessful();
-
-        $form = $crawler->selectButton('Upload')->form();
-        $form['media[imageFile]']->upload($uploadedFile);
-        $form['media[title]'] = 'Test Image';
-        $form['media[alt]'] = 'Test Alt Text';
-
-        $this->client->submit($form);
-        $this->assertResponseRedirects();
-
-        // Verify the image was saved
-        $media = $this->entityManager->getRepository(Media::class)->findOneBy(['title' => 'Test Image']);
-        $this->assertNotNull($media);
-        $this->assertEquals('Test Alt Text', $media->getAlt());
-        $this->assertNotNull($media->getFilename());
-        $this->assertTrue(file_exists($this->uploadDir . '/' . $media->getFilename()));
-    }
-
-    public function testUploadInvalidImage(): void
-    {
-        // Login as admin
-        $this->client->loginUser($this->createTestUser());
-
-        // Create an invalid file
-        $invalidFilePath = $this->uploadDir . '/test.txt';
-        file_put_contents($invalidFilePath, 'This is not an image');
-        
-        $uploadedFile = new UploadedFile(
-            $invalidFilePath,
-            'test.txt',
-            'text/plain',
-            null,
-            true
-        );
-
-        // Try to upload the invalid file
-        $crawler = $this->client->request('GET', '/admin');
-        $this->assertResponseIsSuccessful();
-
-        $form = $crawler->selectButton('Upload')->form();
-        $form['media[imageFile]']->upload($uploadedFile);
-        $form['media[title]'] = 'Invalid File';
-
-        $this->client->submit($form);
-        
-        // Verify the upload was rejected
-        $this->assertResponseStatusCodeSame(400);
-        $this->assertSelectorTextContains('.invalid-feedback', 'Please upload a valid image file');
+        $this->client = null;
     }
 }

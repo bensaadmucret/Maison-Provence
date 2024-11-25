@@ -1,39 +1,56 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ product.name }} - {{ site_name }}{% endblock %}
+{% block title %}{{ product.name }} - {{ site_configuration.siteName }}{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="{{ product.description|striptags|slice(0, 160) }}">
+    <meta property="og:title" content="{{ product.name }} - {{ site_configuration.siteName }}">
+    <meta property="og:description" content="{{ product.description|striptags|slice(0, 160) }}">
+{% endblock %}
 
 {% block body %}
 <div class="container mx-auto px-4 py-8">
-    <nav class="mb-8">
-        <a href="{{ path('app_product_index') }}" class="text-primary hover:text-primary-dark">
+    {# Navigation principale #}
+    <nav class="mb-8 flex justify-between items-center">
+        <a href="{{ path('app_product_index') }}" class="text-blue-600 hover:text-blue-800">
             ← Retour aux produits
         </a>
-    </nav>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="space-y-4">
-            {% if product.media is not empty %}
-                <div class="relative aspect-square">
-                    <img src="{{ asset(product.media.first.path) }}" 
-                         alt="{{ product.name }}" 
-                         class="w-full h-full object-cover rounded-lg shadow-lg">
-                </div>
-                {% if product.media|length > 1 %}
-                    <div class="grid grid-cols-4 gap-2">
-                        {% for media in product.media|slice(1, 4) %}
-                            <img src="{{ asset(media.path) }}" 
-                                 alt="{{ product.name }}" 
-                                 class="w-full aspect-square object-cover rounded cursor-pointer hover:opacity-75 transition">
-                        {% endfor %}
-                    </div>
-                {% endif %}
+        <div class="flex gap-4">
+            {% if previousProduct %}
+                <a href="{{ path('app_product_show', {slug: previousProduct.slug}) }}" 
+                   class="text-gray-600 hover:text-blue-600">
+                    ← {{ previousProduct.name }}
+                </a>
+            {% endif %}
+            {% if nextProduct %}
+                <a href="{{ path('app_product_show', {slug: nextProduct.slug}) }}" 
+                   class="text-gray-600 hover:text-blue-600">
+                    {{ nextProduct.name }} →
+                </a>
             {% endif %}
         </div>
+    </nav>
 
+    {# Produit principal #}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {# Image du produit #}
+        <div class="space-y-4">
+            <div class="relative aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
+                {% if product.image %}
+                    <img src="{{ asset('uploads/products/' ~ product.image) }}" 
+                         alt="{{ product.name }}"
+                         class="w-full h-full object-cover rounded-lg shadow-lg">
+                {% else %}
+                    <span class="text-gray-400">Aucune image disponible</span>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Informations produit #}
         <div class="space-y-6">
             <h1 class="text-4xl font-bold">{{ product.name }}</h1>
             
-            <div class="text-3xl font-bold text-primary">
+            <div class="text-3xl font-bold text-blue-600">
                 {{ product.price|number_format(2, ',', ' ') }} €
             </div>
 
@@ -45,7 +62,7 @@
                 <div class="text-sm text-gray-600">
                     En stock : {{ product.stock }} unité(s)
                 </div>
-                <button class="w-full bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition">
+                <button class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
                     Ajouter au panier
                 </button>
             {% else %}
@@ -57,13 +74,44 @@
             {% if product.category %}
                 <div class="pt-4 border-t">
                     <h2 class="text-lg font-semibold mb-2">Catégorie</h2>
-                    <a href="{{ path('app_product_category', {categoryId: product.category.id}) }}" 
-                       class="text-primary hover:text-primary-dark">
+                    <a href="{{ path('app_product_index') }}?category={{ product.category.slug }}" 
+                       class="text-blue-600 hover:text-blue-800">
                         {{ product.category.name }}
                     </a>
                 </div>
             {% endif %}
         </div>
     </div>
+
+    {# Produits similaires #}
+    {% if similarProducts is not empty %}
+        <div class="mt-16">
+            <h2 class="text-2xl font-bold mb-8">Produits similaires</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {% for similarProduct in similarProducts %}
+                    <a href="{{ path('app_product_show', {slug: similarProduct.slug}) }}" 
+                       class="group">
+                        <div class="aspect-square rounded-lg overflow-hidden mb-4 bg-gray-100">
+                            {% if similarProduct.image %}
+                                <img src="{{ asset('uploads/products/' ~ similarProduct.image) }}" 
+                                     alt="{{ similarProduct.name }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            {% else %}
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <span class="text-gray-400">Aucune image</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <h3 class="font-semibold group-hover:text-blue-600 transition">
+                            {{ similarProduct.name }}
+                        </h3>
+                        <div class="text-blue-600 font-bold mt-2">
+                            {{ similarProduct.price|number_format(2, ',', ' ') }} €
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
