@@ -48,22 +48,27 @@ class SiteConfigurationCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
-            TextField::new('siteName', 'Nom du site')
-                ->setHelp('Le nom qui apparaîtra dans le titre du site'),
+        yield TextField::new('siteName', 'Nom du site')
+            ->setHelp('Le nom qui apparaîtra dans le titre du site');
 
-            BooleanField::new('maintenanceMode', 'Mode maintenance')
-                ->setHelp('Activer/désactiver le mode maintenance')
-                ->renderAsSwitch(),
+        yield BooleanField::new('maintenanceMode', 'Mode maintenance')
+            ->setHelp('Activer/désactiver le mode maintenance')
+            ->renderAsSwitch();
 
-            TextareaField::new('maintenanceMessage', 'Message de maintenance')
-                ->setHelp('Message affiché pendant la maintenance')
-                ->hideOnIndex(),
+        yield TextareaField::new('maintenanceMessage', 'Message de maintenance')
+            ->setHelp('Message affiché pendant la maintenance')
+            ->hideOnIndex();
 
-            DateTimeField::new('updatedAt', 'Dernière modification')
-                ->setFormat('dd/MM/Y HH:mm:ss')
-                ->hideOnForm(),
-        ];
+        yield BooleanField::new('isEcommerceEnabled', 'Activer la e-boutique')
+            ->setHelp('Désactiver pour basculer en mode site vitrine');
+
+        yield TextareaField::new('ecommerceDisabledMessage', 'Message e-boutique désactivée')
+            ->setHelp('Message affiché quand la e-boutique est désactivée')
+            ->hideOnIndex();
+
+        yield DateTimeField::new('updatedAt', 'Dernière modification')
+            ->setFormat('dd/MM/Y HH:mm:ss')
+            ->hideOnForm();
     }
 
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void

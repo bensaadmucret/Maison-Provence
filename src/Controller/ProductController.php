@@ -29,8 +29,14 @@ class ProductController extends AbstractController
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
-        $products = $this->productService->getActiveProducts();
         $site = $this->getSiteConfiguration($this->entityManager);
+        
+        if (!$site->isEcommerceEnabled()) {
+            $this->addFlash('warning', $site->getEcommerceDisabledMessage() ?? 'La boutique est temporairement désactivée.');
+            return $this->redirectToRoute('app_home');
+        }
+
+        $products = $this->productService->getActiveProducts();
 
         return $this->render('product/index.html.twig', [
             'products' => $products,
@@ -41,6 +47,13 @@ class ProductController extends AbstractController
     #[Route('/{slug}', name: 'show', methods: ['GET'])]
     public function show(Request $request, string $slug): Response
     {
+        $site = $this->getSiteConfiguration($this->entityManager);
+        
+        if (!$site->isEcommerceEnabled()) {
+            $this->addFlash('warning', $site->getEcommerceDisabledMessage() ?? 'La boutique est temporairement désactivée.');
+            return $this->redirectToRoute('app_home');
+        }
+
         try {
             // Débogage détaillé de la requête
             error_log('=== Début de la méthode show ===');

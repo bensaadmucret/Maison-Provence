@@ -62,6 +62,50 @@ docker-compose exec php bin/console doctrine:migrations:migrate
 docker-compose exec php bin/console doctrine:fixtures:load
 ```
 
+## 🚀 CI/CD
+
+Le projet utilise GitHub Actions pour l'intégration continue et les analyses de sécurité.
+
+### Workflows
+
+#### CI (Intégration Continue)
+- Exécute les tests PHPUnit
+- Vérifie la qualité du code (PHP CS Fixer)
+- Analyse statique du code (PHPStan)
+- Génère et upload la couverture de code
+- Déclenché sur push et pull requests
+
+#### Sécurité
+- Analyse de sécurité hebdomadaire
+- Vérification des dépendances
+- Audit de sécurité du code
+- Scan Snyk
+- Génération de rapports de sécurité
+
+### Configuration requise
+- SNYK_TOKEN (optionnel, pour les scans de sécurité avancés)
+
+## 🛍️ Configuration E-commerce
+
+Le site peut fonctionner en deux modes :
+- **Mode E-commerce** : Toutes les fonctionnalités e-commerce sont activées (produits, panier, paiement)
+- **Mode Vitrine** : Le site fonctionne comme une vitrine, sans les fonctionnalités e-commerce
+
+### Changer de mode
+
+1. Accéder à l'interface d'administration (/admin)
+2. Aller dans "Configuration du site"
+3. Dans la section "E-commerce" :
+   - Activer/désactiver la e-boutique avec le bouton
+   - Personnaliser le message affiché quand la boutique est désactivée
+4. Sauvegarder les changements
+
+### Effets du mode vitrine
+- Les pages produits ne sont plus accessibles
+- Le lien "Produits" est masqué dans la navigation
+- Les utilisateurs sont redirigés vers la page d'accueil
+- Un message personnalisé est affiché
+
 ## 🧪 Tests
 
 Exécuter les tests unitaires :

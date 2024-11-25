@@ -29,11 +29,11 @@ class SiteConfiguration
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $contactPhone = null;
 
-    #[ORM\Column]
-    private ?bool $ecommerceEnabled = null;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $ecommerceDisabledMessage = null;
+
+    #[ORM\Column]
+    private ?bool $isEcommerceEnabled = true;
 
     #[ORM\Column(type: 'datetime_immutable')]
     private ?\DateTimeImmutable $createdAt = null;
@@ -46,7 +46,7 @@ class SiteConfiguration
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
         $this->maintenanceMode = false;
-        $this->ecommerceEnabled = true;
+        $this->isEcommerceEnabled = true;
     }
 
     public function getId(): ?int
@@ -114,18 +114,6 @@ class SiteConfiguration
         return $this;
     }
 
-    public function isEcommerceEnabled(): ?bool
-    {
-        return $this->ecommerceEnabled;
-    }
-
-    public function setEcommerceEnabled(bool $ecommerceEnabled): static
-    {
-        $this->ecommerceEnabled = $ecommerceEnabled;
-
-        return $this;
-    }
-
     public function getEcommerceDisabledMessage(): ?string
     {
         return $this->ecommerceDisabledMessage;
@@ -135,6 +123,17 @@ class SiteConfiguration
     {
         $this->ecommerceDisabledMessage = $ecommerceDisabledMessage;
 
+        return $this;
+    }
+
+    public function isEcommerceEnabled(): ?bool
+    {
+        return $this->isEcommerceEnabled;
+    }
+
+    public function setIsEcommerceEnabled(bool $isEcommerceEnabled): static
+    {
+        $this->isEcommerceEnabled = $isEcommerceEnabled;
         return $this;
     }
 
