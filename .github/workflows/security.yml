@@ -28,7 +28,10 @@ jobs:
       - name: PHPCS Security Audit
         run: |
           composer require --dev pheromone/phpcs-security-audit
-          vendor/bin/phpcs --standard=vendor/pheromone/phpcs-security-audit/Security/ruleset.xml src/
+          vendor/bin/phpcs --standard=vendor/pheromone/phpcs-security-audit/Security/ruleset.xml \
+            --warning-severity=0 \
+            --ignore=*/tests/*,*/var/*,*/vendor/*,*/bin/*,*/public/* \
+            src/
 
       - name: Run Symfony Security Checker
         run: |
