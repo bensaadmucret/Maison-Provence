@@ -14,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
@@ -95,6 +96,17 @@ class ProductCrudController extends AbstractCrudController
         yield NumberField::new('stock', 'Stock');
         yield AssociationField::new('category', 'Catégorie');
         yield BooleanField::new('isActive', 'Actif');
+        yield ImageField::new('image', 'Image')
+            ->setBasePath('/uploads/images')
+            ->setUploadDir('public/uploads/images')
+            ->setUploadedFileNamePattern('[randomhash].[extension]')
+            ->setFormTypeOptions([
+                'required' => false,
+                'attr' => [
+                    'accept' => 'image/*'
+                ]
+            ])
+            ->onlyOnForms();
         yield DateTimeField::new('createdAt', 'Créé le')
             ->hideOnForm();
         yield DateTimeField::new('updatedAt', 'Mis à jour le')
@@ -176,6 +188,8 @@ class ProductCrudController extends AbstractCrudController
             $entityManager->persist($seo);
         }
 
+        $entityInstance->setUpdatedAt(new \DateTimeImmutable());
+        $entityManager->persist($entityInstance);
         $entityManager->flush();
     }
 }

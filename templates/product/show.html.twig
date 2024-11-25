@@ -37,7 +37,7 @@
         <div class="space-y-4">
             <div class="relative aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
                 {% if product.image %}
-                    <img src="{{ asset('uploads/products/' ~ product.image) }}" 
+                    <img src="{{ asset('/uploads/images/' ~ product.image) }}" 
                          alt="{{ product.name }}"
                          class="w-full h-full object-cover rounded-lg shadow-lg">
                 {% else %}
@@ -93,7 +93,7 @@
                        class="group">
                         <div class="aspect-square rounded-lg overflow-hidden mb-4 bg-gray-100">
                             {% if similarProduct.image %}
-                                <img src="{{ asset('uploads/products/' ~ similarProduct.image) }}" 
+                                <img src="{{ asset('/uploads/images/' ~ similarProduct.image) }}" 
                                      alt="{{ similarProduct.name }}"
                                      class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             {% else %}

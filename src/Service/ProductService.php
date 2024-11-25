@@ -98,7 +98,7 @@ class ProductService
             ->where('p.category = :category')
             ->andWhere('p.id != :productId')
             ->andWhere('p.isActive = true')
-            ->setParameter('category', $product->getCategory())
+            ->setParameter('category', $product->getCategory()->getId())
             ->setParameter('productId', $product->getId())
             ->setMaxResults($limit)
             ->orderBy('RANDOM()', 'ASC')
