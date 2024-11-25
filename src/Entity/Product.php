@@ -57,9 +57,14 @@ class Product
     public function __construct()
     {
         $this->media = new ArrayCollection();
+        $this->isActive = true;
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
-        $this->isActive = true;
+    }
+
+    public function __toString(): string
+    {
+        return $this->name ?? '';
     }
 
     public function getId(): ?int

@@ -44,6 +44,11 @@ class MediaCollection
         $this->updatedAt = new \DateTimeImmutable();
     }
 
+    public function __toString(): string
+    {
+        return $this->name ?? '';
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -54,9 +59,10 @@ class MediaCollection
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): self
     {
         $this->name = $name;
+        $this->updatedAt = new \DateTimeImmutable();
 
         return $this;
     }
@@ -66,9 +72,10 @@ class MediaCollection
         return $this->description;
     }
 
-    public function setDescription(?string $description): static
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+        $this->updatedAt = new \DateTimeImmutable();
 
         return $this;
     }
@@ -78,9 +85,10 @@ class MediaCollection
         return $this->type;
     }
 
-    public function setType(string $type): static
+    public function setType(?string $type): self
     {
         $this->type = $type;
+        $this->updatedAt = new \DateTimeImmutable();
 
         return $this;
     }
@@ -90,9 +98,10 @@ class MediaCollection
         return $this->settings;
     }
 
-    public function setSettings(?array $settings): static
+    public function setSettings(?array $settings): self
     {
         $this->settings = $settings;
+        $this->updatedAt = new \DateTimeImmutable();
 
         return $this;
     }

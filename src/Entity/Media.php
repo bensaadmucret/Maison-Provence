@@ -4,14 +4,20 @@ namespace App\Entity;
 
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
+#[Vich\Uploadable]
 class Media
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[Vich\UploadableField(mapping: 'media_image', fileNameProperty: 'filename')]
+    private ?File $imageFile = null;
 
     #[ORM\Column(length: 255)]
     private ?string $filename = null;
@@ -46,6 +52,25 @@ class Media
         $this->updatedAt = new \DateTimeImmutable();
     }
 
+    public function __toString(): string
+    {
+        return $this->title ?? $this->filename ?? '';
+    }
+
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -56,7 +81,7 @@ class Media
         return $this->filename;
     }
 
-    public function setFilename(string $filename): static
+    public function setFilename(?string $filename): self
     {
         $this->filename = $filename;
 
@@ -73,7 +98,7 @@ class Media
         return $this->title;
     }
 
-    public function setTitle(?string $title): static
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
 
@@ -85,7 +110,7 @@ class Media
         return $this->alt;
     }
 
-    public function setAlt(?string $alt): static
+    public function setAlt(?string $alt): self
     {
         $this->alt = $alt;
 
@@ -97,7 +122,7 @@ class Media
         return $this->position;
     }
 
-    public function setPosition(?int $position): static
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
 
@@ -109,7 +134,7 @@ class Media
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
 
@@ -121,7 +146,7 @@ class Media
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -133,7 +158,7 @@ class Media
         return $this->type;
     }
 
-    public function setType(string $type): static
+    public function setType(?string $type): self
     {
         $this->type = $type;
 
@@ -145,7 +170,7 @@ class Media
         return $this->product;
     }
 
-    public function setProduct(?Product $product): static
+    public function setProduct(?Product $product): self
     {
         $this->product = $product;
 
@@ -157,7 +182,7 @@ class Media
         return $this->collection;
     }
 
-    public function setCollection(?MediaCollection $collection): static
+    public function setCollection(?MediaCollection $collection): self
     {
         $this->collection = $collection;
 
