@@ -17,16 +17,24 @@ class ProductSEO extends SEO
 
     public function setProduct(?Product $product): static
     {
-        if ($product === null && $this->product !== null) {
+        if (null === $product && null !== $this->product) {
             $this->product->setSeo(null);
         }
 
-        if ($product !== null && $product->getSeo() !== $this) {
+        if (null !== $product && $product->getSeo() !== $this) {
             $product->setSeo($this);
         }
 
         $this->product = $product;
 
+        return $this;
+    }
+
+    public function setOgImage(?string $ogImage): self
+    {
+        $openGraphData = $this->getOpenGraphData();
+        $openGraphData['image'] = $ogImage;
+        $this->setOpenGraphData($openGraphData);
         return $this;
     }
 }

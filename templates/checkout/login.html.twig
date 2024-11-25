@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion ou Inscription - Checkout{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Résumé du panier -->
+        <div class="col-md-4 order-md-2 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Résumé du panier</h4>
+                </div>
+                <div class="card-body">
+                    {% for item in cart.items %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="my-0">{{ item.product.name }}</h6>
+                            <small class="text-muted">Quantité: {{ item.quantity }}</small>
+                        </div>
+                        <span class="text-muted">{{ (item.price * item.quantity)|number_format(2, ',', ' ') }} €</span>
+                    </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span>Total</span>
+                        <strong>{{ cart.total|number_format(2, ',', ' ') }} €</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Options de connexion/inscription -->
+        <div class="col-md-8 order-md-1">
+            <div class="row">
+                <!-- Option Connexion -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Déjà client ?</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <p>Connectez-vous pour continuer votre commande</p>
+                            <a href="{{ path('app_login') }}" class="btn btn-primary mt-auto">Se connecter</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Option Inscription -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-success text-white">
+                            <h4 class="mb-0">Nouveau client ?</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <div class="mb-4">
+                                <h5>Avantages de la création d'un compte :</h5>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i> Suivi de vos commandes</li>
+                                    <li><i class="fas fa-check text-success me-2"></i> Historique d'achats</li>
+                                    <li><i class="fas fa-check text-success me-2"></i> Adresses sauvegardées</li>
+                                    <li><i class="fas fa-check text-success me-2"></i> Promotions exclusives</li>
+                                </ul>
+                            </div>
+                            <a href="{{ path('app_register') }}" class="btn btn-success mt-auto">Créer un compte</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

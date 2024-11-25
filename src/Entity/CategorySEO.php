@@ -21,7 +21,7 @@ class CategorySEO extends SEO
     {
         $this->category = $category;
 
-        if ($category !== null && $category->getSeo() !== $this) {
+        if (null !== $category && $category->getSeo() !== $this) {
             $category->setSeo($this);
         }
 

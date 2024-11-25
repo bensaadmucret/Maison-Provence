@@ -6,6 +6,9 @@
 parameters:
     upload_directory: '%kernel.project_dir%/public/uploads'
     images_directory: '%upload_directory%/images'
+    stripe_public_key: '%env(STRIPE_PUBLIC_KEY)%'
+    stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
+    stripe_webhook_secret: '%env(STRIPE_WEBHOOK_SECRET)%'
 
 services:
     # default configuration for services in *this* file
@@ -28,3 +31,7 @@ services:
     App\EventListener\AuthenticationSuccessListener:
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onSecurityInteractiveLogin }
+
+    App\Service\MediaService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'

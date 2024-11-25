@@ -11,12 +11,12 @@ trait SiteConfigurationTrait
 
     protected function getSiteConfiguration(EntityManagerInterface $entityManager): SiteConfiguration
     {
-        if ($this->siteConfiguration === null) {
+        if (null === $this->siteConfiguration) {
             $this->siteConfiguration = $entityManager
                 ->getRepository(SiteConfiguration::class)
                 ->findOneBy([]);
 
-            if ($this->siteConfiguration === null) {
+            if (null === $this->siteConfiguration) {
                 throw new \RuntimeException('Site configuration not found');
             }
         }

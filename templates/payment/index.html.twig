@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement de la commande{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        #payment-element {
+            margin-bottom: 24px;
+        }
+        .spinner {
+            display: none;
+        }
+        #payment-message {
+            color: rgb(105, 115, 134);
+            font-size: 16px;
+            line-height: 20px;
+            padding-top: 12px;
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripe = Stripe('{{ publicKey }}');
+        const options = {
+            clientSecret: '{{ clientSecret }}',
+            appearance: {
+                theme: 'stripe',
+                variables: {
+                    colorPrimary: '#5469d4',
+                }
+            },
+        };
+
+        const elements = stripe.elements(options);
+        const paymentElement = elements.create('payment');
+        paymentElement.mount('#payment-element');
+
+        const form = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit');
+        const spinner = document.getElementById('spinner');
+        const message = document.getElementById('payment-message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setLoading(true);
+
+            const {error} = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    return_url: '{{ url('payment_success') }}',
+                }
+            });
+
+            if (error) {
+                message.textContent = error.message;
+            }
+
+            setLoading(false);
+        });
+
+        function setLoading(isLoading) {
+            submitButton.disabled = isLoading;
+            spinner.style.display = isLoading ? 'inline-block' : 'none';
+            submitButton.textContent = isLoading ? 'Traitement...' : 'Payer maintenant';
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="max-w-2xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">Paiement de votre commande</h1>
+
+        <div class="bg-gray-50 rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Récapitulatif</h2>
+            <div class="space-y-2">
+                <p><span class="font-medium">Référence :</span> {{ order.reference }}</p>
+                <p><span class="font-medium">Total :</span> {{ order.total|number_format(2, ',', ' ') }} €</p>
+            </div>
+        </div>
+
+        <form id="payment-form" class="space-y-6">
+            <div id="payment-element"></div>
+            <button id="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
+                <span id="button-text">Payer maintenant</span>
+                <span id="spinner" class="hidden animate-spin ml-2">⟳</span>
+            </button>
+            <div id="payment-message" class="text-gray-600 text-center mt-4"></div>
+        </form>
+    </div>
+{% endblock %}

@@ -7,7 +7,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class SlugService
 {
     public function __construct(
-        private readonly SluggerInterface $slugger
+        private readonly SluggerInterface $slugger,
     ) {
     }
 

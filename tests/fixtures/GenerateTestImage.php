@@ -18,7 +18,7 @@ class GenerateTestImage
         imagestring($image, 5, 10, 40, 'Test Image', $text_color);
 
         // Save the image
-        $outputPath = __DIR__ . '/test.jpg';
+        $outputPath = __DIR__.'/test.jpg';
         imagejpeg($image, $outputPath);
         imagedestroy($image);
 

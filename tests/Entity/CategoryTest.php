@@ -47,7 +47,7 @@ class CategoryTest extends TestCase
     public function testProductAssociation(): void
     {
         $product = new Product();
-        
+
         $this->category->addProduct($product);
         $this->assertCount(1, $this->category->getProducts());
         $this->assertEquals($this->category, $product->getCategory());
@@ -75,7 +75,7 @@ class CategoryTest extends TestCase
     {
         $seo = new CategorySEO();
         $seo->setCategory($this->category);
-        
+
         $this->assertInstanceOf(CategorySEO::class, $this->category->getSeo());
         $this->assertEquals($seo, $this->category->getSeo());
         $this->assertEquals($this->category, $seo->getCategory());

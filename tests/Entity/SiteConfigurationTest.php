@@ -21,7 +21,7 @@ class SiteConfigurationTest extends TestCase
 
     public function testEcommerceEnabledCanBeChanged(): void
     {
-        $this->siteConfig->setEcommerceEnabled(false);
+        $this->siteConfig->setIsEcommerceEnabled(false);
         $this->assertFalse($this->siteConfig->isEcommerceEnabled());
     }
 

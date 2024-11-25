@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
@@ -17,6 +18,15 @@ class Media
     private ?int $id = null;
 
     #[Vich\UploadableField(mapping: 'media_image', fileNameProperty: 'filename')]
+    #[Assert\NotNull(message: 'Please upload a file')]
+    #[Assert\Image(
+        maxSize: '5M',
+        mimeTypes: ['image/jpeg', 'image/png', 'image/gif'],
+        mimeTypesMessage: 'Please upload a valid image file (JPEG, PNG, GIF)',
+        maxSizeMessage: 'The file is too large ({{ size }} {{ suffix }}). Maximum allowed size is {{ limit }} {{ suffix }}.',
+        detectCorrupted: true,
+        corruptedMessage: 'The image file appears to be corrupted. Please try uploading a different file.',
+    )]
     private ?File $imageFile = null;
 
     #[ORM\Column(length: 255)]

@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes adresses - {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="container my-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1>Mes adresses</h1>
+                <p class="text-muted">Gérez vos adresses de livraison et de facturation.</p>
+            </div>
+            <div class="col-auto">
+                <a href="{{ path('app_address_new') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Ajouter une adresse
+                </a>
+            </div>
+        </div>
+
+        {% if addresses|length > 0 %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for address in addresses %}
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title d-flex justify-content-between align-items-center">
+                                    {{ address.name }}
+                                    <div class="badges">
+                                        {% if address.isDefault %}
+                                            <span class="badge bg-primary">Par défaut</span>
+                                        {% endif %}
+                                        {% if address.isBilling %}
+                                            <span class="badge bg-info">Facturation</span>
+                                        {% endif %}
+                                    </div>
+                                </h5>
+                                <p class="card-text">
+                                    {{ address.fullName }}<br>
+                                    {{ address.street }}<br>
+                                    {% if address.streetComplement %}
+                                        {{ address.streetComplement }}<br>
+                                    {% endif %}
+                                    {{ address.postalCode }} {{ address.city }}<br>
+                                    {{ address.country }}<br>
+                                    {% if address.phone %}
+                                        <i class="fas fa-phone me-2"></i>{{ address.phone }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <div class="btn-group w-100" role="group">
+                                    {% if not address.isDefault %}
+                                        <form action="{{ path('app_address_set_default', {'id': address.id}) }}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-primary btn-sm" title="Définir comme adresse par défaut">
+                                                <i class="fas fa-home"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    {% if not address.isBilling %}
+                                        <form action="{{ path('app_address_set_billing', {'id': address.id}) }}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-info btn-sm" title="Définir comme adresse de facturation">
+                                                <i class="fas fa-file-invoice"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    <a href="{{ path('app_address_edit', {'id': address.id}) }}" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ path('app_address_delete', {'id': address.id}) }}" method="post" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette adresse ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ address.id) }}">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Vous n'avez pas encore ajouté d'adresse. 
+                <a href="{{ path('app_address_new') }}" class="alert-link">Ajoutez votre première adresse</a>.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .card {
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-group .btn {
+            flex: 1;
+        }
+    </style>
+{% endblock %}

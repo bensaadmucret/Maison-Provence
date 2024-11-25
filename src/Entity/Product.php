@@ -233,4 +233,9 @@ class Product
 
         return $this;
     }
+
+    public function getMainImage(): ?Media
+    {
+        return $this->media->first() ?: null;
+    }
 }

@@ -35,9 +35,9 @@ class MediaTest extends TestCase
     {
         $file = $this->createMock(File::class);
         $initialUpdatedAt = $this->media->getUpdatedAt();
-        
+
         $this->media->setImageFile($file);
-        
+
         $this->assertSame($file, $this->media->getImageFile());
         $this->assertNotSame($initialUpdatedAt, $this->media->getUpdatedAt());
     }
@@ -45,9 +45,9 @@ class MediaTest extends TestCase
     public function testNullImageFile(): void
     {
         $initialUpdatedAt = $this->media->getUpdatedAt();
-        
+
         $this->media->setImageFile(null);
-        
+
         $this->assertNull($this->media->getImageFile());
         $this->assertSame($initialUpdatedAt, $this->media->getUpdatedAt());
     }
@@ -56,7 +56,7 @@ class MediaTest extends TestCase
     {
         $product = new Product();
         $this->media->setProduct($product);
-        
+
         $this->assertSame($product, $this->media->getProduct());
     }
 
@@ -64,7 +64,7 @@ class MediaTest extends TestCase
     {
         $collection = new MediaCollection();
         $this->media->setCollection($collection);
-        
+
         $this->assertSame($collection, $this->media->getCollection());
     }
 
@@ -73,14 +73,14 @@ class MediaTest extends TestCase
         // Test with title
         $this->media->setTitle('Test Title');
         $this->media->setFilename('test.jpg');
-        $this->assertEquals('Test Title', (string)$this->media);
+        $this->assertEquals('Test Title', (string) $this->media);
 
         // Test with only filename
         $this->media->setTitle(null);
-        $this->assertEquals('test.jpg', (string)$this->media);
+        $this->assertEquals('test.jpg', (string) $this->media);
 
         // Test with neither
         $this->media->setFilename(null);
-        $this->assertEquals('', (string)$this->media);
+        $this->assertEquals('', (string) $this->media);
     }
 }

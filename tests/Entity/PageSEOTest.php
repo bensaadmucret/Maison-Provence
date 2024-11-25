@@ -2,7 +2,6 @@
 
 namespace App\Tests\Entity;
 
-use App\Entity\Page;
 use App\Entity\PageSEO;
 use PHPUnit\Framework\TestCase;
 

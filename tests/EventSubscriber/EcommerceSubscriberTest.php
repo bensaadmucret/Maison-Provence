@@ -45,7 +45,7 @@ class EcommerceSubscriberTest extends TestCase
 
     public function testEcommerceRouteIsBlockedWhenDisabled(): void
     {
-        $this->siteConfig->setEcommerceEnabled(false);
+        $this->siteConfig->setIsEcommerceEnabled(false);
 
         $event = $this->createRequestEvent('/shop/products');
 
@@ -63,7 +63,7 @@ class EcommerceSubscriberTest extends TestCase
 
     public function testAdminCanAccessEcommerceWhenDisabled(): void
     {
-        $this->siteConfig->setEcommerceEnabled(false);
+        $this->siteConfig->setIsEcommerceEnabled(false);
 
         $event = $this->createRequestEvent('/shop/products');
 

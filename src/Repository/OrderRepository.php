@@ -40,6 +40,15 @@ class OrderRepository extends ServiceEntityRepository
         }
     }
 
+    public function findOneByReference(string $reference): ?Order
+    {
+        return $this->createQueryBuilder('o')
+            ->where('o.reference = :reference')
+            ->setParameter('reference', $reference)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('o')

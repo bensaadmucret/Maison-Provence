@@ -21,6 +21,7 @@ class PageSEO extends SEO
     public function setRoute(string $route): static
     {
         $this->route = $route;
+
         return $this;
     }
 
@@ -32,6 +33,7 @@ class PageSEO extends SEO
     public function setIdentifier(string $identifier): static
     {
         $this->identifier = $identifier;
+
         return $this;
     }
 }

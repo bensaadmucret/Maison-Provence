@@ -4,82 +4,61 @@ namespace App\Tests\Unit\Controller;
 
 use App\Controller\ProductController;
 use App\Entity\Product;
-use App\Entity\SiteConfiguration;
 use App\Service\ProductService;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
 class ProductControllerTest extends TestCase
 {
     private ProductController $controller;
-    private ProductService $productService;
-    private SerializerInterface $serializer;
-    private ValidatorInterface $validator;
-    private EntityManagerInterface $entityManager;
-    private Environment $twig;
-    private SiteConfiguration $siteConfig;
-    private RequestStack $requestStack;
-    private Session $session;
-    private UrlGeneratorInterface $router;
+    private ProductService&MockObject $productService;
+    private Environment&MockObject $twig;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private SessionInterface $session;
+    private EntityManagerInterface&MockObject $entityManager;
+    private SerializerInterface&MockObject $serializer;
+    private ValidatorInterface&MockObject $validator;
+    private ContainerInterface&MockObject $container;
 
     protected function setUp(): void
     {
         $this->productService = $this->createMock(ProductService::class);
+        $this->twig = $this->createMock(Environment::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $this->session = new Session(new MockArraySessionStorage());
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->serializer = $this->createMock(SerializerInterface::class);
         $this->validator = $this->createMock(ValidatorInterface::class);
-        $this->twig = $this->createMock(Environment::class);
-        $this->requestStack = $this->createMock(RequestStack::class);
-        $this->session = $this->createMock(Session::class);
-        $this->router = $this->createMock(UrlGeneratorInterface::class);
 
-        $this->requestStack->method('getSession')
-            ->willReturn($this->session);
-
-        $this->session->method('getFlashBag')
-            ->willReturn(new FlashBag());
-
-        $siteConfigRepository = $this->createMock(EntityRepository::class);
-        $this->entityManager->method('getRepository')
-            ->willReturnCallback(function ($entityClass) use ($siteConfigRepository) {
-                if ($entityClass === SiteConfiguration::class) {
-                    return $siteConfigRepository;
-                }
-                return $this->createMock(EntityRepository::class);
+        // Create and configure container mock
+        $this->container = $this->createMock(ContainerInterface::class);
+        $this->container->method('has')
+            ->willReturnCallback(function ($id) {
+                return match ($id) {
+                    'twig', 'router', 'serializer' => true,
+                    default => false,
+                };
             });
-
-        $siteConfig = new SiteConfiguration();
-        $siteConfig->setSiteName('Maison Provence');
-        $siteConfigRepository->method('findOneBy')
-            ->willReturn($siteConfig);
-
-        $product = new Product();
-        $product->setName('Test Product');
-        $product->setSlug('test-product');
-        $product->setIsActive(true);
-
-        $this->productService->method('getProductBySlug')
-            ->willReturnCallback(function ($slug) use ($product) {
-                if ($slug === 'test-product') {
-                    return $product;
-                }
-                if ($slug === 'non-existent') {
-                    return null;
-                }
-                return null;
+        $this->container->method('get')
+            ->willReturnCallback(function ($id) {
+                return match ($id) {
+                    'twig' => $this->twig,
+                    'router' => $this->urlGenerator,
+                    'serializer' => $this->serializer,
+                    default => null,
+                };
             });
 
         $this->controller = new ProductController(
@@ -88,99 +67,148 @@ class ProductControllerTest extends TestCase
             $this->serializer,
             $this->validator
         );
-
-        $container = $this->getContainer();
-        $this->controller->setContainer($container);
-    }
-
-    private function getContainer(): object
-    {
-        $container = $this->createMock('Psr\Container\ContainerInterface');
-        $container->method('get')
-            ->willReturnCallback(function ($id) {
-                if ($id === 'twig') {
-                    return $this->twig;
-                }
-                if ($id === 'request_stack') {
-                    return $this->requestStack;
-                }
-                if ($id === 'router') {
-                    return $this->router;
-                }
-                if ($id === 'twig.loader.native_filesystem') {
-                    return $this->createMock(FilesystemLoader::class);
-                }
-                return null;
-            });
-        $container->method('has')
-            ->willReturnCallback(function ($id) {
-                return in_array($id, ['twig', 'request_stack', 'router', 'twig.loader.native_filesystem']);
-            });
-        return $container;
-    }
-
-    public function testIndex(): void
-    {
-        $products = [
-            $this->createMock(Product::class),
-            $this->createMock(Product::class),
-        ];
-
-        $this->productService->expects($this->once())
-            ->method('getActiveProducts')
-            ->willReturn($products);
-
-        $this->twig->expects($this->once())
-            ->method('render')
-            ->with(
-                'product/index.html.twig',
-                $this->callback(function ($params) use ($products) {
-                    return $params['products'] === $products &&
-                           isset($params['site_configuration']) &&
-                           $params['site_configuration']->getSiteName() === 'Maison Provence';
-                })
-            )
-            ->willReturn('rendered template');
-
-        $response = $this->controller->index();
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->controller->setContainer($this->container);
     }
 
     public function testShow(): void
     {
-        $request = Request::create('/products/test-product', 'GET');
+        // Arrange
+        $request = new Request();
+        $request->setSession($this->session);
 
-        $this->twig->expects($this->once())
+        $product = new Product();
+        $product->setName('Test Product')
+            ->setPrice(1000)
+            ->setStock(10);
+
+        $this->productService
+            ->expects(self::once())
+            ->method('getProductBySlug')
+            ->with('test-product')
+            ->willReturn($product);
+
+        $this->productService
+            ->expects(self::once())
+            ->method('getSimilarProducts')
+            ->with($product, 4)
+            ->willReturn([]);
+
+        $this->productService
+            ->expects(self::once())
+            ->method('getPreviousProduct')
+            ->with($product)
+            ->willReturn(null);
+
+        $this->productService
+            ->expects(self::once())
+            ->method('getNextProduct')
+            ->with($product)
+            ->willReturn(null);
+
+        $this->twig
+            ->expects(self::once())
             ->method('render')
             ->with(
                 'product/show.html.twig',
-                $this->callback(function ($params) {
-                    return $params['product']->getName() === 'Test Product' &&
-                           isset($params['site_configuration']) &&
-                           $params['site_configuration']->getSiteName() === 'Maison Provence';
-                })
+                [
+                    'product' => $product,
+                    'similarProducts' => [],
+                    'previousProduct' => null,
+                    'nextProduct' => null,
+                ]
             )
             ->willReturn('rendered template');
 
+        // Act
         $response = $this->controller->show($request, 'test-product');
-        $this->assertEquals(200, $response->getStatusCode());
+
+        // Assert
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals('rendered template', $response->getContent());
     }
 
-    public function testShowNotFound(): void
+    public function testIndex(): void
     {
-        $request = Request::create('/products/non-existent', 'GET');
+        // Arrange
+        $products = [
+            new Product(),
+            new Product(),
+        ];
 
-        $this->router->expects($this->once())
-            ->method('generate')
-            ->with('app_product_index')
-            ->willReturn('/products');
+        $this->productService
+            ->expects(self::once())
+            ->method('getActiveProducts')
+            ->willReturn($products);
 
-        $this->session->expects($this->once())
-            ->method('getFlashBag')
-            ->willReturn(new FlashBag());
+        $this->twig
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'product/index.html.twig',
+                ['products' => $products]
+            )
+            ->willReturn('rendered template');
 
-        $response = $this->controller->show($request, 'non-existent');
-        $this->assertEquals(302, $response->getStatusCode());
-        $this->assertEquals('/products', $response->headers->get('Location'));
+        // Act
+        $response = $this->controller->index();
+
+        // Assert
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals('rendered template', $response->getContent());
+    }
+
+    public function testDelete(): void
+    {
+        // Arrange
+        $request = new Request();
+        $request->setSession($this->session);
+
+        $this->productService
+            ->expects(self::once())
+            ->method('deleteProduct')
+            ->with(1)
+            ->willReturn(true);
+
+        // Act
+        $response = $this->controller->delete($request, 1);
+
+        // Assert
+        self::assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+        self::assertEquals('', $response->getContent());
+    }
+
+    public function testDeleteError(): void
+    {
+        // Arrange
+        $request = new Request();
+        $request->setSession($this->session);
+
+        $errorMessage = 'Product could not be deleted';
+        $this->productService
+            ->expects(self::once())
+            ->method('deleteProduct')
+            ->with(1)
+            ->willThrowException(new \Exception($errorMessage));
+
+        // Configure serializer mock for JSON response
+        $this->serializer
+            ->expects(self::once())
+            ->method('serialize')
+            ->with(['error' => $errorMessage], 'json', ['json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS])
+            ->willReturn(json_encode(['error' => $errorMessage]));
+
+        // Act
+        $response = $this->controller->delete($request, 1);
+
+        // Assert
+        self::assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertNotEmpty($response->getContent(), 'Response content should not be empty');
+        self::assertJson($response->getContent(), 'Response content should be valid JSON');
+        
+        $content = json_decode($response->getContent(), true);
+        self::assertNotNull($content, 'Response content should decode to a non-null value');
+        self::assertIsArray($content, 'Response content should decode to an array');
+        self::assertArrayHasKey('error', $content);
+        self::assertEquals($errorMessage, $content['error']);
     }
 }

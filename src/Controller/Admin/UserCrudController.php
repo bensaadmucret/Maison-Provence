@@ -26,7 +26,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class UserCrudController extends AbstractCrudController
 {
     public function __construct(
-        private UserPasswordHasherInterface $passwordHasher
+        private UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 
@@ -47,32 +47,32 @@ class UserCrudController extends AbstractCrudController
             ->setPageTitle('edit', 'Modifier l\'utilisateur')
             ->setPageTitle('detail', 'Détails de l\'utilisateur')
             ->setFormOptions([
-                'validation_groups' => ['Default', 'create']
+                'validation_groups' => ['Default', 'create'],
             ]);
     }
 
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->hideOnForm();
-        
+
         yield EmailField::new('email', 'Email')
             ->setFormTypeOption('attr', [
                 'placeholder' => 'exemple@email.com',
-                'required' => true
+                'required' => true,
             ]);
-            
+
         yield TextField::new('firstName', 'Prénom')
             ->setFormType(TextType::class)
             ->setFormTypeOption('attr', [
                 'placeholder' => 'Prénom',
-                'required' => true
+                'required' => true,
             ]);
-            
+
         yield TextField::new('lastName', 'Nom')
             ->setFormType(TextType::class)
             ->setFormTypeOption('attr', [
                 'placeholder' => 'Nom',
-                'required' => true
+                'required' => true,
             ]);
 
         if (Crud::PAGE_NEW === $pageName || Crud::PAGE_EDIT === $pageName) {
@@ -81,7 +81,7 @@ class UserCrudController extends AbstractCrudController
                 ->setRequired(Crud::PAGE_NEW === $pageName)
                 ->setFormTypeOption('attr', [
                     'placeholder' => Crud::PAGE_NEW === $pageName ? 'Mot de passe' : 'Laisser vide pour ne pas modifier',
-                    'required' => Crud::PAGE_NEW === $pageName
+                    'required' => Crud::PAGE_NEW === $pageName,
                 ]);
         }
 

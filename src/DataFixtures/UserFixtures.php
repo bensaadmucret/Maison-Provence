@@ -23,13 +23,13 @@ class UserFixtures extends Fixture
         $admin->setRoles(['ROLE_ADMIN']);
         $admin->setFirstName('Admin');
         $admin->setLastName('System');
-        
+
         $hashedPassword = $this->passwordHasher->hashPassword(
             $admin,
             'admin'  // Default password, should be changed in production
         );
         $admin->setPassword($hashedPassword);
-        
+
         $manager->persist($admin);
         $manager->flush();
     }

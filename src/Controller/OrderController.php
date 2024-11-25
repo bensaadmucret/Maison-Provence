@@ -3,22 +3,26 @@
 namespace App\Controller;
 
 use App\DTO\OrderDTO;
+use App\Repository\OrderRepository;
 use App\Service\OrderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/orders')]
+#[IsGranted('ROLE_USER')]
 class OrderController extends AbstractController
 {
     public function __construct(
         private readonly OrderService $orderService,
         private readonly SerializerInterface $serializer,
         private readonly ValidatorInterface $validator,
+        private readonly OrderRepository $orderRepository,
     ) {
     }
 
@@ -105,5 +109,24 @@ class OrderController extends AbstractController
         $orders = $this->orderService->getOrdersByDateRange($start, $end);
 
         return $this->json($orders);
+    }
+
+    #[Route('/show/{reference}', name: 'app_order_show')]
+    public function show(string $reference): Response
+    {
+        $order = $this->orderRepository->findOneByReference($reference);
+
+        if (!$order) {
+            throw $this->createNotFoundException('Commande non trouvée');
+        }
+
+        // Vérifier que l'utilisateur est le propriétaire de la commande
+        if ($order->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return $this->render('order/show.html.twig', [
+            'order' => $order,
+        ]);
     }
 }

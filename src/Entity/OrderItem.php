@@ -26,7 +26,7 @@ class OrderItem
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'orderItems')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'order_id', nullable: false)]
     private ?Order $orderRef = null;
 
     #[ORM\ManyToOne]
@@ -66,6 +66,11 @@ class OrderItem
         $this->price = $price;
 
         return $this;
+    }
+
+    public function getSubtotal(): float
+    {
+        return $this->price * $this->quantity;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
@@ -114,5 +119,10 @@ class OrderItem
         $this->product = $product;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf('OrderItem #%d: %d x %s', $this->id, $this->quantity, $this->product?->getName() ?? 'Unknown Product');
     }
 }

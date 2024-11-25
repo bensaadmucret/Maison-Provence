@@ -49,7 +49,7 @@ class ProductSEOTest extends TestCase
     public function testProductAssociation(): void
     {
         $product = new Product();
-        
+
         $this->productSEO->setProduct($product);
         $this->assertSame($product, $this->productSEO->getProduct());
     }

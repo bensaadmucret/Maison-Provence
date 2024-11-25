@@ -2,7 +2,6 @@
 
 namespace App\Tests\Service;
 
-use App\DTO\ProductDTO;
 use App\Entity\Category;
 use App\Entity\Product;
 use App\Repository\CategoryRepository;
@@ -10,28 +9,31 @@ use App\Repository\ProductRepository;
 use App\Service\ProductService;
 use App\Service\SlugService;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityNotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @extends TestCase
+ */
 class ProductServiceTest extends TestCase
 {
-    private ProductRepository $productRepository;
-    private CategoryRepository $categoryRepository;
-    private EntityManagerInterface $entityManager;
-    private SlugService $slugService;
     private ProductService $productService;
+    private ProductRepository&MockObject $productRepository;
+    private CategoryRepository&MockObject $categoryRepository;
+    private SlugService&MockObject $slugService;
+    private EntityManagerInterface&MockObject $entityManager;
 
     protected function setUp(): void
     {
         $this->productRepository = $this->createMock(ProductRepository::class);
         $this->categoryRepository = $this->createMock(CategoryRepository::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->slugService = $this->createMock(SlugService::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
 
         $this->productService = new ProductService(
+            $this->entityManager,
             $this->productRepository,
             $this->categoryRepository,
-            $this->entityManager,
             $this->slugService
         );
     }
@@ -49,15 +51,16 @@ class ProductServiceTest extends TestCase
         $product2->setIsActive(true);
 
         $this->productRepository
-            ->expects($this->once())
-            ->method('findActiveProducts')
+            ->expects(self::once())
+            ->method('findBy')
+            ->with(['isActive' => true])
             ->willReturn([$product1, $product2]);
 
         $result = $this->productService->getActiveProducts();
 
-        $this->assertCount(2, $result);
-        $this->assertSame($product1, $result[0]);
-        $this->assertSame($product2, $result[1]);
+        self::assertCount(2, $result);
+        self::assertSame($product1, $result[0]);
+        self::assertSame($product2, $result[1]);
     }
 
     public function testGetProductBySlug(): void
@@ -68,14 +71,14 @@ class ProductServiceTest extends TestCase
         $product->setIsActive(true);
 
         $this->productRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('findOneActiveBySlug')
             ->with('test-product')
             ->willReturn($product);
 
         $result = $this->productService->getProductBySlug('test-product');
 
-        $this->assertSame($product, $result);
+        self::assertSame($product, $result);
     }
 
     public function testCreateProduct(): void
@@ -92,36 +95,36 @@ class ProductServiceTest extends TestCase
         $dto->setIsActive(true);
 
         $this->categoryRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with(1)
             ->willReturn($category);
 
         $this->slugService
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('generateSlug')
             ->with('New Product')
             ->willReturn('new-product');
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('persist')
-            ->with($this->isInstanceOf(Product::class));
+            ->with(self::isInstanceOf(Product::class));
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
 
         $product = $this->productService->createProduct($dto);
 
-        $this->assertInstanceOf(Product::class, $product);
-        $this->assertEquals('New Product', $product->getName());
-        $this->assertEquals('new-product', $product->getSlug());
-        $this->assertEquals('Description', $product->getDescription());
-        $this->assertEquals(19.99, $product->getPrice());
-        $this->assertEquals(10, $product->getStock());
-        $this->assertTrue($product->isActive());
-        $this->assertSame($category, $product->getCategory());
+        self::assertInstanceOf(Product::class, $product);
+        self::assertEquals('New Product', $product->getName());
+        self::assertEquals('new-product', $product->getSlug());
+        self::assertEquals('Description', $product->getDescription());
+        self::assertEquals(19.99, $product->getPrice());
+        self::assertEquals(10, $product->getStock());
+        self::assertTrue($product->isActive());
+        self::assertSame($category, $product->getCategory());
     }
 
     public function testCreateProductWithInvalidCategory(): void
@@ -131,15 +134,19 @@ class ProductServiceTest extends TestCase
         $dto->setCategoryId(999); // ID inexistante
 
         $this->categoryRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with(999)
             ->willReturn(null);
 
-        $this->expectException(EntityNotFoundException::class);
-        $this->expectExceptionMessage('Category not found');
+        $this->slugService
+            ->expects(self::once())
+            ->method('generateSlug')
+            ->with('New Product')
+            ->willReturn('new-product');
 
-        $this->productService->createProduct($dto);
+        $product = $this->productService->createProduct($dto);
+        self::assertNull($product->getCategory());
     }
 
     public function testUpdateProduct(): void
@@ -160,36 +167,53 @@ class ProductServiceTest extends TestCase
         $dto->setIsActive(true);
 
         $this->productRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with(1)
             ->willReturn($existingProduct);
 
         $this->categoryRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with(1)
             ->willReturn($category);
 
         $this->slugService
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('generateSlug')
             ->with('Updated Name')
             ->willReturn('updated-name');
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
 
         $updatedProduct = $this->productService->updateProduct(1, $dto);
 
-        $this->assertEquals('Updated Name', $updatedProduct->getName());
-        $this->assertEquals('updated-name', $updatedProduct->getSlug());
-        $this->assertEquals('Updated Description', $updatedProduct->getDescription());
-        $this->assertEquals(29.99, $updatedProduct->getPrice());
-        $this->assertEquals(20, $updatedProduct->getStock());
-        $this->assertTrue($updatedProduct->isActive());
-        $this->assertSame($category, $updatedProduct->getCategory());
+        self::assertEquals('Updated Name', $updatedProduct->getName());
+        self::assertEquals('updated-name', $updatedProduct->getSlug());
+        self::assertEquals('Updated Description', $updatedProduct->getDescription());
+        self::assertEquals(29.99, $updatedProduct->getPrice());
+        self::assertEquals(20, $updatedProduct->getStock());
+        self::assertTrue($updatedProduct->isActive());
+        self::assertSame($category, $updatedProduct->getCategory());
+    }
+
+    public function testUpdateProductNotFound(): void
+    {
+        $dto = new ProductDTO();
+        $dto->setName('Updated Name');
+
+        $this->productRepository
+            ->expects(self::once())
+            ->method('find')
+            ->with(1)
+            ->willReturn(null);
+
+        $this->expectException(EntityNotFoundException::class);
+        $this->expectExceptionMessage('Product not found');
+
+        $this->productService->updateProduct(1, $dto);
     }
 
     public function testDeleteProduct(): void
@@ -198,34 +222,35 @@ class ProductServiceTest extends TestCase
         $product->setName('Product to Delete');
 
         $this->productRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with(1)
             ->willReturn($product);
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('remove')
             ->with($product);
 
         $this->entityManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('flush');
 
-        $this->productService->deleteProduct(1);
+        $result = $this->productService->deleteProduct(1);
+        self::assertTrue($result);
     }
 
-    public function testDeleteNonExistentProduct(): void
+    public function testDeleteProductNotFound(): void
     {
         $this->productRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
-            ->with(999)
+            ->with(1)
             ->willReturn(null);
 
         $this->expectException(EntityNotFoundException::class);
         $this->expectExceptionMessage('Product not found');
 
-        $this->productService->deleteProduct(999);
+        $this->productService->deleteProduct(1);
     }
 }

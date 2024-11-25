@@ -46,25 +46,6 @@ class ProductRepository extends ServiceEntityRepository
 
     public function findOneActiveBySlug(string $slug): ?Product
     {
-        error_log('Début de findOneActiveBySlug avec slug : ' . $slug);
-        
-        // Vérifier d'abord si le slug existe dans la base de données
-        $allProducts = $this->createQueryBuilder('p')
-            ->select('p.id, p.slug, p.isActive, p.name')
-            ->getQuery()
-            ->getArrayResult();
-            
-        error_log('Tous les produits dans la base :');
-        foreach ($allProducts as $product) {
-            error_log(sprintf(
-                'ID: %d, Nom: %s, Slug: %s, Actif: %s',
-                $product['id'],
-                $product['name'],
-                $product['slug'],
-                $product['isActive'] ? 'oui' : 'non'
-            ));
-        }
-        
         $qb = $this->createQueryBuilder('p');
         
         $result = $qb
@@ -73,39 +54,36 @@ class ProductRepository extends ServiceEntityRepository
             ->setParameter('slug', $slug)
             ->setParameter('active', true)
             ->getQuery()
-            ->getResult();
+            ->getOneOrNullResult();
 
-        if (empty($result)) {
-            // Vérifions si le produit existe mais n'est pas actif
+        if (!$result) {
+            // Log if product exists but is inactive
             $inactiveProduct = $this->createQueryBuilder('p')
-                ->select('p.id, p.name, p.slug, p.isActive')
+                ->select('p')
                 ->where('p.slug = :slug')
                 ->setParameter('slug', $slug)
                 ->getQuery()
-                ->getArrayResult();
+                ->getOneOrNullResult();
 
-            if (!empty($inactiveProduct)) {
-                error_log('Produit trouvé mais inactif : ' . json_encode($inactiveProduct[0]));
+            if ($inactiveProduct instanceof Product) {
+                error_log(sprintf(
+                    'Product found but inactive - ID: %d, Name: %s, Slug: %s',
+                    $inactiveProduct->getId(),
+                    $inactiveProduct->getName(),
+                    $inactiveProduct->getSlug()
+                ));
             } else {
-                error_log('Aucun produit trouvé avec le slug : ' . $slug);
+                error_log('No product found with slug: ' . $slug);
             }
-            
-            // Log de la requête SQL
-            $sql = $qb->getQuery()->getSQL();
-            $params = $qb->getQuery()->getParameters();
-            error_log('Requête SQL : ' . $sql);
-            error_log('Paramètres : ' . json_encode($params->map(function($param) {
-                return [$param->getName() => $param->getValue()];
-            })->toArray()));
         } else {
-            error_log('Produit trouvé : ' . json_encode([
-                'id' => $result[0]->getId(),
-                'name' => $result[0]->getName(),
-                'slug' => $result[0]->getSlug(),
-                'isActive' => $result[0]->isActive()
-            ]));
+            error_log(sprintf(
+                'Active product found - ID: %d, Name: %s, Slug: %s',
+                $result->getId(),
+                $result->getName(),
+                $result->getSlug()
+            ));
         }
 
-        return $result ? $result[0] : null;
+        return $result;
     }
 }

@@ -18,9 +18,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
-use Twig\TwigFunction;
 use Twig\Loader\FilesystemLoader;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
+use Twig\TwigFunction;
 
 class ImportMapExtension extends AbstractExtension
 {
@@ -42,14 +42,14 @@ class AppExtension extends AbstractExtension implements GlobalsInterface
     public function getGlobals(): array
     {
         return [
-            'app' => (object)[
+            'app' => (object) [
                 'user' => null,
                 'request' => null,
                 'session' => null,
                 'flashes' => [],
                 'environment' => 'test',
-                'debug' => true
-            ]
+                'debug' => true,
+            ],
         ];
     }
 }
@@ -66,14 +66,14 @@ class ProductShowTemplateTest extends TestCase
     protected function setUp(): void
     {
         $loader = new FilesystemLoader([
-            __DIR__ . '/../../templates'
+            __DIR__.'/../../templates',
         ]);
-        
+
         $this->twig = new Environment($loader, [
             'debug' => true,
             'cache' => false,
             'strict_variables' => true,
-            'optimizations' => 0
+            'optimizations' => 0,
         ]);
 
         // Mock EntityManager et Repository pour SiteConfigurationExtension
@@ -89,13 +89,13 @@ class ProductShowTemplateTest extends TestCase
             ->willReturn($repository);
 
         $this->siteConfigExtension = new SiteConfigurationExtension($entityManager);
-        
+
         // Créer une vraie instance de RoutingExtension avec un générateur d'URL mocké
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->method('generate')
             ->willReturn('#');
         $this->routingExtension = new RoutingExtension($urlGenerator);
-        
+
         // Créer une vraie instance de AssetExtension
         $defaultPackage = new Package(new EmptyVersionStrategy());
         $packages = new Packages($defaultPackage);
@@ -104,7 +104,7 @@ class ProductShowTemplateTest extends TestCase
         // Mock RuntimeLoader for Twig extensions
         $runtimeLoader = $this->createMock(RuntimeLoaderInterface::class);
         $this->twig->addRuntimeLoader($runtimeLoader);
-        
+
         // Add all required extensions
         $this->twig->addExtension(new AppExtension());
         $this->twig->addExtension(new ImportMapExtension());
@@ -144,7 +144,7 @@ class ProductShowTemplateTest extends TestCase
 
         // Créer des produits similaires
         $similarProducts = [];
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             $similarProduct = new Product();
             $similarProduct->setName("Produit similaire $i");
             $similarProduct->setPrice(50 + $i);

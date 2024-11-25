@@ -32,7 +32,7 @@ class MediaCollectionTest extends TestCase
     public function testMediaManagement(): void
     {
         $media = new Media();
-        
+
         // Test adding media
         $this->collection->addMedia($media);
         $this->assertCount(1, $this->collection->getMedia());
@@ -51,7 +51,7 @@ class MediaCollectionTest extends TestCase
         $settings = [
             'autoplay' => true,
             'delay' => 5000,
-            'transition' => 'fade'
+            'transition' => 'fade',
         ];
 
         $this->collection->setSettings($settings);
@@ -61,16 +61,16 @@ class MediaCollectionTest extends TestCase
     public function testToString(): void
     {
         $this->collection->setName('Test Collection');
-        $this->assertEquals('Test Collection', (string)$this->collection);
+        $this->assertEquals('Test Collection', (string) $this->collection);
 
         $this->collection->setName(null);
-        $this->assertEquals('', (string)$this->collection);
+        $this->assertEquals('', (string) $this->collection);
     }
 
     public function testType(): void
     {
         $types = ['carousel', 'grid', 'masonry'];
-        
+
         foreach ($types as $type) {
             $this->collection->setType($type);
             $this->assertEquals($type, $this->collection->getType());
@@ -83,7 +83,7 @@ class MediaCollectionTest extends TestCase
         $initialUpdatedAt = $this->collection->getUpdatedAt();
 
         sleep(1); // Ensure time difference
-        
+
         $this->collection->setName('New Name');
         $newUpdatedAt = $this->collection->getUpdatedAt();
 

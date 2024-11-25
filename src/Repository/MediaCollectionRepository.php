@@ -39,6 +39,9 @@ class MediaCollectionRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @return MediaCollection[]
+     */
     public function findByType(string $type): array
     {
         return $this->createQueryBuilder('mc')
@@ -47,5 +50,13 @@ class MediaCollectionRepository extends ServiceEntityRepository
             ->orderBy('mc.name', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return MediaCollection[]
+     */
+    public function findCollectionsByType(string $type): array
+    {
+        return $this->findByType($type);
     }
 }

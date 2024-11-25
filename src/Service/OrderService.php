@@ -4,126 +4,192 @@ namespace App\Service;
 
 use App\DTO\OrderDTO;
 use App\DTO\OrderItemDTO;
+use App\Entity\Cart;
 use App\Entity\Order;
 use App\Entity\OrderItem;
+use App\Entity\Product;
+use App\Entity\User;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityNotFoundException;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Uid\Uuid;
 
-#[AsService]
-#[AutoconfigureTag('app.service')]
 class OrderService
 {
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_PAID = 'paid';
+    public const STATUS_SHIPPED = 'shipped';
+    public const STATUS_DELIVERED = 'delivered';
+    public const STATUS_CANCELLED = 'cancelled';
+
     public function __construct(
-        #[Autowire(service: OrderRepository::class)]
-        private readonly OrderRepository $orderRepository,
-        #[Autowire(service: ProductRepository::class)]
-        private readonly ProductRepository $productRepository,
-        #[Autowire(service: UserRepository::class)]
-        private readonly UserRepository $userRepository,
-        #[Autowire(service: EntityManagerInterface::class)]
         private readonly EntityManagerInterface $entityManager,
+        private readonly OrderRepository $orderRepository,
+        private readonly ProductRepository $productRepository,
+        private readonly UserRepository $userRepository,
+        private readonly Security $security,
     ) {
     }
 
-    public function createOrder(OrderDTO $orderDTO): Order
+    public function createOrder(OrderDTO $orderDTO): ?Order
     {
-        $user = $this->userRepository->find($orderDTO->getUserId());
-        if (!$user) {
-            throw new EntityNotFoundException('User not found');
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return null;
         }
 
         $order = new Order();
-        $order
-            ->setReference(Uuid::v4()->toRfc4122())
-            ->setUser($user)
-            ->setShippingAddress($orderDTO->getShippingAddress())
-            ->setShippingMethod($orderDTO->getShippingMethod())
-            ->setPaymentMethod($orderDTO->getPaymentMethod())
-            ->setStatus('pending');
+        $order->setUser($user);
+        $order->setReference(Uuid::v4()->toRfc4122());
+        $order->setStatus(self::STATUS_PENDING);
+        
+        // Set default addresses from user if available
+        if ($user->getDefaultAddress()) {
+            $order->setShippingAddress($user->getDefaultAddress());
+        }
+        if ($user->getDefaultBillingAddress()) {
+            $order->setBillingAddress($user->getDefaultBillingAddress());
+        }
+        
+        $order->setPaymentMethod($orderDTO->getPaymentMethod() ?? 'stripe');
 
-        $total = 0;
+        $totalAmount = 0.0;
         foreach ($orderDTO->getItems() as $itemDTO) {
-            $orderItem = $this->createOrderItem($itemDTO);
+            $product = $this->productRepository->find($itemDTO->getProductId());
+            if (!$product) {
+                continue;
+            }
+
+            $quantity = max(1, $itemDTO->getQuantity() ?? 1);
+            if ($product->getStock() !== null && $product->getStock() < $quantity) {
+                continue;
+            }
+
+            $orderItem = new OrderItem();
+            $orderItem->setProduct($product);
+            $orderItem->setQuantity((int) $quantity);
+            $orderItem->setPrice((float) $product->getPrice());
+            $orderItem->setOrderRef($order);
+            
+            $totalAmount += $orderItem->getPrice() * $orderItem->getQuantity();
             $order->addOrderItem($orderItem);
-            $total += $orderItem->getPrice() * $orderItem->getQuantity();
+
+            // Update product stock
+            if ($product->getStock() !== null) {
+                $newStock = $product->getStock() - $quantity;
+                if ($newStock >= 0) {
+                    $product->setStock($newStock);
+                    $this->entityManager->persist($product);
+                }
+            }
         }
 
-        $order->setTotal($total);
-
-        $this->orderRepository->save($order, true);
+        $order->setTotal($totalAmount);
+        $this->entityManager->persist($order);
+        $this->entityManager->flush();
 
         return $order;
     }
 
-    private function createOrderItem(OrderItemDTO $itemDTO): OrderItem
+    /**
+     * @return array<Order>
+     */
+    public function getUserOrders(): array
     {
-        $product = $this->productRepository->find($itemDTO->getProductId());
-        if (!$product) {
-            throw new EntityNotFoundException('Product not found');
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return [];
         }
 
-        if ($product->getStock() < $itemDTO->getQuantity()) {
-            throw new \InvalidArgumentException('Not enough stock available');
-        }
-
-        $orderItem = new OrderItem();
-        $orderItem
-            ->setProduct($product)
-            ->setQuantity($itemDTO->getQuantity())
-            ->setPrice($product->getPrice());
-
-        // Update product stock
-        $product->setStock($product->getStock() - $itemDTO->getQuantity());
-        $this->entityManager->persist($product);
-
-        return $orderItem;
+        return $this->orderRepository->findBy(['user' => $user], ['createdAt' => 'DESC']);
     }
 
-    public function updateOrderStatus(int $id, string $status): Order
+    public function getOrder(int $id): ?Order
     {
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return null;
+        }
+
         $order = $this->orderRepository->find($id);
+        if (!$order || $order->getUser() !== $user) {
+            return null;
+        }
+
+        return $order;
+    }
+
+    public function updateOrderStatus(int $id, string $status): ?Order
+    {
+        $order = $this->getOrder($id);
         if (!$order) {
-            throw new EntityNotFoundException('Order not found');
+            return null;
         }
 
         $order->setStatus($status);
-        $this->orderRepository->save($order, true);
+        $this->entityManager->flush();
 
         return $order;
     }
 
-    public function getOrder(int $id): Order
+    public function createOrderFromCart(Cart $cart): ?Order
     {
-        $order = $this->orderRepository->find($id);
-        if (!$order) {
-            throw new EntityNotFoundException('Order not found');
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return null;
         }
+
+        $order = new Order();
+        $order->setUser($user);
+        $order->setReference(Uuid::v4()->toRfc4122());
+        $order->setStatus(self::STATUS_PENDING);
+        $order->setPaymentMethod('stripe');
+
+        if ($user->getDefaultAddress()) {
+            $order->setShippingAddress($user->getDefaultAddress());
+        }
+        
+        if ($user->getDefaultBillingAddress()) {
+            $order->setBillingAddress($user->getDefaultBillingAddress());
+        }
+
+        $totalAmount = 0.0;
+        foreach ($cart->getItems() as $cartItem) {
+            $product = $cartItem->getProduct();
+            if (!$product) {
+                continue;
+            }
+
+            $quantity = $cartItem->getQuantity();
+            if ($product->getStock() !== null && $product->getStock() < $quantity) {
+                continue;
+            }
+
+            $orderItem = new OrderItem();
+            $orderItem->setProduct($product);
+            $orderItem->setQuantity((int) $quantity);
+            $orderItem->setPrice((float) $product->getPrice());
+            $orderItem->setOrderRef($order);
+
+            $totalAmount += $orderItem->getPrice() * $orderItem->getQuantity();
+            $order->addOrderItem($orderItem);
+
+            // Update product stock
+            if ($product->getStock() !== null) {
+                $newStock = $product->getStock() - $quantity;
+                if ($newStock >= 0) {
+                    $product->setStock($newStock);
+                    $this->entityManager->persist($product);
+                }
+            }
+        }
+
+        $order->setTotal($totalAmount);
+        $this->entityManager->persist($order);
+        $this->entityManager->flush();
 
         return $order;
-    }
-
-    public function getUserOrders(int $userId): array
-    {
-        $user = $this->userRepository->find($userId);
-        if (!$user) {
-            throw new EntityNotFoundException('User not found');
-        }
-
-        return $this->orderRepository->findByUser($user);
-    }
-
-    public function getOrdersByStatus(string $status): array
-    {
-        return $this->orderRepository->findByStatus($status);
-    }
-
-    public function getOrdersByDateRange(\DateTimeInterface $start, \DateTimeInterface $end): array
-    {
-        return $this->orderRepository->findByDateRange($start, $end);
     }
 }

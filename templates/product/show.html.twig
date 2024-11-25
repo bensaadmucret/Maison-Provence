@@ -54,17 +54,34 @@
                 {{ product.price|number_format(2, ',', ' ') }} €
             </div>
 
-            <div class="prose max-w-none">
+            <div class="text-gray-700 leading-relaxed">
                 {{ product.description|raw }}
             </div>
 
             {% if product.stock > 0 %}
-                <div class="text-sm text-gray-600">
+                <div class="text-sm text-gray-600 mb-4">
                     En stock : {{ product.stock }} unité(s)
                 </div>
-                <button class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                    Ajouter au panier
-                </button>
+                <form action="{{ path('app_cart_add') }}" method="POST" class="space-y-4">
+                    <input type="hidden" name="productId" value="{{ product.id }}">
+                    <div class="flex items-center space-x-4">
+                        <label for="quantity" class="text-gray-700">Quantité :</label>
+                        <select name="quantity" 
+                                id="quantity" 
+                                class="w-20 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            {% for i in 1..min(product.stock, 10) %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" 
+                            class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                        </svg>
+                        <span>Ajouter au panier</span>
+                    </button>
+                </form>
             {% else %}
                 <div class="text-red-600 font-semibold">
                     Produit temporairement indisponible

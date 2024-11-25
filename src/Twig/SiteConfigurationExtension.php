@@ -12,13 +12,13 @@ class SiteConfigurationExtension extends AbstractExtension implements GlobalsInt
     private ?SiteConfiguration $configuration = null;
 
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
     public function getGlobals(): array
     {
-        if ($this->configuration === null) {
+        if (null === $this->configuration) {
             $this->configuration = $this->entityManager
                 ->getRepository(SiteConfiguration::class)
                 ->findOneBy([]);

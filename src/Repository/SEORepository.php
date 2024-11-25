@@ -22,7 +22,7 @@ class SEORepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les configurations SEO qui n'ont pas d'URL canonique définie
+     * Trouve les configurations SEO qui n'ont pas d'URL canonique définie.
      *
      * @return SEO[]
      */
@@ -35,7 +35,7 @@ class SEORepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les configurations SEO avec des titres meta dépassant la longueur recommandée
+     * Trouve les configurations SEO avec des titres meta dépassant la longueur recommandée.
      *
      * @return SEO[]
      */
@@ -48,7 +48,7 @@ class SEORepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les configurations SEO avec des descriptions meta dépassant la longueur recommandée
+     * Trouve les configurations SEO avec des descriptions meta dépassant la longueur recommandée.
      *
      * @return SEO[]
      */
@@ -61,7 +61,7 @@ class SEORepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les configurations SEO qui ne sont pas indexables
+     * Trouve les configurations SEO qui ne sont pas indexables.
      *
      * @return SEO[]
      */
@@ -75,7 +75,7 @@ class SEORepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les configurations SEO sans mots-clés
+     * Trouve les configurations SEO sans mots-clés.
      *
      * @return SEO[]
      */
@@ -89,7 +89,7 @@ class SEORepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les configurations SEO sans données Open Graph
+     * Trouve les configurations SEO sans données Open Graph.
      *
      * @return SEO[]
      */

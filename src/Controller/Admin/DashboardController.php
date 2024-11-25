@@ -179,7 +179,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Collections', 'fa fa-folder', MediaCollection::class);
 
         yield MenuItem::section('');
-        yield MenuItem::linkToRoute('Retour au site', 'fa fa-arrow-left', 'homepage');
+        yield MenuItem::linkToRoute('Retour au site', 'fa fa-arrow-left', 'app_home');
     }
 
     public function configureAssets(): Assets

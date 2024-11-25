@@ -49,7 +49,7 @@ class CategorySEOTest extends TestCase
     public function testCategoryAssociation(): void
     {
         $category = new Category();
-        
+
         $this->categorySEO->setCategory($category);
         $this->assertSame($category, $this->categorySEO->getCategory());
     }

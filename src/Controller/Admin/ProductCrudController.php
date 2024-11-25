@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -20,7 +21,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -65,13 +65,13 @@ class ProductCrudController extends AbstractCrudController
             ->setFollowable(true)
             ->setMetaKeywords([])
             ->setOpenGraphData([]);
-        
+
         $product->setSeo($seo);
         $seo->setProduct($product);
-        
+
         // Persister explicitement l'entité SEO
         $this->entityManager->persist($seo);
-        
+
         return $product;
     }
 
@@ -103,8 +103,8 @@ class ProductCrudController extends AbstractCrudController
             ->setFormTypeOptions([
                 'required' => false,
                 'attr' => [
-                    'accept' => 'image/*'
-                ]
+                    'accept' => 'image/*',
+                ],
             ])
             ->onlyOnForms();
         yield DateTimeField::new('createdAt', 'Créé le')
@@ -119,7 +119,7 @@ class ProductCrudController extends AbstractCrudController
             ->setFormTypeOption('by_reference', false)
             ->onlyOnForms();
 
-        if ($pageName === Crud::PAGE_NEW || $pageName === Crud::PAGE_EDIT) {
+        if (Crud::PAGE_NEW === $pageName || Crud::PAGE_EDIT === $pageName) {
             // Section SEO
             yield FormField::addTab('SEO');
             yield FormField::addPanel('Métadonnées SEO');

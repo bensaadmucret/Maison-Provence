@@ -1,0 +1,46 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+    <div class="row g-3">
+        <div class="col-12">
+            {{ form_row(form.name) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.firstName) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.lastName) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(form.street) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(form.streetComplement) }}
+        </div>
+        <div class="col-md-4">
+            {{ form_row(form.postalCode) }}
+        </div>
+        <div class="col-md-8">
+            {{ form_row(form.city) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.country) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.phone) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.isDefault) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.isBilling) }}
+        </div>
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+        <a href="{{ path('app_address_index') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Retour
+        </a>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-2"></i>{{ button_label|default('Enregistrer') }}
+        </button>
+    </div>
+{{ form_end(form) }}

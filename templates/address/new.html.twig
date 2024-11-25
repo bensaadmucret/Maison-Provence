@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle adresse - {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="container my-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        {% if redirect == 'checkout' %}
+                            <div class="alert alert-info mb-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Pour finaliser votre commande, veuillez ajouter une adresse de livraison.
+                            </div>
+                        {% endif %}
+                        
+                        <h1 class="card-title h3 mb-4">Ajouter une nouvelle adresse</h1>
+                        {{ include('address/_form.html.twig') }}
+
+                        <div class="mt-3">
+                            {% if redirect == 'checkout' %}
+                                <a href="{{ path('app_cart_show') }}" class="btn btn-link">
+                                    <i class="fas fa-arrow-left me-2"></i>Retour au panier
+                                </a>
+                            {% else %}
+                                <a href="{{ path('app_address_index') }}" class="btn btn-link">
+                                    <i class="fas fa-arrow-left me-2"></i>Retour à mes adresses
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addressInput = document.querySelector('.address-autocomplete');
+            if (addressInput) {
+                const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                    componentRestrictions: { country: ['fr'] },
+                    fields: ['address_components', 'formatted_address'],
+                    types: ['address']
+                });
+
+                autocomplete.addListener('place_changed', function() {
+                    const place = autocomplete.getPlace();
+                    if (!place.address_components) return;
+
+                    // Remplir les champs d'adresse
+                    for (const component of place.address_components) {
+                        const type = component.types[0];
+                        if (type === 'street_number' || type === 'route') {
+                            addressInput.value = place.formatted_address.split(',')[0];
+                        } else if (type === 'postal_code') {
+                            document.querySelector('[name="address[postalCode]"]').value = component.long_name;
+                        } else if (type === 'locality') {
+                            document.querySelector('[name="address[city]"]').value = component.long_name;
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

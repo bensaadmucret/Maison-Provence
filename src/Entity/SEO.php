@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\DiscriminatorMap([
     'product' => ProductSEO::class,
     'category' => CategorySEO::class,
-    'page' => PageSEO::class
+    'page' => PageSEO::class,
 ])]
 abstract class SEO
 {
@@ -58,7 +58,8 @@ abstract class SEO
 
     public function setMetaTitle(?string $metaTitle): static
     {
-        $this->metaTitle = $metaTitle !== null ? substr($metaTitle, 0, 60) : null;
+        $this->metaTitle = null !== $metaTitle ? substr($metaTitle, 0, 60) : null;
+
         return $this;
     }
 
@@ -69,7 +70,8 @@ abstract class SEO
 
     public function setMetaDescription(?string $metaDescription): static
     {
-        $this->metaDescription = $metaDescription !== null ? substr($metaDescription, 0, 160) : null;
+        $this->metaDescription = null !== $metaDescription ? substr($metaDescription, 0, 160) : null;
+
         return $this;
     }
 
@@ -81,6 +83,7 @@ abstract class SEO
     public function setCanonicalUrl(?string $canonicalUrl): static
     {
         $this->canonicalUrl = $canonicalUrl;
+
         return $this;
     }
 
@@ -92,6 +95,7 @@ abstract class SEO
     public function setMetaKeywords(array $metaKeywords): static
     {
         $this->metaKeywords = array_unique($metaKeywords);
+
         return $this;
     }
 
@@ -103,6 +107,7 @@ abstract class SEO
     public function setIndexable(bool $indexable): static
     {
         $this->indexable = $indexable;
+
         return $this;
     }
 
@@ -114,6 +119,7 @@ abstract class SEO
     public function setFollowable(bool $followable): static
     {
         $this->followable = $followable;
+
         return $this;
     }
 
@@ -127,9 +133,10 @@ abstract class SEO
         // Filter out invalid OG properties
         $this->openGraphData = array_filter(
             $openGraphData,
-            fn($key) => str_starts_with($key, 'og:'),
+            fn ($key) => str_starts_with($key, 'og:'),
             ARRAY_FILTER_USE_KEY
         );
+
         return $this;
     }
 }

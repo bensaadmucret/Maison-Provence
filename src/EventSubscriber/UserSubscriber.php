@@ -11,7 +11,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private UserPasswordHasherInterface $passwordHasher
+        private UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 
@@ -55,7 +55,7 @@ class UserSubscriber implements EventSubscriberInterface
             $user,
             $user->getPlainPassword()
         );
-        
+
         $user->setPassword($hashedPassword);
         $user->eraseCredentials();
     }

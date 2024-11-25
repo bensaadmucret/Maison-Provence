@@ -68,6 +68,7 @@ class Category
     public function setName(string $name): static
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -79,6 +80,7 @@ class Category
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -90,6 +92,7 @@ class Category
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+
         return $this;
     }
 
@@ -101,6 +104,7 @@ class Category
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -112,6 +116,7 @@ class Category
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -152,6 +157,7 @@ class Category
     public function setLevel(int $level): static
     {
         $this->level = $level;
+
         return $this;
     }
 
@@ -207,6 +213,7 @@ class Category
     public function setSeo(?CategorySEO $seo): static
     {
         $this->seo = $seo;
+
         return $this;
     }
 

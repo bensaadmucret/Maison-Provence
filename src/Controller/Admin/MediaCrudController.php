@@ -27,6 +27,14 @@ class MediaCrudController extends AbstractCrudController
             IdField::new('id')->hideOnForm(),
             TextField::new('imageFile', 'Image')
                 ->setFormType(VichImageType::class)
+                ->setFormTypeOptions([
+                    'required' => true,
+                    'allow_delete' => true,
+                    'download_uri' => false,
+                    'image_uri' => true,
+                    'asset_helper' => true,
+                    'error_bubbling' => true,
+                ])
                 ->onlyOnForms(),
             ImageField::new('filename', 'Image')
                 ->setBasePath('uploads/media')
@@ -41,7 +49,12 @@ class MediaCrudController extends AbstractCrudController
                     'Vidéo' => 'video',
                 ])
                 ->setRequired(true),
-            AssociationField::new('product', 'Produit')->setRequired(false),
+            AssociationField::new('product', 'Produit')
+                ->setRequired(false)
+                ->setFormTypeOptions([
+                    'class' => 'App\Entity\Product',
+                    'choice_label' => 'name',
+                ]),
             AssociationField::new('collection', 'Collection')->setRequired(false),
             DateTimeField::new('createdAt', 'Créé le')->hideOnForm(),
             DateTimeField::new('updatedAt', 'Modifié le')->hideOnForm(),
@@ -62,5 +75,16 @@ class MediaCrudController extends AbstractCrudController
             $entityInstance->setUpdatedAt(new \DateTimeImmutable());
         }
         parent::updateEntity($entityManager, $entityInstance);
+    }
+
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        try {
+            parent::persistEntity($entityManager, $entityInstance);
+        } catch (\Exception $e) {
+            // Log the error if needed
+            // Return to form with error message
+            return;
+        }
     }
 }

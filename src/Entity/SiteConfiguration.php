@@ -32,7 +32,7 @@ class SiteConfiguration
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $ecommerceDisabledMessage = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'boolean', name: 'is_ecommerce_enabled')]
     private ?bool $isEcommerceEnabled = true;
 
     #[ORM\Column(type: 'datetime_immutable')]
@@ -134,6 +134,7 @@ class SiteConfiguration
     public function setIsEcommerceEnabled(bool $isEcommerceEnabled): static
     {
         $this->isEcommerceEnabled = $isEcommerceEnabled;
+
         return $this;
     }
 

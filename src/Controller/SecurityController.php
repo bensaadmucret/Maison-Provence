@@ -13,7 +13,15 @@ class SecurityController extends AbstractController
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser()) {
-            return $this->redirectToRoute('admin');
+            // Check for checkout redirect
+            $session = $this->container->get('request_stack')->getSession();
+            if ($checkoutRedirect = $session->get('checkout_redirect')) {
+                $session->remove('checkout_redirect');
+
+                return $this->redirect($checkoutRedirect);
+            }
+
+            return $this->redirectToRoute('app_home');
         }
 
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -22,6 +30,8 @@ class SecurityController extends AbstractController
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
+            'show_register_link' => true,
+            'checkout_mode' => $this->container->get('request_stack')->getSession()->has('checkout_redirect'),
         ]);
     }
 
