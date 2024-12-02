@@ -111,10 +111,13 @@ restructure: ## Restructure le projet en déplaçant les fichiers de src vers la
 install-o2switch: ## Installation sur o2switch
 	@echo "🚀 Installation du projet sur o2switch..."
 	composer install --no-dev --optimize-autoloader
+	composer dump-env prod
 	php bin/console cache:clear --env=prod
+	APP_ENV=prod APP_DEBUG=0 php bin/console cache:clear
 	php bin/console doctrine:migrations:migrate --no-interaction --env=prod
 	php bin/console assets:install public --env=prod
 	php bin/console importmap:install
+	php bin/console asset-map:compile
 	npm install
 	npm run build
 	@echo "✅ Installation terminée"
@@ -122,9 +125,13 @@ install-o2switch: ## Installation sur o2switch
 deploy-o2switch: ## Déploiement sur o2switch (après git pull)
 	@echo "🚀 Déploiement du projet sur o2switch..."
 	composer install --no-dev --optimize-autoloader
+	composer dump-env prod
 	php bin/console cache:clear --env=prod
+	APP_ENV=prod APP_DEBUG=0 php bin/console cache:clear
 	php bin/console doctrine:migrations:migrate --no-interaction --env=prod
 	php bin/console assets:install public --env=prod
+	php bin/console importmap:install
+	php bin/console asset-map:compile
 	npm install
 	npm run build
 	@echo "✨ Nettoyage des caches..."
