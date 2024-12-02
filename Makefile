@@ -1,4 +1,4 @@
-.PHONY: help install start stop restart build logs shell db-connect tests lint fix-cs analyze qa fixtures test-unit test-functional test-coverage test-coverage-text quality-report metrics assets-watch assets-build cache-clear migrate restructure install-o2switch deploy-o2switch clear-cache-prod
+.PHONY: help install start stop restart build logs shell db-connect tests lint fix-cs analyze qa fixtures test-unit test-functional test-coverage test-coverage-text quality-report metrics assets-watch assets-build cache-clear migrate restructure install-o2switch deploy-o2switch clear-cache-prod build-assets
 
 # Couleurs pour le help
 HELP_COLOR = \033[36m
@@ -17,7 +17,6 @@ install: ## Installe le projet
 	docker compose exec php composer install
 	docker compose exec php php bin/console doctrine:database:create --if-not-exists
 	docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
-	docker compose exec node npm install
 
 start: ## Démarre les conteneurs
 	docker compose up -d
@@ -83,11 +82,11 @@ quality-report: ## Génère un rapport complet de qualité
 metrics: ## Affiche les métriques du code
 	docker compose exec php vendor/bin/phpmetrics --report-html=metrics src/
 
-assets-watch: ## Lance la compilation des assets en mode watch
-	docker compose exec node npm run dev
-
-assets-build: ## Compile les assets pour la production
-	docker compose exec node npm run build
+build-assets: ## Compile les assets pour la production
+	@echo "🚀 Compilation des assets..."
+	npm install
+	npm run build
+	@echo "✅ Assets compilés"
 
 cache-clear: ## Vide le cache
 	docker compose exec php php bin/console cache:clear
@@ -118,11 +117,9 @@ install-o2switch: ## Installation sur o2switch
 	php bin/console assets:install public --env=prod
 	php bin/console importmap:install
 	php bin/console asset-map:compile
-	npm install
-	npm run build
 	@echo "✅ Installation terminée"
 
-deploy-o2switch: ## Déploiement sur o2switch (après git pull)
+deploy-o2switch: build-assets ## Déploiement sur o2switch (après git pull)
 	@echo "🚀 Déploiement du projet sur o2switch..."
 	composer install --no-dev --optimize-autoloader
 	composer dump-env prod
@@ -132,8 +129,6 @@ deploy-o2switch: ## Déploiement sur o2switch (après git pull)
 	php bin/console assets:install public --env=prod
 	php bin/console importmap:install
 	php bin/console asset-map:compile
-	npm install
-	npm run build
 	@echo "✨ Nettoyage des caches..."
 	rm -rf var/cache/*
 	@echo "✅ Déploiement terminé"
