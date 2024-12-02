@@ -12,6 +12,7 @@
     "watch:dev": "php bin/console asset-map:watch --env=dev"
   },
   "dependencies": {
+    "@hotwired/turbo": "^8.0.12",
     "@stripe/stripe-js": "^5.2.0",
     "flowbite": "^2.5.2",
     "imagesloaded": "^5.0.0",

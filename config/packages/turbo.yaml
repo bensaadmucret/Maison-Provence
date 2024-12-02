@@ -1,0 +1,9 @@
+turbo:
+    # Uncomment if you want to control the Turbo configuration
+    # broadcast:
+    #     enable: false  # Enable/disable broadcasting entirely
+    #     entity_template: 'broadcast/{entity}/{id}'  # Default template for entity updates
+    #     entity_transport: default  # Default transport for entity updates
+    # mercure:
+    #     hub_url: '%env(MERCURE_URL)%'  # URL of your Mercure hub
+    #     jwt_secret: '%env(MERCURE_JWT_SECRET)%'  # Secret key for Mercure JWT

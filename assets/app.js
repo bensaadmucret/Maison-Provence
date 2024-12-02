@@ -9,6 +9,7 @@ import './styles/app.css';
 
 import { startStimulusApp } from '@symfony/stimulus-bundle';
 import { registerChart } from '@symfony/ux-chartjs';
+import '@hotwired/turbo';
 
 registerChart();
 
