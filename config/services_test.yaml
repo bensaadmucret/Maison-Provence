@@ -7,6 +7,9 @@ services:
         autoconfigure: true
         public: true
 
+    App\Tests\Fixtures\GenerateTestImage:
+        public: true
+
     App\Tests\:
         resource: '../tests/*'
         exclude: '../tests/{bootstrap.php}'
