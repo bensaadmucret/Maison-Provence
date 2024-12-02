@@ -34,6 +34,14 @@
         <include>
             <directory suffix=".php">src</directory>
         </include>
+        <exclude>
+            <directory>src/DataFixtures</directory>
+            <directory>src/Migrations</directory>
+        </exclude>
+        <report>
+            <html outputDirectory="coverage"/>
+            <clover outputFile="coverage/clover.xml"/>
+        </report>
     </coverage>
 
     <listeners>

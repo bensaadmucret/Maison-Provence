@@ -1,0 +1,12 @@
+parameters:
+    upload_directory: '%kernel.project_dir%/var/test/uploads'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    App\Tests\:
+        resource: '../tests/*'
+        exclude: '../tests/{bootstrap.php}'
