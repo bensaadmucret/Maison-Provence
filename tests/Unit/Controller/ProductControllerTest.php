@@ -167,7 +167,7 @@ class ProductControllerTest extends TestCase
             ->expects(self::once())
             ->method('deleteProduct')
             ->with(1)
-            ->willReturn(true);
+            ->willReturnSelf();
 
         // Act
         $response = $this->controller->delete($request, 1);

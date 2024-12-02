@@ -3,114 +3,111 @@
 namespace App\Tests\Service;
 
 use App\Entity\Cart;
+use App\Entity\CartItem;
 use App\Entity\Product;
-use App\Entity\User;
+use App\Repository\CartItemRepository;
 use App\Repository\CartRepository;
 use App\Repository\ProductRepository;
 use App\Service\CartService;
+use App\Service\LoggingService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CartServiceTest extends TestCase
 {
     private CartService $cartService;
-    private RequestStack $requestStack;
     private EntityManagerInterface&MockObject $entityManager;
     private CartRepository&MockObject $cartRepository;
+    private CartItemRepository&MockObject $cartItemRepository;
     private ProductRepository&MockObject $productRepository;
-    private Security&MockObject $security;
+    private LoggingService&MockObject $loggingService;
+    private RequestStack $requestStack;
     private SessionInterface&MockObject $session;
 
     protected function setUp(): void
     {
-        $this->requestStack = new RequestStack();
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->cartRepository = $this->createMock(CartRepository::class);
+        $this->cartItemRepository = $this->createMock(CartItemRepository::class);
         $this->productRepository = $this->createMock(ProductRepository::class);
-        $this->security = $this->createMock(Security::class);
+        $this->loggingService = $this->createMock(LoggingService::class);
+        
+        $this->requestStack = new RequestStack();
         $this->session = $this->createMock(SessionInterface::class);
+        $this->session->method('getId')->willReturn('test_session_id');
+        $this->requestStack->push($this->session);
 
         $this->cartService = new CartService(
-            $this->requestStack,
             $this->entityManager,
             $this->cartRepository,
+            $this->cartItemRepository,
             $this->productRepository,
-            $this->security
+            $this->requestStack,
+            $this->loggingService
         );
     }
 
-    public function testGetCartForAnonymousUser(): void
+    public function testGetCartCreatesNewCartIfNotExists(): void
     {
-        $this->security->expects(self::once())
-            ->method('getUser')
+        $this->session->expects(self::once())
+            ->method('get')
+            ->with('cart_id')
             ->willReturn(null);
+
+        $this->cartRepository->expects(self::never())
+            ->method('find');
 
         $cart = $this->cartService->getCart();
 
         self::assertInstanceOf(Cart::class, $cart);
-        self::assertNull($cart->getUser());
+        self::assertEquals('test_session_id', $cart->getSessionId());
     }
 
-    public function testGetCartForAuthenticatedUser(): void
+    public function testGetCartReturnsExistingCart(): void
     {
-        $user = new User();
         $existingCart = new Cart();
-        $existingCart->setUser($user);
+        $existingCart->setSessionId('test_session_id');
 
-        $this->security->expects(self::once())
-            ->method('getUser')
-            ->willReturn($user);
+        $this->session->expects(self::once())
+            ->method('get')
+            ->with('cart_id')
+            ->willReturn(1);
 
         $this->cartRepository->expects(self::once())
-            ->method('findOneBy')
-            ->with(['user' => $user])
+            ->method('find')
+            ->with(1)
             ->willReturn($existingCart);
 
         $cart = $this->cartService->getCart();
 
         self::assertSame($existingCart, $cart);
-        self::assertSame($user, $cart->getUser());
     }
 
-    public function testAddProduct(): void
+    public function testAddProductThrowsExceptionWhenProductNotFound(): void
     {
-        $product = new Product();
-        $product->setStock(10);
-
         $this->productRepository->expects(self::once())
             ->method('find')
             ->with(1)
-            ->willReturn($product);
+            ->willReturn(null);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Produit non trouvé');
 
         $this->cartService->addProduct(1);
-
-        $cart = $this->cartService->getCart();
-        self::assertTrue($cart->hasProduct($product));
-        self::assertEquals(1, $cart->getQuantity($product));
     }
 
-    public function testAddProductWithQuantity(): void
+    public function testAddProductThrowsExceptionWhenQuantityInvalid(): void
     {
-        $product = new Product();
-        $product->setStock(10);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('La quantité doit être supérieure à 0');
 
-        $this->productRepository->expects(self::once())
-            ->method('find')
-            ->with(1)
-            ->willReturn($product);
-
-        $this->cartService->addProduct(1, 3);
-
-        $cart = $this->cartService->getCart();
-        self::assertTrue($cart->hasProduct($product));
-        self::assertEquals(3, $cart->getQuantity($product));
+        $this->cartService->addProduct(1, 0);
     }
 
-    public function testAddProductWithInsufficientStock(): void
+    public function testAddProductThrowsExceptionWhenInsufficientStock(): void
     {
         $product = new Product();
         $product->setStock(2);
@@ -121,66 +118,120 @@ class CartServiceTest extends TestCase
             ->willReturn($product);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Not enough stock');
+        $this->expectExceptionMessage('Stock insuffisant');
 
         $this->cartService->addProduct(1, 3);
     }
 
-    public function testRemoveProduct(): void
+    public function testAddProductCreatesNewCartItem(): void
     {
         $product = new Product();
-        $cart = $this->cartService->getCart();
-        $cart->addProduct($product, 1);
+        $product->setStock(5);
+        $product->setPrice(1000);
 
         $this->productRepository->expects(self::once())
             ->method('find')
             ->with(1)
             ->willReturn($product);
 
-        $this->cartService->removeProduct(1);
+        $this->cartItemRepository->expects(self::once())
+            ->method('findOneBy')
+            ->willReturn(null);
 
-        self::assertFalse($cart->hasProduct($product));
+        $this->entityManager->expects(self::once())
+            ->method('persist')
+            ->with(self::isInstanceOf(CartItem::class));
+
+        $this->cartService->addProduct(1, 2);
     }
 
-    public function testUpdateQuantity(): void
+    public function testUpdateQuantityThrowsExceptionWhenItemNotFound(): void
     {
-        $product = new Product();
-        $product->setStock(10);
-        $cart = $this->cartService->getCart();
-        $cart->addProduct($product, 1);
-
-        $this->productRepository->expects(self::once())
+        $this->cartItemRepository->expects(self::once())
             ->method('find')
             ->with(1)
-            ->willReturn($product);
+            ->willReturn(null);
 
-        $this->cartService->updateQuantity(1, 3);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Article non trouvé dans le panier');
 
-        self::assertEquals(3, $cart->getQuantity($product));
+        $this->cartService->updateQuantity(1, 2);
     }
 
-    public function testGetTotal(): void
+    public function testRemoveItemThrowsExceptionWhenItemNotFound(): void
     {
-        $product1 = new Product();
-        $product1->setPrice(1000);
-        $product2 = new Product();
-        $product2->setPrice(2000);
+        $this->cartItemRepository->expects(self::once())
+            ->method('find')
+            ->with(1)
+            ->willReturn(null);
 
-        $cart = $this->cartService->getCart();
-        $cart->addProduct($product1, 2);
-        $cart->addProduct($product2, 1);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Article non trouvé dans le panier');
+
+        $this->cartService->removeItem(1);
+    }
+
+    public function testClearRemovesAllItems(): void
+    {
+        $cart = new Cart();
+        $item1 = new CartItem();
+        $item2 = new CartItem();
+        $cart->addItem($item1);
+        $cart->addItem($item2);
+
+        $this->entityManager->expects(self::exactly(2))
+            ->method('remove')
+            ->withConsecutive(
+                [self::identicalTo($item1)],
+                [self::identicalTo($item2)]
+            );
+
+        $this->cartService->clear();
+    }
+
+    public function testGetTotalReturnsCorrectSum(): void
+    {
+        $cart = new Cart();
+        $item1 = new CartItem();
+        $item1->setQuantity(2);
+        $item1->setPrice(1000);
+        $item2 = new CartItem();
+        $item2->setQuantity(1);
+        $item2->setPrice(2000);
+        
+        $cart->addItem($item1);
+        $cart->addItem($item2);
+
+        $this->session->method('get')->willReturn(1);
+        $this->cartRepository->method('find')->willReturn($cart);
 
         self::assertEquals(4000, $this->cartService->getTotal());
     }
 
-    public function testEmpty(): void
+    public function testGetItemCountReturnsCorrectCount(): void
     {
-        $product = new Product();
-        $cart = $this->cartService->getCart();
-        $cart->addProduct($product, 1);
+        $cart = new Cart();
+        $item1 = new CartItem();
+        $item1->setQuantity(2);
+        $item2 = new CartItem();
+        $item2->setQuantity(3);
+        
+        $cart->addItem($item1);
+        $cart->addItem($item2);
 
-        $this->cartService->empty();
+        $this->session->method('get')->willReturn(1);
+        $this->cartRepository->method('find')->willReturn($cart);
 
-        self::assertEmpty($cart->getProducts());
+        self::assertEquals(5, $this->cartService->getItemCount());
+    }
+
+    public function testIsEmptyReturnsTrueForEmptyCart(): void
+    {
+        $cart = new Cart();
+        
+        $this->session->method('get')->willReturn(1);
+        $this->cartRepository->method('find')->willReturn($cart);
+
+        self::assertTrue($this->cartService->isEmpty());
     }
 }

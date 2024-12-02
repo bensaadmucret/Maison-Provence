@@ -7,16 +7,20 @@ use App\Entity\Category;
 use App\Entity\Product;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
+use App\Service\Interface\ProductServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
+use App\Service\LoggingService;
+use App\Service\SlugService;
 
-class ProductService
+class ProductService implements ProductServiceInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ProductRepository $productRepository,
         private readonly CategoryRepository $categoryRepository,
         private readonly SlugService $slugService,
+        private readonly LoggingService $loggingService,
     ) {
     }
 
@@ -25,18 +29,10 @@ class ProductService
      */
     public function getActiveProducts(): array
     {
-        error_log('=== Récupération des produits actifs ===');
+        $this->loggingService->logProductSearch('active products');
         $products = $this->productRepository->findBy(['isActive' => true]);
-        error_log('Nombre de produits actifs trouvés : '.count($products));
-        foreach ($products as $product) {
-            error_log(sprintf(
-                'Produit actif trouvé - ID: %d, Nom: %s, Slug: %s',
-                $product->getId(),
-                $product->getName(),
-                $product->getSlug()
-            ));
-        }
-
+        $this->loggingService->logProductDetails($products);
+        
         return $products;
     }
 
@@ -56,45 +52,26 @@ class ProductService
 
     public function getProductBySlug(string $slug): ?Product
     {
-        error_log('=== Recherche de produit par slug ===');
-        error_log('Slug recherché : '.$slug);
+        $this->loggingService->logProductSearch($slug);
 
-        // Vérifier la connexion à la base de données
         try {
             $conn = $this->entityManager->getConnection();
             $conn->connect();
-            error_log('Connexion à la base de données OK');
+            $this->loggingService->logDatabaseConnection(true);
         } catch (\Exception $e) {
-            error_log('Erreur de connexion à la base de données : '.$e->getMessage());
+            $this->loggingService->logDatabaseConnection(false, $e);
             throw $e;
         }
 
-        // Récupérer tous les produits pour le débogage
         $allProducts = $this->productRepository->findAll();
-        error_log('Nombre total de produits dans la base : '.count($allProducts));
-        foreach ($allProducts as $p) {
-            error_log(sprintf(
-                'Produit en base - ID: %d, Nom: %s, Slug: %s, Actif: %s',
-                $p->getId(),
-                $p->getName(),
-                $p->getSlug(),
-                $p->isActive() ? 'oui' : 'non'
-            ));
-        }
+        $this->loggingService->logProductDetails($allProducts);
 
         $product = $this->productRepository->findOneActiveBySlug($slug);
 
         if ($product) {
-            error_log('Produit trouvé avec le slug '.$slug);
-            error_log(sprintf(
-                'Détails du produit - ID: %d, Nom: %s, Slug: %s, Actif: %s',
-                $product->getId(),
-                $product->getName(),
-                $product->getSlug(),
-                $product->isActive() ? 'oui' : 'non'
-            ));
+            $this->loggingService->logProductFound($product);
         } else {
-            error_log('Aucun produit actif trouvé avec le slug '.$slug);
+            $this->loggingService->logProductNotFound($slug);
         }
 
         return $product;
@@ -144,9 +121,25 @@ class ProductService
     {
         $product = new Product();
         $this->updateProductFromDTO($product, $productDTO);
-
+        
         $this->entityManager->persist($product);
         $this->entityManager->flush();
+        
+        return $product;
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     */
+    public function updateProduct(int $id, ProductDTO $productDTO): Product
+    {
+        $this->loggingService->logProductUpdate($id);
+
+        $product = $this->getProduct($id);
+        $this->updateProductFromDTO($product, $productDTO);
+        $this->entityManager->flush();
+
+        $this->loggingService->logProductUpdated($product);
 
         return $product;
     }
@@ -154,22 +147,13 @@ class ProductService
     /**
      * @throws EntityNotFoundException
      */
-    public function updateProduct(int $id, ProductDTO $dto): Product
+    public function deleteProduct(int $id): void
     {
-        error_log('=== Mise à jour du produit '.$id.' ===');
+        $this->loggingService->logProductDeletion($id);
 
         $product = $this->getProduct($id);
-        $this->updateProductFromDTO($product, $dto);
+        $this->entityManager->remove($product);
         $this->entityManager->flush();
-
-        error_log(sprintf(
-            'Produit mis à jour - ID: %d, Nom: %s, Slug: %s',
-            $product->getId(),
-            $product->getName(),
-            $product->getSlug()
-        ));
-
-        return $product;
     }
 
     private function updateProductFromDTO(Product $product, ProductDTO $productDTO): void
@@ -206,21 +190,5 @@ class ProductService
                 $product->setCategory($category);
             }
         }
-    }
-
-    /**
-     * @throws EntityNotFoundException
-     */
-    public function deleteProduct(int $id): bool
-    {
-        error_log('=== Suppression du produit '.$id.' ===');
-
-        $product = $this->getProduct($id);
-        $this->entityManager->remove($product);
-        $this->entityManager->flush();
-
-        error_log('Produit supprimé avec succès');
-
-        return true;
     }
 }

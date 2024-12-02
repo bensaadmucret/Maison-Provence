@@ -3,43 +3,45 @@
 namespace App\Service;
 
 use App\Entity\Cart;
+use App\Entity\CartItem;
 use App\Entity\Product;
-use App\Entity\User;
+use App\Repository\CartItemRepository;
 use App\Repository\CartRepository;
 use App\Repository\ProductRepository;
+use App\Service\Interface\CartServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CartService
+class CartService implements CartServiceInterface
 {
     private ?Cart $cart = null;
 
     public function __construct(
-        private RequestStack $requestStack,
-        private EntityManagerInterface $entityManager,
-        private CartRepository $cartRepository,
-        private ProductRepository $productRepository,
-        private Security $security
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CartRepository $cartRepository,
+        private readonly CartItemRepository $cartItemRepository,
+        private readonly ProductRepository $productRepository,
+        private readonly RequestStack $requestStack,
+        private readonly LoggingService $loggingService
     ) {
     }
 
     public function getCart(): Cart
     {
         if ($this->cart === null) {
-            /** @var User|null $user */
-            $user = $this->security->getUser();
+            $session = $this->requestStack->getSession();
+            $cartId = $session->get('cart_id');
 
-            if ($user) {
-                $this->cart = $this->cartRepository->findOneBy(['user' => $user]) ?? new Cart();
-                $this->cart->setUser($user);
-            } else {
-                $this->cart = new Cart();
+            if ($cartId) {
+                $this->cart = $this->cartRepository->find($cartId);
             }
 
-            if (!$this->cart->getId()) {
+            if (!$this->cart) {
+                $this->cart = new Cart();
+                $this->cart->setSessionId($session->getId());
                 $this->entityManager->persist($this->cart);
                 $this->entityManager->flush();
+                $session->set('cart_id', $this->cart->getId());
             }
         }
 
@@ -48,68 +50,100 @@ class CartService
 
     public function addProduct(int $productId, int $quantity = 1): void
     {
+        if ($quantity <= 0) {
+            throw new \InvalidArgumentException('La quantité doit être supérieure à 0');
+        }
+
         $product = $this->productRepository->find($productId);
         if (!$product) {
-            throw new \InvalidArgumentException('Product not found');
+            throw new \InvalidArgumentException('Produit non trouvé');
         }
 
         if ($product->getStock() < $quantity) {
-            throw new \InvalidArgumentException('Not enough stock');
+            throw new \InvalidArgumentException('Stock insuffisant');
         }
 
         $cart = $this->getCart();
-        $cart->addProduct($product, $quantity);
+        $cartItem = $this->cartItemRepository->findOneBy([
+            'cart' => $cart,
+            'product' => $product
+        ]);
 
-        $this->entityManager->flush();
-    }
-
-    public function removeProduct(int $productId): void
-    {
-        $product = $this->productRepository->find($productId);
-        if (!$product) {
-            throw new \InvalidArgumentException('Product not found');
+        if ($cartItem) {
+            $newQuantity = $cartItem->getQuantity() + $quantity;
+            if ($product->getStock() < $newQuantity) {
+                throw new \InvalidArgumentException('Stock insuffisant pour la quantité totale');
+            }
+            $cartItem->setQuantity($newQuantity);
+        } else {
+            $cartItem = new CartItem();
+            $cartItem->setCart($cart);
+            $cartItem->setProduct($product);
+            $cartItem->setQuantity($quantity);
+            $cartItem->setPrice($product->getPrice());
+            $this->entityManager->persist($cartItem);
         }
 
-        $cart = $this->getCart();
-        $cart->removeProduct($product);
-
         $this->entityManager->flush();
+        $this->loggingService->logCartUpdate($cart);
     }
 
-    public function updateQuantity(int $productId, int $quantity): void
+    public function updateQuantity(int $itemId, int $quantity): void
     {
-        $product = $this->productRepository->find($productId);
-        if (!$product) {
-            throw new \InvalidArgumentException('Product not found');
+        if ($quantity <= 0) {
+            throw new \InvalidArgumentException('La quantité doit être supérieure à 0');
         }
 
+        $cartItem = $this->cartItemRepository->find($itemId);
+        if (!$cartItem) {
+            throw new \InvalidArgumentException('Article non trouvé dans le panier');
+        }
+
+        $product = $cartItem->getProduct();
         if ($product->getStock() < $quantity) {
-            throw new \InvalidArgumentException('Not enough stock');
+            throw new \InvalidArgumentException('Stock insuffisant');
         }
 
-        $cart = $this->getCart();
-        $cart->setQuantity($product, $quantity);
-
+        $cartItem->setQuantity($quantity);
         $this->entityManager->flush();
+        $this->loggingService->logCartUpdate($cartItem->getCart());
+    }
+
+    public function removeItem(int $itemId): void
+    {
+        $cartItem = $this->cartItemRepository->find($itemId);
+        if (!$cartItem) {
+            throw new \InvalidArgumentException('Article non trouvé dans le panier');
+        }
+
+        $cart = $cartItem->getCart();
+        $this->entityManager->remove($cartItem);
+        $this->entityManager->flush();
+        $this->loggingService->logCartUpdate($cart);
+    }
+
+    public function clear(): void
+    {
+        $cart = $this->getCart();
+        foreach ($cart->getItems() as $item) {
+            $this->entityManager->remove($item);
+        }
+        $this->entityManager->flush();
+        $this->loggingService->logCartCleared($cart);
     }
 
     public function getTotal(): float
     {
-        $total = 0.0;
-        $cart = $this->getCart();
-
-        foreach ($cart->getProducts() as $product) {
-            $total += $product->getPrice() * $cart->getQuantity($product);
-        }
-
-        return $total;
+        return $this->getCart()->getTotal();
     }
 
-    public function empty(): void
+    public function getItemCount(): int
     {
-        $cart = $this->getCart();
-        $cart->empty();
+        return $this->getCart()->getItemsCount();
+    }
 
-        $this->entityManager->flush();
+    public function isEmpty(): bool
+    {
+        return $this->getCart()->isEmpty();
     }
 }

@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CartRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Cart
 {
     #[ORM\Id]
@@ -121,6 +122,20 @@ class Cart
         );
     }
 
+    public function getItemsCount(): int
+    {
+        return array_reduce(
+            $this->items->toArray(),
+            fn(int $count, CartItem $item) => $count + $item->getQuantity(),
+            0
+        );
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->items->isEmpty();
+    }
+
     public function findItem(Product $product): ?CartItem
     {
         foreach ($this->items as $item) {
@@ -128,14 +143,17 @@ class Cart
                 return $item;
             }
         }
-
         return null;
     }
 
     public function clear(): void
     {
-        foreach ($this->items->toArray() as $item) {
-            $this->removeItem($item);
-        }
+        $this->items->clear();
+    }
+
+    #[ORM\PreUpdate]
+    public function updateTimestamp(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }
