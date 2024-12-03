@@ -28,7 +28,7 @@ framework:
         json_manifest_path: '%kernel.project_dir%/public/build/manifest.json'
         
     serializer:
-        enable_annotations: true
+        enable_attributes: true
         
     mailer:
         message_bus: false
