@@ -15,19 +15,31 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                default_target_path: admin
+            custom_authenticator: App\Security\LoginFormAuthenticator
             logout:
                 path: app_logout
-
+                target: app_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800 # 1 semaine
+                signature_properties: ['password']
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
+            # Protection contre les attaques
+            x_frame_options: SAMEORIGIN
+            content_security_policy:
+                enabled: true
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/login, roles: PUBLIC_ACCESS }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/, roles: PUBLIC_ACCESS }
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
 
 when@test:
     security:

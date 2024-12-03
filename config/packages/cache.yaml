@@ -1,19 +1,24 @@
 framework:
     cache:
         # Unique name of your app: used to compute stable namespaces for cache keys.
-        #prefix_seed: your_vendor_name/app_name
+        prefix_seed: maison_provence
 
-        # The "app" cache stores to the filesystem by default.
-        # The data in this cache should persist between deploys.
-        # Other options include:
+        # Utiliser APCu pour le cache système
+        system: cache.adapter.apcu
 
-        # Redis
-        #app: cache.adapter.redis
-        #default_redis_provider: redis://localhost
+        # Utiliser le filesystem pour le cache par défaut
+        app: cache.adapter.filesystem
 
-        # APCu (not recommended with heavy random-write workloads as memory fragmentation can cause perf issues)
-        #app: cache.adapter.apcu
-
-        # Namespaced pools use the above "app" backend by default
-        #pools:
-            #my.dedicated.cache: null
+        # Pools de cache spécifiques
+        pools:
+            # Cache pour doctrine
+            doctrine.result_cache_pool:
+                adapter: cache.app
+            doctrine.system_cache_pool:
+                adapter: cache.system
+            # Cache pour les traductions
+            translations_pool:
+                adapter: cache.app
+            # Cache pour les assets
+            assets_pool:
+                adapter: cache.app

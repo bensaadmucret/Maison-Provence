@@ -3,6 +3,9 @@ doctrine:
         url: '%env(resolve:DATABASE_URL)%'
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
+        schema_filter: ~^(?!session)~
+        types:
+            uuid: Symfony\Bridge\Doctrine\Types\UuidType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -19,6 +22,26 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+        second_level_cache:
+            enabled: true
+            region_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
+            regions:
+                default:
+                    lifetime: 3600
+                    service_lifetime: 3600
+                query_cache:
+                    lifetime: 3600
+        metadata_cache_driver:
+            type: pool
+            pool: doctrine.system_cache_pool
+        query_cache_driver:
+            type: pool
+            pool: doctrine.system_cache_pool
+        result_cache_driver:
+            type: pool
+            pool: doctrine.result_cache_pool
         controller_resolver:
             auto_mapping: false
         dql:
