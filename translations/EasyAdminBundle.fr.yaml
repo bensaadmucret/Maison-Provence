@@ -1,0 +1,47 @@
+default:
+  actions:
+    new: 'Créer %entity_label%'
+    edit: 'Modifier %entity_label%'
+    show: 'Voir %entity_label%'
+    delete: 'Supprimer'
+    save: 'Enregistrer les modifications'
+    cancel: 'Annuler'
+    list: 'Retour à la liste'
+    search: 'Rechercher'
+
+  entity:
+    save_changes: 'Enregistrer les modifications'
+    delete_modal:
+      title: 'Êtes-vous sûr de vouloir supprimer cet élément ?'
+      content: 'Cette action est irréversible.'
+
+  list:
+    actions: 'Actions'
+    no_results: 'Aucun résultat trouvé.'
+    no_entities: 'Aucun élément trouvé.'
+
+  paginator:
+    displaying: 'Affichage de %start% à %end% sur %total% éléments'
+    results: '{0} Aucun résultat|{1} 1 résultat|]1,Inf] %count% résultats'
+
+  filters:
+    title: 'Filtres'
+    button.clear: 'Effacer'
+    button.apply: 'Appliquer'
+    label.is_equal_to: 'est égal à'
+    label.is_not_equal_to: 'est différent de'
+    label.is_greater_than: 'est supérieur à'
+    label.is_greater_than_or_equal_to: 'est supérieur ou égal à'
+    label.is_less_than: 'est inférieur à'
+    label.is_less_than_or_equal_to: 'est inférieur ou égal à'
+    label.is_between: 'est entre'
+    label.contains: 'contient'
+    label.not_contains: 'ne contient pas'
+    label.starts_with: 'commence par'
+    label.ends_with: 'finit par'
+    label.exactly: 'exactement'
+    label.not_exactly: 'différent de'
+    label.is_same: 'est'
+    label.is_not_same: 'n''est pas'
+    label.is_defined: 'est défini'
+    label.is_not_defined: 'n''est pas défini'

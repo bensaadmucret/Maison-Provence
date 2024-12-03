@@ -139,9 +139,9 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('E-Commerce Administration')
-            ->setFaviconPath('favicon.ico')
-            ->setTranslationDomain('admin');
+            ->setTitle('Maison Provence')
+            ->setTranslationDomain('messages')
+            ->renderContentMaximized();
     }
 
     public function configureUserMenu(UserInterface $user): UserMenu
@@ -157,26 +157,23 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-
-        yield MenuItem::section('Configuration');
-        yield MenuItem::linkToCrud('Configuration du site', 'fa fa-cog', SiteConfiguration::class)
-            ->setPermission('ROLE_ADMIN');
-
-        yield MenuItem::section('E-commerce');
-        yield MenuItem::linkToCrud('Produits', 'fa fa-box', Product::class);
-        yield MenuItem::linkToCrud('Catégories', 'fa fa-tags', Category::class);
-        yield MenuItem::linkToCrud('Commandes', 'fa fa-shopping-cart', Order::class);
-
-        yield MenuItem::section('SEO');
-        yield MenuItem::linkToCrud('Métadonnées SEO', 'fa fa-search', SEO::class);
-
-        yield MenuItem::section('Utilisateurs');
-        yield MenuItem::linkToCrud('Utilisateurs', 'fa fa-users', User::class);
-
-        yield MenuItem::section('Médias');
-        yield MenuItem::linkToCrud('Médias', 'fa fa-images', Media::class);
-        yield MenuItem::linkToCrud('Collections', 'fa fa-folder', MediaCollection::class);
+        yield MenuItem::linkToDashboard('dashboard.title', 'fa fa-home');
+        
+        yield MenuItem::section('menu.clients');
+        yield MenuItem::linkToCrud('client.list', 'fas fa-users', User::class);
+        
+        yield MenuItem::section('menu.products');
+        yield MenuItem::linkToCrud('Catégories', 'fas fa-list', Category::class);
+        yield MenuItem::linkToCrud('Produits', 'fas fa-tag', Product::class);
+        
+        yield MenuItem::section('menu.orders');
+        yield MenuItem::linkToCrud('Commandes', 'fas fa-shopping-cart', Order::class);
+        
+        yield MenuItem::section('menu.settings');
+        yield MenuItem::linkToCrud('SEO', 'fas fa-search', SEO::class);
+        yield MenuItem::linkToCrud('Configuration', 'fas fa-cog', SiteConfiguration::class);
+        yield MenuItem::linkToCrud('Médias', 'fas fa-images', Media::class);
+        yield MenuItem::linkToCrud('Collections', 'fas fa-folder', MediaCollection::class);
 
         yield MenuItem::section('');
         yield MenuItem::linkToRoute('Retour au site', 'fa fa-arrow-left', 'app_home');

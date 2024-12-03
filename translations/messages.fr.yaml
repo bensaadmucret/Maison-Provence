@@ -1,0 +1,44 @@
+dashboard:
+  title: 'Tableau de bord'
+  welcome: 'Bienvenue dans votre back-office'
+
+menu:
+  dashboard: 'Tableau de bord'
+  clients: 'Clients'
+  products: 'Produits'
+  orders: 'Commandes'
+  settings: 'Paramètres'
+
+action:
+  new: 'Ajouter'
+  edit: 'Modifier'
+  delete: 'Supprimer'
+  save: 'Enregistrer'
+  cancel: 'Annuler'
+  list: 'Retour à la liste'
+  search: 'Rechercher'
+
+client:
+  title: 'Client'
+  list: 'Liste des clients'
+  new: 'Nouveau client'
+  edit: 'Modifier le client'
+  id: 'ID'
+  nom: 'Nom'
+  prenom: 'Prénom'
+  email: 'Email'
+  telephone: 'Téléphone'
+  adresse: 'Adresse'
+  code_postal: 'Code postal'
+  ville: 'Ville'
+  created_at: 'Créé le'
+  updated_at: 'Modifié le'
+
+message:
+  success:
+    created: 'Élément créé avec succès'
+    updated: 'Élément mis à jour avec succès'
+    deleted: 'Élément supprimé avec succès'
+  error:
+    not_found: 'Élément non trouvé'
+    delete: 'Impossible de supprimer cet élément'

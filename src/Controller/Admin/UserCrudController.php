@@ -38,14 +38,13 @@ class UserCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setEntityLabelInSingular('Utilisateur')
-            ->setEntityLabelInPlural('Utilisateurs')
+            ->setEntityLabelInSingular('client.title')
+            ->setEntityLabelInPlural('client.list')
             ->setDefaultSort(['email' => 'ASC'])
             ->setSearchFields(['email', 'firstName', 'lastName'])
-            ->setPageTitle('index', 'Liste des utilisateurs')
-            ->setPageTitle('new', 'Créer un utilisateur')
-            ->setPageTitle('edit', 'Modifier l\'utilisateur')
-            ->setPageTitle('detail', 'Détails de l\'utilisateur')
+            ->setPageTitle('index', 'client.list')
+            ->setPageTitle('new', 'client.new')
+            ->setPageTitle('edit', 'client.edit')
             ->setFormOptions([
                 'validation_groups' => ['Default', 'create'],
             ]);
@@ -53,25 +52,26 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')->hideOnForm();
+        yield IdField::new('id', 'client.id')
+            ->hideOnForm();
 
-        yield EmailField::new('email', 'Email')
-            ->setFormTypeOption('attr', [
-                'placeholder' => 'exemple@email.com',
-                'required' => true,
-            ]);
-
-        yield TextField::new('firstName', 'Prénom')
+        yield TextField::new('firstName', 'client.nom')
             ->setFormType(TextType::class)
             ->setFormTypeOption('attr', [
                 'placeholder' => 'Prénom',
                 'required' => true,
             ]);
 
-        yield TextField::new('lastName', 'Nom')
+        yield TextField::new('lastName', 'client.prenom')
             ->setFormType(TextType::class)
             ->setFormTypeOption('attr', [
                 'placeholder' => 'Nom',
+                'required' => true,
+            ]);
+
+        yield EmailField::new('email', 'client.email')
+            ->setFormTypeOption('attr', [
+                'placeholder' => 'exemple@email.com',
                 'required' => true,
             ]);
 
@@ -86,15 +86,16 @@ class UserCrudController extends AbstractCrudController
         }
 
         yield ArrayField::new('roles', 'Rôles')
-            ->setHelp('Les rôles disponibles sont: ROLE_USER, ROLE_ADMIN');
+            ->setHelp('Les rôles disponibles sont: ROLE_USER, ROLE_ADMIN')
+            ->hideOnIndex();
 
         if (Crud::PAGE_NEW !== $pageName) {
             yield DateTimeField::new('lastLoginAt', 'Dernière connexion')
                 ->setFormat('dd/MM/Y HH:mm:ss');
-            yield DateTimeField::new('createdAt', 'Créé le')
+            yield DateTimeField::new('createdAt', 'client.created_at')
                 ->setFormat('dd/MM/Y HH:mm:ss')
                 ->hideOnForm();
-            yield DateTimeField::new('updatedAt', 'Mis à jour le')
+            yield DateTimeField::new('updatedAt', 'client.updated_at')
                 ->setFormat('dd/MM/Y HH:mm:ss')
                 ->hideOnForm();
         }
@@ -105,16 +106,19 @@ class UserCrudController extends AbstractCrudController
         return $actions
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
-                return $action->setIcon('fa fa-plus')->addCssClass('btn btn-primary');
+                return $action->setLabel('action.new');
             })
             ->update(Crud::PAGE_INDEX, Action::EDIT, function (Action $action) {
-                return $action->setIcon('fa fa-edit');
-            })
-            ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
-                return $action->setIcon('fa fa-eye');
+                return $action->setLabel('action.edit');
             })
             ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
-                return $action->setIcon('fa fa-trash');
+                return $action->setLabel('action.delete');
+            })
+            ->update(Crud::PAGE_DETAIL, Action::EDIT, function (Action $action) {
+                return $action->setLabel('action.edit');
+            })
+            ->update(Crud::PAGE_DETAIL, Action::DELETE, function (Action $action) {
+                return $action->setLabel('action.delete');
             });
     }
 
