@@ -22,6 +22,7 @@
         "symfony/mailer": "7.1.*",
         "symfony/monolog-bundle": "^3.0",
         "symfony/notifier": "7.1.*",
+        "symfony/rate-limiter": "7.1.*",
         "symfony/runtime": "7.1.*",
         "symfony/security-bundle": "7.1.*",
         "symfony/serializer": "7.1.*",

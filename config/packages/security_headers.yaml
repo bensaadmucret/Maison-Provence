@@ -1,0 +1,16 @@
+parameters:
+    security.headers:
+        x_frame_options: 'SAMEORIGIN'
+        content_security_policy:
+            - "default-src 'self'"
+            - "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+            - "style-src 'self' 'unsafe-inline'"
+            - "img-src 'self' data:"
+            - "connect-src 'self'"
+            - "font-src 'self'"
+
+services:
+    security.event_listener.add_security_headers:
+        class: Symfony\Component\EventDispatcher\EventSubscriberInterface
+        tags:
+            - { name: kernel.event_subscriber }
