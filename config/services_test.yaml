@@ -10,3 +10,7 @@ services:
     App\Tests\:
         resource: '../tests/*'
         exclude: '../tests/{bootstrap.php}'
+
+    # Correction de la casse pour GenerateTestImage
+    App\Tests\Fixtures\GenerateTestImage:
+        public: true

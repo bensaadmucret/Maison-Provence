@@ -2,7 +2,7 @@
 
 [![PHP Version](https://img.shields.io/badge/PHP-8.2-777BB4.svg?style=flat-square&logo=php)](https://php.net)
 [![Symfony Version](https://img.shields.io/badge/Symfony-7.1-000000.svg?style=flat-square&logo=symfony)](https://symfony.com)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13-336791.svg?style=flat-square&logo=postgresql)](https://www.postgresql.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791.svg?style=flat-square&logo=postgresql)](https://www.postgresql.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 [![GitHub Actions](https://img.shields.io/github/actions/workflow/status/bensaadmucret/Maison-Provence/ci.yml?branch=main&style=flat-square)](https://github.com/bensaadmucret/Maison-Provence/actions)
 [![Coverage Status](https://coveralls.io/repos/github/bensaadmucret/Maison-Provence/badge.svg?branch=main)](https://coveralls.io/github/bensaadmucret/Maison-Provence?branch=main)
