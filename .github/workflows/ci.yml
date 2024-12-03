@@ -52,17 +52,25 @@ jobs:
           php bin/console doctrine:database:create --env=test
           php bin/console doctrine:schema:create --env=test
 
-      - name: Execute tests via PHPUnit
-        run: vendor/bin/phpunit --coverage-clover coverage.xml
+      - name: Generate code coverage report
+        run: |
+          composer require --dev php-coveralls/php-coveralls
+          vendor/bin/phpunit --coverage-clover coverage.xml
 
-      - name: PHP CS Fixer
-        run: vendor/bin/php-cs-fixer fix --dry-run --diff
-
-      - name: PHPStan
-        run: vendor/bin/phpstan analyse src tests
+      - name: Upload coverage to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        run: |
+          vendor/bin/php-coveralls -v
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage.xml
           fail_ci_if_error: true
+
+      - name: PHP CS Fixer
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse src tests

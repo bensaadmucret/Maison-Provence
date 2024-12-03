@@ -5,7 +5,9 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13-336791.svg?style=flat-square&logo=postgresql)](https://www.postgresql.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 [![GitHub Actions](https://img.shields.io/github/actions/workflow/status/bensaadmucret/Maison-Provence/ci.yml?branch=main&style=flat-square)](https://github.com/bensaadmucret/Maison-Provence/actions)
-[![Maintainability](https://api.codeclimate.com/v1/badges/your-repo-id/maintainability)](https://codeclimate.com/github/bensaadmucret/Maison-Provence)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bensaadmucret_Maison-Provence&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=bensaadmucret_Maison-Provence)
+[![Coverage Status](https://coveralls.io/repos/github/bensaadmucret/Maison-Provence/badge.svg?branch=main)](https://coveralls.io/github/bensaadmucret/Maison-Provence?branch=main)
+[![PHPStan](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg?style=flat-square)](https://phpstan.org/)
 
 Une plateforme e-commerce moderne développée avec Symfony 7.1, mettant l'accent sur l'optimisation SEO et la gestion efficace des produits.
 
