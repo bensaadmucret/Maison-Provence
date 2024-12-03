@@ -30,7 +30,6 @@ doctrine:
             regions:
                 default:
                     lifetime: 3600
-                    lifetime: 3600
                 query_cache:
                     lifetime: 3600
         metadata_cache_driver:
