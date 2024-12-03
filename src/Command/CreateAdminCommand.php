@@ -29,21 +29,21 @@ class CreateAdminCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $user = new User();
-        $user->setEmail('admin@admin.com');
+        $user->setEmail('contact.mzb@maison-lavande-provence.fr');
         $user->setRoles(['ROLE_ADMIN']);
         $user->setFirstName('Admin');
         $user->setLastName('User');
 
         $hashedPassword = $this->passwordHasher->hashPassword(
             $user,
-            'admin' // Mot de passe temporaire
+            'Edben79@' 
         );
         $user->setPassword($hashedPassword);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $io->success('Admin user created successfully with email: admin@admin.com and password: admin');
+        $io->success('Admin user created successfully.');
 
         return Command::SUCCESS;
     }
