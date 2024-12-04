@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ccaae847c53d89e27eee6a6970e9f26c",
+    "content-hash": "3b51c019707624e3dab73c41ce6752a5",
     "packages": [
         {
             "name": "composer/semver",
@@ -1558,6 +1558,68 @@
             "time": "2024-01-23T15:35:55+00:00"
         },
         {
+            "name": "imagine/imagine",
+            "version": "1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-imagine/Imagine.git",
+                "reference": "80ab21434890dee9ba54969d31c51ac8d4d551e0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-imagine/Imagine/zipball/80ab21434890dee9ba54969d31c51ac8d4d551e0",
+                "reference": "80ab21434890dee9ba54969d31c51ac8d4d551e0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5 || ^7.5 || ^8.4 || ^9.3"
+            },
+            "suggest": {
+                "ext-exif": "to read EXIF metadata",
+                "ext-gd": "to use the GD implementation",
+                "ext-gmagick": "to use the Gmagick implementation",
+                "ext-imagick": "to use the Imagick implementation"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-develop": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Imagine\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bulat Shakirzyanov",
+                    "email": "mallluhuct@gmail.com",
+                    "homepage": "http://avalanche123.com"
+                }
+            ],
+            "description": "Image processing for PHP",
+            "homepage": "http://imagine.readthedocs.org/",
+            "keywords": [
+                "drawing",
+                "graphics",
+                "image manipulation",
+                "image processing"
+            ],
+            "support": {
+                "issues": "https://github.com/php-imagine/Imagine/issues",
+                "source": "https://github.com/php-imagine/Imagine/tree/1.5.0"
+            },
+            "time": "2024-12-03T14:37:55+00:00"
+        },
+        {
             "name": "jms/metadata",
             "version": "2.8.0",
             "source": {
@@ -1620,6 +1682,112 @@
                 "source": "https://github.com/schmittjoh/metadata/tree/2.8.0"
             },
             "time": "2023-02-15T13:44:18+00:00"
+        },
+        {
+            "name": "liip/imagine-bundle",
+            "version": "2.13.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liip/LiipImagineBundle.git",
+                "reference": "98e0318ea0f7b9500343236e63cc29ded58a1d43"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/liip/LiipImagineBundle/zipball/98e0318ea0f7b9500343236e63cc29ded58a1d43",
+                "reference": "98e0318ea0f7b9500343236e63cc29ded58a1d43",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "imagine/imagine": "^1.3.2",
+                "php": "^7.2|^8.0",
+                "symfony/filesystem": "^3.4|^4.4|^5.3|^6.0|^7.0",
+                "symfony/finder": "^3.4|^4.4|^5.3|^6.0|^7.0",
+                "symfony/framework-bundle": "^3.4.23|^4.4|^5.3|^6.0|^7.0",
+                "symfony/mime": "^4.4|^5.3|^6.0|^7.0",
+                "symfony/options-resolver": "^3.4|^4.4|^5.3|^6.0|^7.0",
+                "symfony/process": "^3.4|^4.4|^5.3|^6.0|^7.0",
+                "twig/twig": "^1.44|^2.9|^3.0"
+            },
+            "require-dev": {
+                "amazonwebservices/aws-sdk-for-php": "^1.0",
+                "aws/aws-sdk-php": "^2.4|^3.0",
+                "doctrine/cache": "^1.11|^2.0",
+                "doctrine/persistence": "^1.3|^2.0",
+                "enqueue/enqueue-bundle": "^0.9|^0.10",
+                "ext-gd": "*",
+                "league/flysystem": "^1.0|^2.0|^3.0",
+                "phpstan/phpstan": "^1.10.0",
+                "psr/cache": "^1.0|^2.0|^3.0",
+                "psr/log": "^1.0",
+                "symfony/asset": "^3.4|^4.4|^5.3|^6.0|^7.0",
+                "symfony/browser-kit": "^3.4|^4.4|^5.3|^6.0|^7.0",
+                "symfony/cache": "^3.4|^4.4|^5.3|^6.0|^7.0",
+                "symfony/console": "^3.4|^4.4|^5.3|^6.0|^7.0",
+                "symfony/dependency-injection": "^3.4|^4.4|^5.3|^6.0|^7.0",
+                "symfony/form": "^3.4|^4.4|^5.3|^6.0|^7.0",
+                "symfony/messenger": "^4.4|^5.3|^6.0|^7.0",
+                "symfony/phpunit-bridge": "^7.0.2",
+                "symfony/templating": "^3.4|^4.4|^5.3|^6.0",
+                "symfony/validator": "^3.4|^4.4|^5.3|^6.0|^7.0",
+                "symfony/yaml": "^3.4|^4.4|^5.3|^6.0|^7.0"
+            },
+            "suggest": {
+                "alcaeus/mongo-php-adapter": "required for mongodb components",
+                "amazonwebservices/aws-sdk-for-php": "required to use AWS version 1 cache resolver",
+                "aws/aws-sdk-php": "required to use AWS version 2/3 cache resolver",
+                "doctrine/mongodb-odm": "required to use mongodb-backed doctrine components",
+                "enqueue/enqueue-bundle": "^0.9 add if you like to process images in background",
+                "ext-exif": "required to read EXIF metadata from images",
+                "ext-gd": "required to use gd driver",
+                "ext-gmagick": "required to use gmagick driver",
+                "ext-imagick": "required to use imagick driver",
+                "ext-json": "required to read JSON manifest versioning",
+                "ext-mongodb": "required for mongodb components",
+                "league/flysystem": "required to use FlySystem data loader or cache resolver",
+                "monolog/monolog": "A psr/log compatible logger is required to enable logging",
+                "rokka/imagine-vips": "required to use 'vips' driver",
+                "symfony/asset": "If you want to use asset versioning",
+                "symfony/messenger": "If you like to process images in background",
+                "symfony/templating": "required to use deprecated Templating component instead of Twig"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Liip\\ImagineBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Liip and other contributors",
+                    "homepage": "https://github.com/liip/LiipImagineBundle/contributors"
+                }
+            ],
+            "description": "This bundle provides an image manipulation abstraction toolkit for Symfony-based projects.",
+            "homepage": "https://www.liip.ch",
+            "keywords": [
+                "bundle",
+                "image",
+                "imagine",
+                "liip",
+                "manipulation",
+                "photos",
+                "pictures",
+                "symfony",
+                "transformation"
+            ],
+            "support": {
+                "issues": "https://github.com/liip/LiipImagineBundle/issues",
+                "source": "https://github.com/liip/LiipImagineBundle/tree/2.13.2"
+            },
+            "time": "2024-09-04T12:55:26+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -4139,6 +4307,84 @@
             "time": "2024-11-08T15:46:42+00:00"
         },
         {
+            "name": "symfony/lock",
+            "version": "v7.1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/lock.git",
+                "reference": "1b898398007d80b4f32128df4b4f0c07c0368cf4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/lock/zipball/1b898398007d80b4f32128df4b4f0c07c0368cf4",
+                "reference": "1b898398007d80b4f32128df4b4f0c07c0368cf4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "psr/log": "^1|^2|^3"
+            },
+            "conflict": {
+                "doctrine/dbal": "<3.6",
+                "symfony/cache": "<6.4"
+            },
+            "require-dev": {
+                "doctrine/dbal": "^3.6|^4",
+                "predis/predis": "^1.1|^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Lock\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jérémy Derussé",
+                    "email": "jeremy@derusse.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Creates and manages locks, a mechanism to provide exclusive access to a shared resource",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "cas",
+                "flock",
+                "locking",
+                "mutex",
+                "redlock",
+                "semaphore"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/lock/tree/v7.1.6"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-10-25T15:34:21+00:00"
+        },
+        {
             "name": "symfony/mailer",
             "version": "v7.1.6",
             "source": {
@@ -5238,6 +5484,67 @@
                 }
             ],
             "time": "2024-09-09T11:45:10+00:00"
+        },
+        {
+            "name": "symfony/process",
+            "version": "v7.1.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/process.git",
+                "reference": "42783370fda6e538771f7c7a36e9fa2ee3a84892"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/process/zipball/42783370fda6e538771f7c7a36e9fa2ee3a84892",
+                "reference": "42783370fda6e538771f7c7a36e9fa2ee3a84892",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Process\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Executes commands in sub-processes",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/process/tree/v7.1.8"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-11-06T14:23:19+00:00"
         },
         {
             "name": "symfony/property-access",
@@ -11714,67 +12021,6 @@
                 }
             ],
             "time": "2024-11-13T16:15:23+00:00"
-        },
-        {
-            "name": "symfony/process",
-            "version": "v7.1.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/process.git",
-                "reference": "42783370fda6e538771f7c7a36e9fa2ee3a84892"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/42783370fda6e538771f7c7a36e9fa2ee3a84892",
-                "reference": "42783370fda6e538771f7c7a36e9fa2ee3a84892",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Process\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Executes commands in sub-processes",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/process/tree/v7.1.8"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2024-11-06T14:23:19+00:00"
         },
         {
             "name": "symfony/web-link",

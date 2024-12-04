@@ -2,30 +2,21 @@
 
 namespace App\Twig;
 
-use App\Entity\SiteConfiguration;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\SiteConfigurationService;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 
 class SiteConfigurationExtension extends AbstractExtension implements GlobalsInterface
 {
-    private ?SiteConfiguration $configuration = null;
-
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private SiteConfigurationService $configurationService
     ) {
     }
 
     public function getGlobals(): array
     {
-        if (null === $this->configuration) {
-            $this->configuration = $this->entityManager
-                ->getRepository(SiteConfiguration::class)
-                ->findOneBy([]);
-        }
-
         return [
-            'site_configuration' => $this->configuration,
+            'site_config' => $this->configurationService->getConfiguration(),
         ];
     }
 }

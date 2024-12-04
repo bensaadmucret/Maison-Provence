@@ -1,0 +1,20 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block title %}Confirmation de votre message{% endblock %}
+
+{% block content %}
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: #333; text-align: center;">Confirmation de réception</h1>
+        
+        <p>Bonjour {{ contact.name }},</p>
+        
+        <p>Nous avons bien reçu votre message et nous vous en remercions.</p>
+        
+        <p>Nous vous répondrons dans les plus brefs délais.</p>
+        
+        <div style="margin-top: 30px;">
+            <p>Cordialement,<br>
+            L'équipe {{ site_config.siteName }}</p>
+        </div>
+    </div>
+{% endblock %}

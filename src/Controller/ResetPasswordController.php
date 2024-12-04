@@ -30,7 +30,7 @@ class ResetPasswordController extends AbstractController
     ) {
     }
 
-    #[Route('', name: 'app_forgot_password_request')]
+    #[Route('', name: 'app_reset_password_request')]
     public function request(Request $request, MailerInterface $mailer): Response
     {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
@@ -52,7 +52,7 @@ class ResetPasswordController extends AbstractController
     public function checkEmail(): Response
     {
         if (null === ($resetToken = $this->getTokenObjectFromSession())) {
-            return $this->redirectToRoute('app_forgot_password_request');
+            return $this->redirectToRoute('app_reset_password_request');
         }
 
         return $this->render('reset_password/check_email.html.twig', [
@@ -83,7 +83,7 @@ class ResetPasswordController extends AbstractController
                 $e->getReason()
             ));
 
-            return $this->redirectToRoute('app_forgot_password_request');
+            return $this->redirectToRoute('app_reset_password_request');
         }
 
         $form = $this->createForm(ChangePasswordFormType::class);
@@ -127,7 +127,10 @@ class ResetPasswordController extends AbstractController
         }
 
         $email = (new TemplatedEmail())
-            ->from(new Address($_ENV['MAILER_FROM_ADDRESS'], $_ENV['MAILER_FROM_NAME']))
+            ->from(new Address(
+                $this->getParameter('app.mail_from_address'),
+                $this->getParameter('app.mail_from_name')
+            ))
             ->to($user->getEmail())
             ->subject('Votre demande de réinitialisation de mot de passe')
             ->htmlTemplate('reset_password/email.html.twig')

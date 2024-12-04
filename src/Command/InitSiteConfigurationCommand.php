@@ -2,8 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\SiteConfiguration;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\SiteConfigurationService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,7 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class InitSiteConfigurationCommand extends Command
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private SiteConfigurationService $configService,
     ) {
         parent::__construct();
     }
@@ -26,26 +25,29 @@ class InitSiteConfigurationCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $configRepository = $this->entityManager->getRepository(SiteConfiguration::class);
-        $existingConfig = $configRepository->findOneBy([]);
+        try {
+            if ($this->configService->hasConfiguration()) {
+                $io->warning('Site configuration already exists.');
+                return Command::SUCCESS;
+            }
 
-        if ($existingConfig) {
-            $io->warning('Site configuration already exists.');
+            $config = $this->configService->createDefaultConfiguration();
+            
+            $io->success('Site configuration has been initialized successfully.');
+            $io->table(
+                ['Setting', 'Value'],
+                [
+                    ['Site Name', $config->getSiteName()],
+                    ['Contact Email', $config->getContactEmail()],
+                    ['E-commerce Enabled', $config->getIsEcommerceEnabled() ? 'Yes' : 'No'],
+                    ['Maintenance Mode', $config->getMaintenanceMode() ? 'Yes' : 'No'],
+                ]
+            );
 
             return Command::SUCCESS;
+        } catch (\Exception $e) {
+            $io->error('An error occurred while initializing the site configuration: ' . $e->getMessage());
+            return Command::FAILURE;
         }
-
-        $config = new SiteConfiguration();
-        $config->setSiteName('Maison Provence');
-        $config->setMaintenanceMode(false);
-        $config->setMaintenanceMessage('Le site est actuellement en maintenance. Nous serons bientôt de retour.');
-        $config->setUpdatedAt(new \DateTimeImmutable());
-
-        $this->entityManager->persist($config);
-        $this->entityManager->flush();
-
-        $io->success('Site configuration has been initialized.');
-
-        return Command::SUCCESS;
     }
 }

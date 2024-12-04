@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Fond du logo -->
+    <circle cx="16" cy="16" r="16" fill="#4A90E2"/>
+    
+    <!-- Stylisation MP pour Maison Provence -->
+    <path d="M8 8 L8 24 L12 24 L12 16 L16 24 L20 16 L20 24 L24 24 L24 8 L20 8 L16 16 L12 8 Z" fill="white"/>
+</svg>

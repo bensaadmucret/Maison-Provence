@@ -1,0 +1,19 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block title %}Nouveau message de contact{% endblock %}
+
+{% block content %}
+    <h1>Nouveau message de contact</h1>
+
+    <p>Un nouveau message a été envoyé via le formulaire de contact :</p>
+
+    <div style="background-color: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 5px;">
+        <p><strong>De :</strong> {{ contact.name }} ({{ contact.email }})</p>
+        <p><strong>Sujet :</strong> {{ contact.subject }}</p>
+        <p><strong>Message :</strong></p>
+        <p style="white-space: pre-wrap;">{{ contact.message }}</p>
+        <p><strong>Date :</strong> {{ contact.createdAt|date('d/m/Y H:i') }}</p>
+    </div>
+
+    <p>Vous pouvez répondre directement à cet email pour contacter l'expéditeur.</p>
+{% endblock %}

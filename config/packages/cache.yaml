@@ -3,19 +3,32 @@ framework:
         # Unique name of your app: used to compute stable namespaces for cache keys.
         prefix_seed: maison_provence
 
-        # Utiliser APCu pour le cache système
-        system: cache.adapter.apcu
+        # Utiliser APCu pour le cache par défaut
+        app: cache.adapter.apcu
 
-        # Utiliser le filesystem pour le cache par défaut
-        app: cache.adapter.filesystem
+        # Utiliser le filesystem pour le cache système
+        system: cache.adapter.system
+
+        # Répertoire pour les pools de cache
+        directory: '%kernel.cache_dir%/pools'
+
+        # Fournisseur de cache par défaut pour doctrine
+        default_doctrine_dbal_provider: 'cache.provider.doctrine'
 
         # Pools de cache spécifiques
         pools:
             # Cache pour doctrine
             doctrine.result_cache_pool:
                 adapter: cache.app
+                default_lifetime: 3600
             doctrine.system_cache_pool:
                 adapter: cache.system
+                default_lifetime: 3600
+            # Cache pour les produits
+            product_cache:
+                adapter: cache.app
+                default_lifetime: 3600
+                tags: true
             # Cache pour les traductions
             translations_pool:
                 adapter: cache.app

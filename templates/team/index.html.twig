@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notre Équipe - {{ site_config.siteName }}{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-12">Notre Équipe</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for member in team_members %}
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
+                    {% if member.photo %}
+                        <img src="{{ vich_uploader_asset(member, 'photoFile') | imagine_filter('team_full') }}" 
+                             alt="Photo de {{ member.getFullName }}" 
+                             class="w-full h-64 object-cover"
+                             loading="lazy">
+                    {% else %}
+                        <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                            <svg class="w-24 h-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </div>
+                    {% endif %}
+
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2">{{ member.getFullName }}</h3>
+                        <p class="text-gray-600 mb-4">{{ member.role }}</p>
+                        
+                        {% if member.description %}
+                            <p class="text-gray-600">{{ member.description|nl2br }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center text-gray-600 col-span-full">Aucun membre d'équipe n'a été ajouté pour le moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

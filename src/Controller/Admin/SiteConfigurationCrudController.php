@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -51,6 +52,37 @@ class SiteConfigurationCrudController extends AbstractCrudController
         yield TextField::new('siteName', 'Nom du site')
             ->setHelp('Le nom qui apparaîtra dans le titre du site');
 
+        yield BooleanField::new('isEcommerceEnabled', 'E-boutique activée')
+            ->setHelp('Active ou désactive l\'e-boutique et la gestion des utilisateurs');
+
+        yield ImageField::new('logo', 'Logo du site')
+            ->setBasePath('/uploads/logo/')
+            ->setUploadDir('public/uploads/logo')
+            ->setUploadedFileNamePattern('[timestamp]-[randomhash].[extension]')
+            ->setFormTypeOptions([
+                'attr' => [
+                    'accept' => 'image/png,image/jpeg,image/svg+xml'
+                ],
+                'data_class' => null
+            ])
+            ->setColumns(6)
+            ->setHelp('Le logo qui apparaîtra dans la barre de navigation et le pied de page. Format recommandé : PNG ou SVG avec fond transparent.')
+            ->setRequired(false);
+
+        yield ImageField::new('favicon', 'Favicon')
+            ->setBasePath('/uploads/favicon/')
+            ->setUploadDir('public/uploads/favicon')
+            ->setUploadedFileNamePattern('[timestamp]-[randomhash].[extension]')
+            ->setFormTypeOptions([
+                'attr' => [
+                    'accept' => 'image/x-icon,image/png,image/jpeg,image/vnd.microsoft.icon'
+                ],
+                'data_class' => null
+            ])
+            ->setColumns(6)
+            ->setHelp('Le favicon est la petite icône qui s\'affiche dans l\'onglet du navigateur, les favoris et sur mobile. Format recommandé : .ico ou .png de 32x32 pixels.')
+            ->setRequired(false);
+
         yield BooleanField::new('maintenanceMode', 'Mode maintenance')
             ->setHelp('Activer/désactiver le mode maintenance')
             ->renderAsSwitch();
@@ -58,9 +90,6 @@ class SiteConfigurationCrudController extends AbstractCrudController
         yield TextareaField::new('maintenanceMessage', 'Message de maintenance')
             ->setHelp('Message affiché pendant la maintenance')
             ->hideOnIndex();
-
-        yield BooleanField::new('isEcommerceEnabled', 'Activer la e-boutique')
-            ->setHelp('Désactiver pour basculer en mode site vitrine');
 
         yield TextareaField::new('ecommerceDisabledMessage', 'Message e-boutique désactivée')
             ->setHelp('Message affiché quand la e-boutique est désactivée')

@@ -4,10 +4,12 @@ namespace App\Service;
 
 use App\Entity\Media;
 use App\Entity\MediaCollection;
+use App\Message\ProcessImageMessage;
 use App\Repository\MediaCollectionRepository;
 use App\Repository\MediaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[AsService]
@@ -25,6 +27,8 @@ class MediaService
         private readonly MediaCollectionRepository $mediaCollectionRepository,
         #[Autowire(service: SluggerInterface::class)]
         private readonly SluggerInterface $slugger,
+        #[Autowire(service: MessageBusInterface::class)]
+        private readonly MessageBusInterface $messageBus,
         #[Autowire('%kernel.project_dir%')]
         string $projectDir,
     ) {
@@ -63,7 +67,26 @@ class MediaService
 
         $this->mediaRepository->save($media, true);
 
+        // Traitement asynchrone des images
+        if (str_starts_with($media->getMimeType(), 'image/')) {
+            $this->processImage($media);
+        }
+
         return $media;
+    }
+
+    private function processImage(Media $media): void
+    {
+        // Définir les dimensions pour les différentes versions
+        $dimensions = [
+            ['width' => 800, 'height' => 600],  // Version standard
+            ['width' => 300, 'height' => 300],  // Version thumbnail
+            ['width' => 1200, 'height' => null] // Version large
+        ];
+
+        $this->messageBus->dispatch(
+            new ProcessImageMessage($media->getId(), $dimensions)
+        );
     }
 
     public function createMediaCollection(string $name, string $description, string $type, array $settings = []): MediaCollection
@@ -95,11 +118,21 @@ class MediaService
             throw new EntityNotFoundException(sprintf('Media with id %d not found', $id));
         }
 
-        // Delete the physical file
-        $filePath = $this->uploadDir.'/'.$media->getFilename();
-        if (file_exists($filePath)) {
-            unlink($filePath);
+        $this->delete($media);
+    }
+
+    private function delete(Media $media): void
+    {
+        $filename = $media->getFilename();
+        $filepath = $this->uploadDir . '/' . $filename;
+
+        if (file_exists($filepath)) {
+            unlink($filepath);
         }
+
+        // Supprimer aussi les versions redimensionnées
+        $pattern = $this->uploadDir . '/resized/' . pathinfo($filename, PATHINFO_FILENAME) . '_*';
+        array_map('unlink', glob($pattern));
 
         $this->mediaRepository->remove($media, true);
     }
@@ -175,7 +208,6 @@ class MediaService
             throw new EntityNotFoundException(sprintf('Media with id %d not found', $id));
         }
 
-        $this->entityManager->remove($media);
-        $this->entityManager->flush();
+        $this->delete($media);
     }
 }

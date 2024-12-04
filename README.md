@@ -1,4 +1,4 @@
-# Maison Provence 🏡
+# Maison Provence 
 
 [![PHP Version](https://img.shields.io/badge/PHP-8.2-777BB4.svg?style=flat-square&logo=php)](https://php.net)
 [![Symfony Version](https://img.shields.io/badge/Symfony-7.1-000000.svg?style=flat-square&logo=symfony)](https://symfony.com)
@@ -10,7 +10,7 @@
 
 Une plateforme e-commerce moderne développée avec Symfony 7.1, mettant l'accent sur l'optimisation SEO et la gestion efficace des produits.
 
-## 🚀 Fonctionnalités
+## Fonctionnalités
 
 - Gestion complète des produits et catégories
 - Optimisation SEO avancée pour chaque entité
@@ -20,7 +20,7 @@ Une plateforme e-commerce moderne développée avec Symfony 7.1, mettant l'accen
 - Validation robuste des données
 - Tests unitaires complets
 
-## 🛠️ Technologies
+## Technologies
 
 - **Framework**: Symfony 7.1
 - **Base de données**: PostgreSQL
@@ -29,14 +29,14 @@ Une plateforme e-commerce moderne développée avec Symfony 7.1, mettant l'accen
 - **Templates**: Twig
 - **Docker**: Environnement de développement conteneurisé
 
-## 📋 Prérequis
+## Prérequis
 
 - Docker et Docker Compose
 - PHP 8.2 ou supérieur
 - Composer
 - Node.js et Yarn (pour les assets)
 
-## 🔧 Installation
+## Installation
 
 1. Cloner le repository :
 ```bash
@@ -70,7 +70,7 @@ docker-compose exec php bin/console doctrine:migrations:migrate
 docker-compose exec php bin/console doctrine:fixtures:load
 ```
 
-## 🚀 CI/CD
+## CI/CD
 
 Le projet utilise GitHub Actions pour l'intégration continue et les analyses de sécurité.
 
@@ -93,7 +93,105 @@ Le projet utilise GitHub Actions pour l'intégration continue et les analyses de
 ### Configuration requise
 - SNYK_TOKEN (optionnel, pour les scans de sécurité avancés)
 
-## 🛍️ Configuration E-commerce
+## Configuration du Projet
+
+### Installation
+
+1. Cloner le projet
+```bash
+git clone [url_du_projet]
+cd maison-provence
+```
+
+2. Installer les dépendances
+```bash
+composer install
+npm install
+```
+
+3. Configuration de l'environnement
+```bash
+cp .env.local.example .env.local
+# Éditer .env.local avec vos configurations
+```
+
+4. Configurer la base de données
+```bash
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
+```
+
+### Configuration des Secrets en Production
+
+1. Générer les clés de chiffrement :
+```bash
+php bin/console secrets:generate-keys
+```
+
+2. Ajouter les secrets :
+```bash
+php bin/console secrets:set STRIPE_SECRET_KEY
+php bin/console secrets:set DB_PASSWORD
+php bin/console secrets:set APP_SECRET
+```
+
+### Workers Messenger
+
+Démarrer les workers pour le traitement asynchrone :
+```bash
+# Worker prioritaire pour les images
+php bin/console messenger:consume async_priority -vv
+
+# Worker par défaut pour les emails et autres tâches
+php bin/console messenger:consume async_default -vv
+```
+
+### Cache
+
+Le projet utilise APCu pour le cache en production. Assurez-vous qu'il est installé :
+```bash
+pecl install apcu
+```
+
+### Performance
+
+- Le cache HTTP est activé en production via HttpCache
+- Les requêtes Doctrine sont optimisées avec du cache et des jointures intelligentes
+- Le traitement des images est asynchrone via Messenger
+- Les emails sont envoyés de manière asynchrone
+
+### Sécurité
+
+- Les configurations sensibles doivent être dans .env.local (non commité)
+- Les secrets en production sont gérés via le système de secrets Symfony
+- Les headers de sécurité sont configurés via SecurityHeadersSubscriber
+
+## Développement
+
+### Commandes utiles
+
+```bash
+# Vider le cache
+php bin/console cache:clear
+
+# Vérifier la configuration
+php bin/console debug:config
+
+# Lister les routes
+php bin/console debug:router
+
+# Vérifier les messages en attente
+php bin/console messenger:failed:show
+```
+
+### Bonnes pratiques
+
+- Utiliser les DTOs pour les formulaires
+- Traiter les tâches lourdes de manière asynchrone
+- Optimiser les requêtes Doctrine
+- Suivre les standards de code PHP-CS-Fixer
+
+## E-commerce
 
 Le site peut fonctionner en deux modes :
 - **Mode E-commerce** : Toutes les fonctionnalités e-commerce sont activées (produits, panier, paiement)
@@ -114,14 +212,14 @@ Le site peut fonctionner en deux modes :
 - Les utilisateurs sont redirigés vers la page d'accueil
 - Un message personnalisé est affiché
 
-## 🧪 Tests
+## Tests
 
 Exécuter les tests unitaires :
 ```bash
 docker-compose exec php bin/phpunit
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ### Entités principales
 
@@ -136,14 +234,14 @@ docker-compose exec php bin/phpunit
 - **SiteConfigurationTrait**: Accès à la configuration du site
 - **SEOTrait**: Fonctionnalités SEO communes
 
-## 🔐 Sécurité
+## Sécurité
 
 - Validation stricte des entrées utilisateur
 - Protection CSRF
 - Filtrage des données SEO
 - Gestion sécurisée des uploads de fichiers
 
-## 🌐 SEO
+## SEO
 
 - Meta tags personnalisables
 - Validation des longueurs des meta titles et descriptions
@@ -151,14 +249,14 @@ docker-compose exec php bin/phpunit
 - Support des Open Graph tags
 - Mots-clés uniques
 
-## 📈 Performances
+## Performances
 
 - Optimisation des requêtes Doctrine
 - Mise en cache des données
 - Gestion efficace des relations entre entités
 - Chargement lazy des collections
 
-## 🤝 Contribution
+## Contribution
 
 1. Fork le projet
 2. Créer une branche pour votre fonctionnalité
@@ -166,23 +264,22 @@ docker-compose exec php bin/phpunit
 4. Pousser vers la branche
 5. Créer une Pull Request
 
-## 📝 Conventions de code
+## Conventions de code
 
 - PSR-12 pour le style de code
 - Types stricts PHP
 - Documentation PHPDoc
 - Messages de commit conventionnels
 
-## 📄 Licence
+## Licence
 
 Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-## 👥 Équipe
+## Équipe
 
 - [Bensaad Mohammed] - Développeur principal
 
-
-## 📞 Support
+## Support
 
 Pour toute question ou problème :
 - Ouvrir une issue sur GitHub

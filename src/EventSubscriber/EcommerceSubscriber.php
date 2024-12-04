@@ -13,6 +13,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EcommerceSubscriber implements EventSubscriberInterface
 {
+    private const PROTECTED_PATHS = [
+        '/shop',
+        '/register',
+        '/profile',
+    ];
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly Security $security,
@@ -36,8 +42,21 @@ class EcommerceSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $path = $request->getPathInfo();
 
-        // Vérifie si la route concerne l'e-commerce
-        if (!str_starts_with($path, '/shop')) {
+        // Ne pas bloquer les routes d'administration
+        if (str_starts_with($path, '/admin')) {
+            return;
+        }
+
+        // Vérifie si la route est protégée
+        $isProtectedPath = false;
+        foreach (self::PROTECTED_PATHS as $protectedPath) {
+            if (str_starts_with($path, $protectedPath)) {
+                $isProtectedPath = true;
+                break;
+            }
+        }
+
+        if (!$isProtectedPath) {
             return;
         }
 
@@ -50,6 +69,7 @@ class EcommerceSubscriber implements EventSubscriberInterface
 
         // Si l'e-commerce est désactivé et que l'utilisateur n'est pas admin
         if (!$siteConfig->isEcommerceEnabled() && !$this->security->isGranted('ROLE_ADMIN')) {
+            $this->security->logout();
             $event->setResponse(new RedirectResponse($this->urlGenerator->generate('app_home')));
         }
     }

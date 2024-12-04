@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\SiteConfigurationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SiteConfigurationRepository::class)]
 class SiteConfiguration
@@ -34,6 +36,35 @@ class SiteConfiguration
 
     #[ORM\Column(type: 'boolean', name: 'is_ecommerce_enabled')]
     private ?bool $isEcommerceEnabled = true;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $isEcommerceEnabledNew = false;
+
+    /**
+     * @var File|null
+     */
+    #[Assert\File(
+        maxSize: '1024k',
+        mimeTypes: ['image/x-icon', 'image/png', 'image/jpeg', 'image/vnd.microsoft.icon'],
+        mimeTypesMessage: 'Veuillez télécharger un fichier au format valide (ico, png)',
+    )]
+    private ?File $faviconFile = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $favicon = null;
+
+    /**
+     * @var File|null
+     */
+    #[Assert\File(
+        maxSize: '2048k',
+        mimeTypes: ['image/png', 'image/jpeg', 'image/svg+xml'],
+        mimeTypesMessage: 'Veuillez télécharger un fichier au format valide (png, jpg, svg)',
+    )]
+    private ?File $logoFile = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $logo = null;
 
     #[ORM\Column(type: 'datetime_immutable')]
     private ?\DateTimeImmutable $createdAt = null;
@@ -135,6 +166,71 @@ class SiteConfiguration
     {
         $this->isEcommerceEnabled = $isEcommerceEnabled;
 
+        return $this;
+    }
+
+    public function isEcommerceEnabledNew(): bool
+    {
+        return $this->isEcommerceEnabledNew;
+    }
+
+    public function setIsEcommerceEnabledNew(bool $isEcommerceEnabledNew): self
+    {
+        $this->isEcommerceEnabledNew = $isEcommerceEnabledNew;
+        return $this;
+    }
+
+    public function getFavicon(): ?string
+    {
+        return $this->favicon;
+    }
+
+    public function setFavicon(?string $favicon): static
+    {
+        $this->favicon = $favicon;
+        return $this;
+    }
+
+    public function getFaviconFile(): ?File
+    {
+        return $this->faviconFile;
+    }
+
+    public function setFaviconFile(?File $faviconFile): self
+    {
+        $this->faviconFile = $faviconFile;
+        if ($faviconFile) {
+            // Forcer la mise à jour de l'entité même si seul le fichier change
+            $this->updatedAt = new \DateTimeImmutable();
+            $this->favicon = $faviconFile->getFilename();
+        }
+        return $this;
+    }
+
+    public function getLogo(): ?string
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(?string $logo): static
+    {
+        $this->logo = $logo;
+        return $this;
+    }
+
+    public function getLogoFile(): ?File
+    {
+        return $this->logoFile;
+    }
+
+    public function setLogoFile(?File $logoFile): self
+    {
+        $this->logoFile = $logoFile;
+        if ($logoFile) {
+            // Forcer la mise à jour de l'entité même si seul le fichier change
+            $this->updatedAt = new \DateTimeImmutable();
+            $this->logo = $logoFile->getFilename();
+        }
         return $this;
     }
 

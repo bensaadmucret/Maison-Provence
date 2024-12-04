@@ -19,14 +19,30 @@
 
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-            <div class="rounded-md shadow-sm -space-y-px mb-3">
+            <div class="rounded-md shadow-sm space-y-4 mb-3">
                 <div>
                     <label for="email" class="sr-only">Email</label>
-                    <input id="email" name="_username" type="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Email" value="{{ last_username }}">
+                    <input id="email" name="_username" type="email" required class="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Email" value="{{ last_username }}">
                 </div>
                 <div>
                     <label for="password" class="sr-only">Mot de passe</label>
-                    <input id="password" name="_password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Mot de passe">
+                    <div class="relative">
+                        <input id="password" name="_password" type="password" required 
+                            class="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm pr-12" 
+                            placeholder="Mot de passe"
+                            autocomplete="current-password">
+                        <button type="button" 
+                            class="password-toggle absolute inset-y-0 right-0 pr-4 flex items-center focus:outline-none hover:text-gray-600 z-10"
+                            aria-label="Basculer la visibilité du mot de passe">
+                            <svg class="password-toggle-icon show h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <svg class="password-toggle-icon hide h-5 w-5 text-gray-400 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -39,7 +55,7 @@
                 </div>
 
                 <div class="text-sm">
-                    <a href="{{ path('app_forgot_password_request') }}" class="font-medium text-blue-600 hover:text-blue-500">
+                    <a href="{{ path('app_reset_password_request') }}" class="font-medium text-blue-600 hover:text-blue-500">
                         Mot de passe oublié ?
                     </a>
                 </div>
@@ -58,4 +74,44 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const initPasswordToggle = () => {
+                const passwordField = document.querySelector('input[type="password"]');
+                const toggleButton = document.querySelector('.password-toggle');
+                
+                if (!passwordField || !toggleButton) return;
+
+                const toggleVisibility = () => {
+                    const isVisible = passwordField.type === 'text';
+                    
+                    // Mettre à jour le type de l'input
+                    passwordField.type = isVisible ? 'password' : 'text';
+                    
+                    // Mettre à jour les icônes
+                    toggleButton.querySelectorAll('.password-toggle-icon').forEach(icon => {
+                        icon.classList.toggle('hidden');
+                    });
+                    
+                    // Mettre à jour l'attribut aria-label pour l'accessibilité
+                    toggleButton.setAttribute('aria-label', 
+                        isVisible ? 'Afficher le mot de passe' : 'Masquer le mot de passe'
+                    );
+                };
+
+                // Ajouter l'écouteur d'événement avec la délégation
+                toggleButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    toggleVisibility();
+                });
+            };
+
+            // Initialiser le toggle du mot de passe
+            initPasswordToggle();
+        });
+    </script>
 {% endblock %}

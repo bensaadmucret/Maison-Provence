@@ -9,6 +9,7 @@ use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\SEO;
 use App\Entity\SiteConfiguration;
+use App\Entity\TeamMember;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -146,18 +147,17 @@ class DashboardController extends AbstractDashboardController
 
     public function configureUserMenu(UserInterface $user): UserMenu
     {
+        $siteConfig = $this->entityManager->getRepository(SiteConfiguration::class)->findOneBy([]);
+        $avatarUrl = $siteConfig && $siteConfig->getLogo() ? '/uploads/logo/' . $siteConfig->getLogo() : null;
+
         return parent::configureUserMenu($user)
-            ->setName($user->getUserIdentifier())
-            ->setGravatarEmail($user->getUserIdentifier())
-            ->addMenuItems([
-                MenuItem::linkToRoute('Mon Profil', 'fa fa-user', 'admin_profile'),
-                MenuItem::linkToRoute('Paramètres', 'fa fa-cog', 'admin_settings'),
-            ]);
+            ->setAvatarUrl($avatarUrl)
+            ->setName($user->getUserIdentifier());
     }
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('dashboard.title', 'fa fa-home');
+        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         
         yield MenuItem::section('menu.clients');
         yield MenuItem::linkToCrud('client.list', 'fas fa-users', User::class);
@@ -174,6 +174,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Configuration', 'fas fa-cog', SiteConfiguration::class);
         yield MenuItem::linkToCrud('Médias', 'fas fa-images', Media::class);
         yield MenuItem::linkToCrud('Collections', 'fas fa-folder', MediaCollection::class);
+        yield MenuItem::linkToCrud('Équipe', 'fas fa-users', TeamMember::class);
 
         yield MenuItem::section('');
         yield MenuItem::linkToRoute('Retour au site', 'fa fa-arrow-left', 'app_home');

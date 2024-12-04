@@ -24,17 +24,44 @@ framework:
         enabled: true
         default_ttl: 0
         
-    assets:
-        json_manifest_path: '%kernel.project_dir%/public/build/manifest.json'
-        
     serializer:
         enable_attributes: true
         
     mailer:
         message_bus: false
 
+    lock:
+        enabled: true
+        resources:
+            login_limiter:
+                dsn: 'flock'
+            api:
+                dsn: 'flock'
+
+    cache:
+        app: cache.adapter.filesystem
+        system: cache.adapter.system
+        directory: '%kernel.cache_dir%/pools'
+        default_psr6_provider: 'cache.provider.default'
+        pools:
+            cache.provider.default:
+                adapter: cache.adapter.filesystem
+
+    profiler:
+        enabled: true
+        collect: true
+        only_exceptions: false
+        only_main_requests: false
+        dsn: 'file:%kernel.project_dir%/var/cache/%kernel.environment%/profiler'
+
+when@dev:
+    framework:
+        profiler: true
+
 when@test:
     framework:
         test: true
         session:
             storage_factory_id: session.storage.factory.mock_file
+        profiler:
+            collect: false

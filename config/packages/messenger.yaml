@@ -3,27 +3,40 @@ framework:
         failure_transport: failed
 
         transports:
-            # https://symfony.com/doc/current/messenger.html#transport-configuration
-            async:
+            async_priority:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
+                    queue_name: priority
                     use_notify: true
                     check_delayed_interval: 60000
                 retry_strategy:
                     max_retries: 3
                     multiplier: 2
+            
+            async_default:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queue_name: default
+                    use_notify: true
+                    check_delayed_interval: 60000
+                retry_strategy:
+                    max_retries: 3
+                    multiplier: 2
+            
             failed: 'doctrine://default?queue_name=failed'
-            # sync: 'sync://'
 
         default_bus: messenger.bus.default
 
         buses:
-            messenger.bus.default: []
+            messenger.bus.default:
+                middleware:
+                    - doctrine_ping_connection
+                    - doctrine_close_connection
+                    - doctrine_transaction
 
         routing:
-            Symfony\Component\Mailer\Messenger\SendEmailMessage: async
-            Symfony\Component\Notifier\Message\ChatMessage: async
-            Symfony\Component\Notifier\Message\SmsMessage: async
-
-            # Route your messages to the transports
-            # 'App\Message\YourMessage': async
+            'App\Message\ProcessImageMessage': async_priority
+            'Symfony\Component\Mailer\Messenger\SendEmailMessage': async_default
+            'Symfony\Component\Notifier\Message\ChatMessage': async_default
+            'Symfony\Component\Notifier\Message\SmsMessage': async_default
+            'App\Message\ExportOrdersMessage': async_default
