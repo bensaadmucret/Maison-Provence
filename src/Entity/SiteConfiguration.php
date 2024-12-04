@@ -34,11 +34,8 @@ class SiteConfiguration
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $ecommerceDisabledMessage = null;
 
-    #[ORM\Column(type: 'boolean', name: 'is_ecommerce_enabled')]
-    private ?bool $isEcommerceEnabled = true;
-
     #[ORM\Column(type: 'boolean')]
-    private bool $isEcommerceEnabledNew = false;
+    private bool $isEcommerceEnabled = true;
 
     /**
      * @var File|null
@@ -67,14 +64,10 @@ class SiteConfiguration
     private ?string $logo = null;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(type: 'datetime_immutable')]
     private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
         $this->maintenanceMode = false;
         $this->isEcommerceEnabled = true;
@@ -169,17 +162,6 @@ class SiteConfiguration
         return $this;
     }
 
-    public function isEcommerceEnabledNew(): bool
-    {
-        return $this->isEcommerceEnabledNew;
-    }
-
-    public function setIsEcommerceEnabledNew(bool $isEcommerceEnabledNew): self
-    {
-        $this->isEcommerceEnabledNew = $isEcommerceEnabledNew;
-        return $this;
-    }
-
     public function getFavicon(): ?string
     {
         return $this->favicon;
@@ -231,18 +213,6 @@ class SiteConfiguration
             $this->updatedAt = new \DateTimeImmutable();
             $this->logo = $logoFile->getFilename();
         }
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
         return $this;
     }
 

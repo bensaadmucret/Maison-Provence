@@ -24,7 +24,12 @@ class SiteConfigurationService
         return $this->configuration;
     }
 
-    private function createDefaultConfiguration(): SiteConfiguration
+    public function hasConfiguration(): bool
+    {
+        return $this->entityManager->getRepository(SiteConfiguration::class)->count([]) > 0;
+    }
+
+    public function createDefaultConfiguration(): SiteConfiguration
     {
         $config = new SiteConfiguration();
         $config->setSiteName('Maison Provence');
@@ -32,7 +37,6 @@ class SiteConfigurationService
         $config->setMaintenanceMessage('Le site est actuellement en maintenance. Nous serons bientôt de retour.');
         $config->setContactEmail('contact@maison-lavande-provence.fr');
         $config->setIsEcommerceEnabled(true);
-        $config->setIsEcommerceEnabledNew(false);
         $config->setEcommerceDisabledMessage('La boutique en ligne est temporairement désactivée.');
 
         $this->entityManager->persist($config);

@@ -39,8 +39,8 @@ class InitSiteConfigurationCommand extends Command
                 [
                     ['Site Name', $config->getSiteName()],
                     ['Contact Email', $config->getContactEmail()],
-                    ['E-commerce Enabled', $config->getIsEcommerceEnabled() ? 'Yes' : 'No'],
-                    ['Maintenance Mode', $config->getMaintenanceMode() ? 'Yes' : 'No'],
+                    ['E-commerce Enabled', $config->isEcommerceEnabled() ? 'Yes' : 'No'],
+                    ['Maintenance Mode', $config->isMaintenanceMode() ? 'Yes' : 'No'],
                 ]
             );
 
