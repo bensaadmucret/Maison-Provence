@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Order;
-use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use Stripe\Stripe;
 use Stripe\Webhook;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -19,7 +19,7 @@ class StripeService
     public function __construct(
         #[Autowire('%env(STRIPE_SECRET_KEY)%')] string $secretKey,
         #[Autowire('%env(STRIPE_PUBLIC_KEY)%')] string $publicKey,
-        #[Autowire('%env(STRIPE_WEBHOOK_SECRET)%')] string $webhookSecret
+        #[Autowire('%env(STRIPE_WEBHOOK_SECRET)%')] string $webhookSecret,
     ) {
         $this->secretKey = $secretKey;
         $this->publicKey = $publicKey;
@@ -31,7 +31,7 @@ class StripeService
     public function createPaymentIntent(Order $order): PaymentIntent
     {
         $total = $order->getTotal();
-        if ($total === null) {
+        if (null === $total) {
             throw new \InvalidArgumentException('Order total cannot be null');
         }
 

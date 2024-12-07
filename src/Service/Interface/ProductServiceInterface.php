@@ -11,15 +11,15 @@ interface ProductServiceInterface
      * @return Product[]
      */
     public function getActiveProducts(): array;
-    
+
     public function getProductBySlug(string $slug): ?Product;
-    
+
     public function createProduct(ProductDTO $productDTO): Product;
-    
+
     public function updateProduct(int $id, ProductDTO $productDTO): Product;
-    
+
     public function deleteProduct(int $id): void;
-    
+
     /**
      * @return Product[]
      */

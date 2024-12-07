@@ -6,8 +6,8 @@ use App\Repository\TeamMemberRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: TeamMemberRepository::class)]
 #[Vich\Uploadable]
@@ -58,6 +58,7 @@ class TeamMember
     public function setName(?string $name): static
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -69,6 +70,7 @@ class TeamMember
     public function setFirstname(?string $firstname): static
     {
         $this->firstname = $firstname;
+
         return $this;
     }
 
@@ -80,6 +82,7 @@ class TeamMember
     public function setRole(?string $role): static
     {
         $this->role = $role;
+
         return $this;
     }
 
@@ -91,6 +94,7 @@ class TeamMember
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -102,6 +106,7 @@ class TeamMember
     public function setPhoto(?string $photo): static
     {
         $this->photo = $photo;
+
         return $this;
     }
 
@@ -127,6 +132,7 @@ class TeamMember
     public function setPosition(?int $position): static
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -138,11 +144,12 @@ class TeamMember
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
     public function getFullName(): string
     {
-        return trim($this->firstname . ' ' . $this->name);
+        return trim($this->firstname.' '.$this->name);
     }
 }

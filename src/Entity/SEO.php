@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\SEORepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -16,19 +17,20 @@ use Symfony\Component\Validator\Constraints as Assert;
     'category' => CategorySEO::class,
     'page' => PageSEO::class,
 ])]
-abstract class SEO
+#[ORM\HasLifecycleCallbacks]
+abstract class SEO implements SEOInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 60, nullable: true)]
-    #[Assert\Length(max: 60, maxMessage: 'Le titre meta ne doit pas dépasser {{ limit }} caractères')]
+    #[ORM\Column(length: 70, nullable: true)]
+    #[Assert\Length(max: 70, maxMessage: 'Le titre meta ne doit pas dépasser {{ limit }} caractères')]
     private ?string $metaTitle = null;
 
-    #[ORM\Column(length: 160, nullable: true)]
-    #[Assert\Length(max: 160, maxMessage: 'La description meta ne doit pas dépasser {{ limit }} caractères')]
+    #[ORM\Column(length: 200, nullable: true)]
+    #[Assert\Length(max: 200, maxMessage: 'La description meta ne doit pas dépasser {{ limit }} caractères')]
     private ?string $metaDescription = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -44,7 +46,24 @@ abstract class SEO
     private bool $followable = true;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[Assert\Collection(
+        fields: [
+            'title' => [new Assert\Length(max: 70)],
+            'description' => [new Assert\Length(max: 200)],
+            'image' => [new Assert\Url()],
+            'type' => [new Assert\Choice(['website', 'article', 'product'])],
+        ],
+        allowExtraFields: false
+    )]
     private array $openGraphData = [];
+
+    public function __construct()
+    {
+        $this->metaKeywords = [];
+        $this->openGraphData = [];
+        $this->indexable = true;
+        $this->followable = true;
+    }
 
     public function getId(): ?int
     {
@@ -56,9 +75,12 @@ abstract class SEO
         return $this->metaTitle;
     }
 
-    public function setMetaTitle(?string $metaTitle): static
+    public function setMetaTitle(?string $metaTitle): self
     {
-        $this->metaTitle = null !== $metaTitle ? substr($metaTitle, 0, 60) : null;
+        if (null !== $metaTitle && strlen($metaTitle) > 70) {
+            $metaTitle = substr($metaTitle, 0, 70);
+        }
+        $this->metaTitle = $metaTitle;
 
         return $this;
     }
@@ -68,9 +90,12 @@ abstract class SEO
         return $this->metaDescription;
     }
 
-    public function setMetaDescription(?string $metaDescription): static
+    public function setMetaDescription(?string $metaDescription): self
     {
-        $this->metaDescription = null !== $metaDescription ? substr($metaDescription, 0, 160) : null;
+        if (null !== $metaDescription && strlen($metaDescription) > 200) {
+            $metaDescription = substr($metaDescription, 0, 200);
+        }
+        $this->metaDescription = $metaDescription;
 
         return $this;
     }
@@ -80,7 +105,7 @@ abstract class SEO
         return $this->canonicalUrl;
     }
 
-    public function setCanonicalUrl(?string $canonicalUrl): static
+    public function setCanonicalUrl(?string $canonicalUrl): self
     {
         $this->canonicalUrl = $canonicalUrl;
 
@@ -92,9 +117,9 @@ abstract class SEO
         return $this->metaKeywords;
     }
 
-    public function setMetaKeywords(array $metaKeywords): static
+    public function setMetaKeywords(array $metaKeywords): self
     {
-        $this->metaKeywords = array_unique($metaKeywords);
+        $this->metaKeywords = $metaKeywords;
 
         return $this;
     }
@@ -104,7 +129,7 @@ abstract class SEO
         return $this->indexable;
     }
 
-    public function setIndexable(bool $indexable): static
+    public function setIndexable(bool $indexable): self
     {
         $this->indexable = $indexable;
 
@@ -116,7 +141,7 @@ abstract class SEO
         return $this->followable;
     }
 
-    public function setFollowable(bool $followable): static
+    public function setFollowable(bool $followable): self
     {
         $this->followable = $followable;
 
@@ -128,15 +153,16 @@ abstract class SEO
         return $this->openGraphData;
     }
 
-    public function setOpenGraphData(array $openGraphData): static
+    public function setOpenGraphData(array $openGraphData): self
     {
-        // Filter out invalid OG properties
-        $this->openGraphData = array_filter(
-            $openGraphData,
-            fn ($key) => str_starts_with($key, 'og:'),
-            ARRAY_FILTER_USE_KEY
-        );
+        $this->openGraphData = $openGraphData;
 
         return $this;
+    }
+
+    #[ORM\PostLoad]
+    public function onPostLoad(PostLoadEventArgs $event): void
+    {
+        // No need to modify metaKeywords here as it's already an array
     }
 }

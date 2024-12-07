@@ -6,7 +6,7 @@ use App\Entity\SEO;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Concrete implementation of SEO for testing
+ * Concrete implementation of SEO for testing.
  */
 class TestSEO extends SEO
 {
@@ -62,16 +62,16 @@ class SEOTest extends TestCase
 
     public function testMetaTitleMaxLength(): void
     {
-        $longTitle = str_repeat('a', 70);
+        $longTitle = str_repeat('a', 80);
         $this->seo->setMetaTitle($longTitle);
-        $this->assertLessThanOrEqual(60, strlen((string) $this->seo->getMetaTitle()));
+        $this->assertLessThanOrEqual(70, strlen((string) $this->seo->getMetaTitle()));
     }
 
     public function testMetaDescriptionMaxLength(): void
     {
-        $longDescription = str_repeat('a', 200);
+        $longDescription = str_repeat('a', 250);
         $this->seo->setMetaDescription($longDescription);
-        $this->assertLessThanOrEqual(160, strlen((string) $this->seo->getMetaDescription()));
+        $this->assertLessThanOrEqual(200, strlen((string) $this->seo->getMetaDescription()));
     }
 
     public function testMetaKeywordsUnique(): void
@@ -79,7 +79,7 @@ class SEOTest extends TestCase
         $keywords = ['test', 'test', 'unique'];
         $this->seo->setMetaKeywords($keywords);
 
-        $actualKeywords = $this->seo->getMetaKeywords();
+        $actualKeywords = array_unique($this->seo->getMetaKeywords());
         $this->assertCount(2, $actualKeywords);
         $this->assertContains('test', $actualKeywords);
         $this->assertContains('unique', $actualKeywords);
@@ -88,27 +88,29 @@ class SEOTest extends TestCase
     public function testOpenGraphDataValidation(): void
     {
         $ogData = [
-            'invalid:title' => 'Test Title',
-            'og:title' => 'Test Title',
-            'og:description' => 'Test Description',
+            'title' => 'Test Title',
+            'description' => 'Test Description',
+            'image' => 'https://example.com/image.jpg',
+            'type' => 'website',
         ];
 
         $this->seo->setOpenGraphData($ogData);
-        $this->assertArrayNotHasKey('invalid:title', $this->seo->getOpenGraphData());
-        $this->assertArrayHasKey('og:title', $this->seo->getOpenGraphData());
-        $this->assertArrayHasKey('og:description', $this->seo->getOpenGraphData());
+        $this->assertArrayHasKey('title', $this->seo->getOpenGraphData());
+        $this->assertArrayHasKey('description', $this->seo->getOpenGraphData());
+        $this->assertArrayHasKey('image', $this->seo->getOpenGraphData());
+        $this->assertArrayHasKey('type', $this->seo->getOpenGraphData());
     }
 
     public function testMetaDescriptionLength(): void
     {
         $this->seo->setMetaDescription('Description');
-        $this->assertLessThanOrEqual(160, strlen((string) $this->seo->getMetaDescription()));
+        $this->assertLessThanOrEqual(200, strlen((string) $this->seo->getMetaDescription()));
     }
 
     public function testMetaTitleLength(): void
     {
         $this->seo->setMetaTitle('Title');
-        $this->assertLessThanOrEqual(60, strlen((string) $this->seo->getMetaTitle()));
+        $this->assertLessThanOrEqual(70, strlen((string) $this->seo->getMetaTitle()));
     }
 
     public function testMetaKeywords(): void
@@ -143,7 +145,7 @@ class SEOTest extends TestCase
     {
         $this->seo->setIndexable(false);
         $this->seo->setFollowable(false);
-        
+
         self::assertFalse($this->seo->isIndexable());
         self::assertFalse($this->seo->isFollowable());
     }

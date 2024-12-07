@@ -3,8 +3,10 @@
 namespace App\Tests\Unit\Controller;
 
 use App\Controller\ProductController;
+use App\Entity\Media;
 use App\Entity\Product;
 use App\Service\ProductService;
+use App\Service\SiteConfigurationService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +33,7 @@ class ProductControllerTest extends TestCase
     private SerializerInterface&MockObject $serializer;
     private ValidatorInterface&MockObject $validator;
     private ContainerInterface&MockObject $container;
+    private SiteConfigurationService&MockObject $siteConfigurationService;
 
     protected function setUp(): void
     {
@@ -41,6 +44,7 @@ class ProductControllerTest extends TestCase
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->serializer = $this->createMock(SerializerInterface::class);
         $this->validator = $this->createMock(ValidatorInterface::class);
+        $this->siteConfigurationService = $this->createMock(SiteConfigurationService::class);
 
         // Create and configure container mock
         $this->container = $this->createMock(ContainerInterface::class);
@@ -65,7 +69,8 @@ class ProductControllerTest extends TestCase
             $this->productService,
             $this->entityManager,
             $this->serializer,
-            $this->validator
+            $this->validator,
+            $this->siteConfigurationService
         );
         $this->controller->setContainer($this->container);
     }
@@ -129,10 +134,10 @@ class ProductControllerTest extends TestCase
 
     public function testIndex(): void
     {
-        // Arrange
+        $request = new Request();
         $products = [
-            new Product(),
-            new Product(),
+            $this->createMock(Product::class),
+            $this->createMock(Product::class),
         ];
 
         $this->productService
@@ -145,16 +150,20 @@ class ProductControllerTest extends TestCase
             ->method('render')
             ->with(
                 'product/index.html.twig',
-                ['products' => $products]
+                self::callback(function ($params) use ($products) {
+                    return $params['products'] === $products
+                        && 1 === $params['currentPage']
+                        && 0.0 === $params['maxPages']
+                        && 'name' === $params['sortBy']
+                        && 'asc' === $params['order'];
+                })
             )
             ->willReturn('rendered template');
 
-        // Act
-        $response = $this->controller->index();
+        $response = $this->controller->index($request);
 
-        // Assert
-        self::assertEquals(200, $response->getStatusCode());
-        self::assertEquals('rendered template', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertInstanceOf(Response::class, $response);
     }
 
     public function testDelete(): void
@@ -204,11 +213,89 @@ class ProductControllerTest extends TestCase
         self::assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
         self::assertNotEmpty($response->getContent(), 'Response content should not be empty');
         self::assertJson($response->getContent(), 'Response content should be valid JSON');
-        
+
         $content = json_decode($response->getContent(), true);
         self::assertNotNull($content, 'Response content should decode to a non-null value');
         self::assertIsArray($content, 'Response content should decode to an array');
         self::assertArrayHasKey('error', $content);
         self::assertEquals($errorMessage, $content['error']);
+    }
+
+    public function testShowProductWithImages(): void
+    {
+        $product = new Product();
+        $product->setName('Test Product');
+        $product->setSlug('test-product');
+
+        $media1 = new Media();
+        $media1->setFilename('image1.jpg');
+        $media1->setPosition(1);
+        $product->addMedia($media1);
+
+        $media2 = new Media();
+        $media2->setFilename('image2.jpg');
+        $media2->setPosition(2);
+        $product->addMedia($media2);
+
+        $this->productService
+            ->expects(self::once())
+            ->method('getProductBySlug')
+            ->with('test-product')
+            ->willReturn($product);
+
+        $this->twig
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'product/show.html.twig',
+                self::callback(function ($params) use ($product) {
+                    return $params['product'] === $product
+                        && 2 === count($params['product']->getMedia());
+                })
+            )
+            ->willReturn('rendered template');
+
+        $response = $this->controller->show(new Request(), 'test-product');
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertInstanceOf(Response::class, $response);
+    }
+
+    public function testIndexWithProductImages(): void
+    {
+        $product1 = new Product();
+        $product1->setName('Product 1');
+        $media1 = new Media();
+        $media1->setFilename('image1.jpg');
+        $product1->addMedia($media1);
+
+        $product2 = new Product();
+        $product2->setName('Product 2');
+        $media2 = new Media();
+        $media2->setFilename('image2.jpg');
+        $product2->addMedia($media2);
+
+        $this->productService
+            ->expects(self::once())
+            ->method('getActiveProducts')
+            ->willReturn([$product1, $product2]);
+
+        $this->twig
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'product/index.html.twig',
+                self::callback(function ($params) {
+                    return 2 === count($params['products'])
+                        && 1 === $params['products'][0]->getMedia()->count()
+                        && 1 === $params['products'][1]->getMedia()->count();
+                })
+            )
+            ->willReturn('rendered template');
+
+        $response = $this->controller->index(new Request());
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertInstanceOf(Response::class, $response);
     }
 }

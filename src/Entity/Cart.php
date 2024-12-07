@@ -126,7 +126,7 @@ class Cart
     {
         return array_reduce(
             $this->items->toArray(),
-            fn(int $count, CartItem $item) => $count + $item->getQuantity(),
+            fn (int $count, CartItem $item) => $count + $item->getQuantity(),
             0
         );
     }
@@ -143,12 +143,23 @@ class Cart
                 return $item;
             }
         }
+
         return null;
     }
 
     public function clear(): void
     {
         $this->items->clear();
+    }
+
+    public function getTotalPrice(): float
+    {
+        $total = 0.0;
+        foreach ($this->getItems() as $item) {
+            $total += $item->getPrice() * $item->getQuantity();
+        }
+
+        return $total;
     }
 
     #[ORM\PreUpdate]

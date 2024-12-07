@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\DTO\OrderDTO;
-use App\DTO\OrderItemDTO;
 use App\Entity\Cart;
 use App\Entity\Order;
 use App\Entity\OrderItem;
@@ -44,7 +43,7 @@ class OrderService
         $order->setUser($user);
         $order->setReference(Uuid::v4()->toRfc4122());
         $order->setStatus(self::STATUS_PENDING);
-        
+
         // Set default addresses from user if available
         if ($user->getDefaultAddress()) {
             $order->setShippingAddress($user->getDefaultAddress());
@@ -52,7 +51,7 @@ class OrderService
         if ($user->getDefaultBillingAddress()) {
             $order->setBillingAddress($user->getDefaultBillingAddress());
         }
-        
+
         $order->setPaymentMethod($orderDTO->getPaymentMethod() ?? 'stripe');
 
         $totalAmount = 0.0;
@@ -63,7 +62,7 @@ class OrderService
             }
 
             $quantity = max(1, $itemDTO->getQuantity() ?? 1);
-            if ($product->getStock() !== null && $product->getStock() < $quantity) {
+            if (null !== $product->getStock() && $product->getStock() < $quantity) {
                 continue;
             }
 
@@ -72,12 +71,12 @@ class OrderService
             $orderItem->setQuantity((int) $quantity);
             $orderItem->setPrice((float) $product->getPrice());
             $orderItem->setOrderRef($order);
-            
+
             $totalAmount += $orderItem->getPrice() * $orderItem->getQuantity();
             $order->addOrderItem($orderItem);
 
             // Update product stock
-            if ($product->getStock() !== null) {
+            if (null !== $product->getStock()) {
                 $newStock = $product->getStock() - $quantity;
                 if ($newStock >= 0) {
                     $product->setStock($newStock);
@@ -150,7 +149,7 @@ class OrderService
         if ($user->getDefaultAddress()) {
             $order->setShippingAddress($user->getDefaultAddress());
         }
-        
+
         if ($user->getDefaultBillingAddress()) {
             $order->setBillingAddress($user->getDefaultBillingAddress());
         }
@@ -163,7 +162,7 @@ class OrderService
             }
 
             $quantity = $cartItem->getQuantity();
-            if ($product->getStock() !== null && $product->getStock() < $quantity) {
+            if (null !== $product->getStock() && $product->getStock() < $quantity) {
                 continue;
             }
 
@@ -177,7 +176,7 @@ class OrderService
             $order->addOrderItem($orderItem);
 
             // Update product stock
-            if ($product->getStock() !== null) {
+            if (null !== $product->getStock()) {
                 $newStock = $product->getStock() - $quantity;
                 if ($newStock >= 0) {
                     $product->setStock($newStock);

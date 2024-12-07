@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
@@ -41,7 +42,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * @param string $role
      * @return User[]
      */
     public function findByRole(string $role): array
@@ -53,10 +53,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
+    public function createNonSuperAdminQueryBuilder(): QueryBuilder
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.roles NOT LIKE :role')
+            ->setParameter('role', '%ROLE_SUPER_ADMIN%')
+            ->orderBy('u.lastName', 'ASC')
+            ->addOrderBy('u.firstName', 'ASC');
+    }
+
     public function upgradePassword(object $user, string $newHashedPassword): void
     {
         if (!$user instanceof User) {
-            throw new \InvalidArgumentException('User must be an instance of ' . User::class);
+            throw new \InvalidArgumentException('User must be an instance of '.User::class);
         }
 
         $user->setPassword($newHashedPassword);

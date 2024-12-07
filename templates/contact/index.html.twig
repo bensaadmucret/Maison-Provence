@@ -3,40 +3,65 @@
 {% block title %}Contact - {{ site_config.siteName }}{% endblock %}
 
 {% block body %}
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 class="text-2xl font-bold mb-6">Contactez-nous</h1>
-        
-        {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
-            <div class="grid grid-cols-2 gap-4">
+<div class="container mx-auto px-4 py-16 bg-amber-50">
+    <!-- Header Section -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900">Contactez-nous</h1>
+        <p class="text-gray-600 mt-4">
+            Nous sommes là pour répondre à toutes vos questions ou demandes. N'hésitez pas à nous écrire !
+        </p>
+    </div>
+
+    <!-- Contact Form Section -->
+    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
+        {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Name Field -->
                 <div>
-                    {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-1'}}) }}
-                    {{ form_widget(form.name, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                    {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'}}) }}
                     {{ form_errors(form.name, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
                 </div>
+
+                <!-- Email Field -->
                 <div>
-                    {{ form_label(form.email, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-1'}}) }}
-                    {{ form_widget(form.email, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                    {{ form_label(form.email, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.email, {'attr': {'class': 'mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'}}) }}
                     {{ form_errors(form.email, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
-                </div>
-                <div class="col-span-2">
-                    {{ form_label(form.subject, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-1'}}) }}
-                    {{ form_widget(form.subject, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
-                    {{ form_errors(form.subject, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
-                </div>
-                <div class="col-span-2">
-                    {{ form_label(form.message, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-1'}}) }}
-                    {{ form_widget(form.message, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
-                    {{ form_errors(form.message, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
                 </div>
             </div>
 
-            <div class="flex justify-end pt-4">
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-                    Envoyer
+            <!-- Subject Field -->
+            <div>
+                {{ form_label(form.subject, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.subject, {'attr': {'class': 'mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500'}}) }}
+                {{ form_errors(form.subject, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
+
+            <!-- Message Field -->
+            <div>
+                {{ form_label(form.message, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.message, {'attr': {'class': 'mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500', 'rows': '5'}}) }}
+                {{ form_errors(form.message, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 shadow-lg transition-transform transform hover:scale-105">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.743 9.8L9 3H3l6.5 6L3 15h6l5.743-5.8z" />
+                    </svg>
+                    Envoyer votre message
                 </button>
             </div>
         {{ form_end(form) }}
+    </div>
+
+    <!-- Additional Info Section -->
+    <div class="mt-16 text-center">
+        <h2 class="text-2xl font-semibold text-gray-800">Ou contactez-nous directement :</h2>
+        <p class="text-gray-600 mt-2">Par téléphone : <span class="text-blue-600 font-medium">+33 1 23 45 67 89</span></p>
+        <p class="text-gray-600">Par email : <a href="mailto:contact@example.com" class="text-blue-600 hover:underline">contact@example.com</a></p>
     </div>
 </div>
 {% endblock %}

@@ -32,7 +32,7 @@ class ProfileController extends AbstractController
     {
         $user = $this->getUser();
         $profileDTO = ProfileEditDTO::createFromUser($user);
-        
+
         $form = $this->createForm(ProfileFormType::class, $profileDTO);
         $form->handleRequest($request);
 

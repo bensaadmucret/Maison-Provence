@@ -3,8 +3,6 @@
 namespace App\Tests\Controller;
 
 use App\Entity\Cart;
-use App\Entity\CartItem;
-use App\Entity\Product;
 use App\Service\CartService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,11 +26,11 @@ class CartControllerTest extends WebTestCase
         $this->cartService->expects($this->once())
             ->method('getCart')
             ->willReturn($cart);
-        
+
         $this->cartService->expects($this->once())
             ->method('getTotal')
             ->willReturn(4000.0);
-            
+
         $this->cartService->expects($this->once())
             ->method('getItemCount')
             ->willReturn(3);
@@ -67,7 +65,7 @@ class CartControllerTest extends WebTestCase
         );
 
         $this->assertResponseIsSuccessful();
-        
+
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertTrue($responseData['success']);
         $this->assertEquals(2000.0, $responseData['cartTotal']);
@@ -90,7 +88,7 @@ class CartControllerTest extends WebTestCase
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-        
+
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertFalse($responseData['success']);
         $this->assertEquals('Stock insuffisant', $responseData['message']);
@@ -120,7 +118,7 @@ class CartControllerTest extends WebTestCase
         );
 
         $this->assertResponseIsSuccessful();
-        
+
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertTrue($responseData['success']);
         $this->assertEquals(1000.0, $responseData['cartTotal']);
@@ -151,7 +149,7 @@ class CartControllerTest extends WebTestCase
         );
 
         $this->assertResponseIsSuccessful();
-        
+
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertTrue($responseData['success']);
         $this->assertEquals(3000.0, $responseData['cartTotal']);
@@ -174,7 +172,7 @@ class CartControllerTest extends WebTestCase
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-        
+
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertFalse($responseData['success']);
         $this->assertEquals('La quantité doit être supérieure à 0', $responseData['message']);
@@ -194,7 +192,7 @@ class CartControllerTest extends WebTestCase
         );
 
         $this->assertResponseIsSuccessful();
-        
+
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertTrue($responseData['success']);
         $this->assertEquals(0, $responseData['cartTotal']);
@@ -214,7 +212,7 @@ class CartControllerTest extends WebTestCase
         $this->client->request('GET', '/cart/count');
 
         $this->assertResponseIsSuccessful();
-        
+
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(5, $responseData['count']);
         $this->assertEquals(5000.0, $responseData['total']);
@@ -244,7 +242,7 @@ class CartControllerTest extends WebTestCase
         );
 
         $this->assertResponseIsSuccessful();
-        
+
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertTrue($responseData['success']);
         $this->assertEquals(1000.0, $responseData['cartTotal']);
@@ -291,7 +289,7 @@ class CartControllerTest extends WebTestCase
         );
 
         $this->assertResponseIsSuccessful();
-        
+
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertTrue($responseData['success']);
         $this->assertEquals(1000.0, $responseData['cartTotal']);

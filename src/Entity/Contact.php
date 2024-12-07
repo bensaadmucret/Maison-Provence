@@ -74,6 +74,7 @@ class Contact
     public function setName(string $name): static
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -85,6 +86,7 @@ class Contact
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -96,6 +98,7 @@ class Contact
     public function setSubject(string $subject): static
     {
         $this->subject = $subject;
+
         return $this;
     }
 
@@ -107,6 +110,7 @@ class Contact
     public function setMessage(string $message): static
     {
         $this->message = $message;
+
         return $this;
     }
 
@@ -123,6 +127,7 @@ class Contact
     public function setIsRead(bool $isRead): static
     {
         $this->isRead = $isRead;
+
         return $this;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Category;
+use App\Entity\LegalPage;
 use App\Entity\Media;
 use App\Entity\MediaCollection;
 use App\Entity\Order;
@@ -141,6 +142,7 @@ class DashboardController extends AbstractDashboardController
     {
         return Dashboard::new()
             ->setTitle('Maison Provence')
+            ->setFaviconPath('favicon.svg')
             ->setTranslationDomain('messages')
             ->renderContentMaximized();
     }
@@ -148,7 +150,7 @@ class DashboardController extends AbstractDashboardController
     public function configureUserMenu(UserInterface $user): UserMenu
     {
         $siteConfig = $this->entityManager->getRepository(SiteConfiguration::class)->findOneBy([]);
-        $avatarUrl = $siteConfig && $siteConfig->getLogo() ? '/uploads/logo/' . $siteConfig->getLogo() : null;
+        $avatarUrl = $siteConfig && $siteConfig->getLogo() ? '/uploads/logo/'.$siteConfig->getLogo() : null;
 
         return parent::configureUserMenu($user)
             ->setAvatarUrl($avatarUrl)
@@ -158,26 +160,27 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        
-        yield MenuItem::section('menu.clients');
-        yield MenuItem::linkToCrud('client.list', 'fas fa-users', User::class);
-        
-        yield MenuItem::section('menu.products');
-        yield MenuItem::linkToCrud('Catégories', 'fas fa-list', Category::class);
-        yield MenuItem::linkToCrud('Produits', 'fas fa-tag', Product::class);
-        
-        yield MenuItem::section('menu.orders');
+
+        yield MenuItem::section('Navigation');
+        yield MenuItem::linkToRoute('Voir le site', 'fas fa-external-link-alt', 'app_home');
+
+        yield MenuItem::section('E-commerce');
         yield MenuItem::linkToCrud('Commandes', 'fas fa-shopping-cart', Order::class);
-        
-        yield MenuItem::section('menu.settings');
-        yield MenuItem::linkToCrud('SEO', 'fas fa-search', SEO::class);
-        yield MenuItem::linkToCrud('Configuration', 'fas fa-cog', SiteConfiguration::class);
+        yield MenuItem::linkToCrud('Produits', 'fas fa-box', Product::class);
+        yield MenuItem::linkToCrud('Catégories', 'fas fa-tags', Category::class);
+
+        yield MenuItem::section('Contenu');
+        yield MenuItem::linkToCrud('Équipe', 'fas fa-users', TeamMember::class);
         yield MenuItem::linkToCrud('Médias', 'fas fa-images', Media::class);
         yield MenuItem::linkToCrud('Collections', 'fas fa-folder', MediaCollection::class);
-        yield MenuItem::linkToCrud('Équipe', 'fas fa-users', TeamMember::class);
+        yield MenuItem::linkToCrud('Pages légales', 'fas fa-gavel', LegalPage::class);
 
-        yield MenuItem::section('');
-        yield MenuItem::linkToRoute('Retour au site', 'fa fa-arrow-left', 'app_home');
+        yield MenuItem::section('Configuration');
+        yield MenuItem::linkToCrud('Configuration du site', 'fas fa-cog', SiteConfiguration::class);
+        yield MenuItem::linkToCrud('SEO', 'fas fa-search', SEO::class);
+
+        yield MenuItem::section('Utilisateurs');
+        yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-user', User::class);
     }
 
     public function configureAssets(): Assets

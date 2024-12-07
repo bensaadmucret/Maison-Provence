@@ -1,0 +1,106 @@
+{% extends 'customer/dashboard/layout.html.twig' %}
+
+{# Définition du titre de la page #}
+{% block title %}Mon profil - {{ parent() }}{% endblock %}
+
+{% block dashboard_content %}
+    <div class="space-y-6">
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Informations personnelles</h3>
+                
+                {{ form_start(form, {'attr': {'class': 'mt-5 space-y-6'}}) }}
+                    <div class="space-y-6">
+                        <div>
+                            {{ form_label(form.firstName, 'Prénom', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                            {{ form_widget(form.firstName, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'}}) }}
+                            {{ form_errors(form.firstName) }}
+                        </div>
+
+                        <div>
+                            {{ form_label(form.lastName, 'Nom', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                            {{ form_widget(form.lastName, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'}}) }}
+                            {{ form_errors(form.lastName) }}
+                        </div>
+
+                        <div>
+                            {{ form_label(form.email, 'Email', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                            {{ form_widget(form.email, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'}}) }}
+                            {{ form_errors(form.email) }}
+                        </div>
+
+                        <div>
+                            {{ form_label(form.phone, 'Téléphone', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                            {{ form_widget(form.phone, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'}}) }}
+                            {{ form_errors(form.phone) }}
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                            Enregistrer
+                        </button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Changer le mot de passe</h3>
+                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                    <p>Assurez-vous d'utiliser un mot de passe sécurisé que vous n'utilisez nulle part ailleurs.</p>
+                </div>
+                <div class="mt-5">
+                    {{ form_start(password_form, {'attr': {'class': 'space-y-6'}}) }}
+                        <div class="space-y-6">
+                            <div>
+                                {{ form_label(password_form.currentPassword, 'Mot de passe actuel', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                {{ form_widget(password_form.currentPassword, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'}}) }}
+                                {{ form_errors(password_form.currentPassword) }}
+                            </div>
+
+                            <div>
+                                {{ form_label(password_form.newPassword.first, 'Nouveau mot de passe', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                {{ form_widget(password_form.newPassword.first, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'}}) }}
+                                {{ form_errors(password_form.newPassword.first) }}
+                            </div>
+
+                            <div>
+                                {{ form_label(password_form.newPassword.second, 'Confirmer le nouveau mot de passe', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                {{ form_widget(password_form.newPassword.second, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'}}) }}
+                                {{ form_errors(password_form.newPassword.second) }}
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                Changer le mot de passe
+                            </button>
+                        </div>
+                    {{ form_end(password_form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div 
+                x-data="{ show: true }" 
+                x-show="show" 
+                x-init="setTimeout(() => show = false, 5000)"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 transform translate-x-full"
+                x-transition:enter-end="opacity-100 transform translate-x-0"
+                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="opacity-100 transform translate-x-0"
+                x-transition:leave-end="opacity-0 transform translate-x-full"
+                class="fixed bottom-4 right-4 px-4 py-2 rounded-lg {% if label == 'success' %}bg-green-500{% else %}bg-red-500{% endif %} text-white"
+                role="alert"
+                aria-live="polite">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

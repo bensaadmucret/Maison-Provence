@@ -10,7 +10,7 @@ use Twig\TwigFunction;
 class SEOExtension extends AbstractExtension
 {
     public function __construct(
-        private SEOService $seoService
+        private SEOService $seoService,
     ) {
     }
 
@@ -40,12 +40,9 @@ class SEOExtension extends AbstractExtension
         return $seo->getMetaDescription() ?? '';
     }
 
-    /**
-     * @return array<string>
-     */
-    public function getMetaKeywords(SEO $seo): array
+    public function getMetaKeywords(SEO $seo): string
     {
-        return $seo->getMetaKeywords() ?? [];
+        return $seo->getMetaKeywords() ?? '';
     }
 
     public function getCanonicalUrl(SEO $seo): string
@@ -64,6 +61,7 @@ class SEOExtension extends AbstractExtension
     public function getOpenGraphData(SEO $seo): array
     {
         $data = $seo->getOpenGraphData() ?? [];
+
         return array_map(fn ($value) => (string) $value, $data);
     }
 
@@ -73,6 +71,7 @@ class SEOExtension extends AbstractExtension
     public function getTwitterCardData(SEO $seo): array
     {
         $data = $seo->getTwitterCardData() ?? [];
+
         return array_map(fn ($value) => (string) $value, $data);
     }
 }

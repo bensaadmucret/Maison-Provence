@@ -37,9 +37,6 @@ class SiteConfiguration
     #[ORM\Column(type: 'boolean')]
     private bool $isEcommerceEnabled = true;
 
-    /**
-     * @var File|null
-     */
     #[Assert\File(
         maxSize: '1024k',
         mimeTypes: ['image/x-icon', 'image/png', 'image/jpeg', 'image/vnd.microsoft.icon'],
@@ -50,9 +47,6 @@ class SiteConfiguration
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $favicon = null;
 
-    /**
-     * @var File|null
-     */
     #[Assert\File(
         maxSize: '2048k',
         mimeTypes: ['image/png', 'image/jpeg', 'image/svg+xml'],
@@ -65,6 +59,51 @@ class SiteConfiguration
 
     #[ORM\Column(type: 'datetime_immutable')]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $analyticsTrackingId = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $currencyCode = 'EUR';
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $defaultLanguage = 'fr';
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $maxProductsPerPage = 12;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $enableWishlist = true;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $enableCompareProducts = true;
+
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    private float $freeShippingThreshold = 100.00;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $defaultShippingMethod = 'standard';
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $acceptedPaymentMethods = ['carte', 'paypal', 'virement'];
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $gdprComplianceEnabled = true;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $cookieConsentRequired = true;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $newsletterEnabled = true;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $maxNewsletterSubscriptions = 5000;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $cacheEnabled = true;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $cacheDuration = 3600;
 
     public function __construct()
     {
@@ -170,6 +209,7 @@ class SiteConfiguration
     public function setFavicon(?string $favicon): static
     {
         $this->favicon = $favicon;
+
         return $this;
     }
 
@@ -186,6 +226,7 @@ class SiteConfiguration
             $this->updatedAt = new \DateTimeImmutable();
             $this->favicon = $faviconFile->getFilename();
         }
+
         return $this;
     }
 
@@ -197,6 +238,7 @@ class SiteConfiguration
     public function setLogo(?string $logo): static
     {
         $this->logo = $logo;
+
         return $this;
     }
 
@@ -213,6 +255,7 @@ class SiteConfiguration
             $this->updatedAt = new \DateTimeImmutable();
             $this->logo = $logoFile->getFilename();
         }
+
         return $this;
     }
 
@@ -224,6 +267,186 @@ class SiteConfiguration
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getAnalyticsTrackingId(): ?string
+    {
+        return $this->analyticsTrackingId;
+    }
+
+    public function setAnalyticsTrackingId(?string $analyticsTrackingId): static
+    {
+        $this->analyticsTrackingId = $analyticsTrackingId;
+
+        return $this;
+    }
+
+    public function getCurrencyCode(): ?string
+    {
+        return $this->currencyCode;
+    }
+
+    public function setCurrencyCode(?string $currencyCode): static
+    {
+        $this->currencyCode = $currencyCode;
+
+        return $this;
+    }
+
+    public function getDefaultLanguage(): ?string
+    {
+        return $this->defaultLanguage;
+    }
+
+    public function setDefaultLanguage(?string $defaultLanguage): static
+    {
+        $this->defaultLanguage = $defaultLanguage;
+
+        return $this;
+    }
+
+    public function getMaxProductsPerPage(): ?int
+    {
+        return $this->maxProductsPerPage;
+    }
+
+    public function setMaxProductsPerPage(?int $maxProductsPerPage): static
+    {
+        $this->maxProductsPerPage = $maxProductsPerPage;
+
+        return $this;
+    }
+
+    public function isEnableWishlist(): ?bool
+    {
+        return $this->enableWishlist;
+    }
+
+    public function setEnableWishlist(?bool $enableWishlist): static
+    {
+        $this->enableWishlist = $enableWishlist;
+
+        return $this;
+    }
+
+    public function isEnableCompareProducts(): ?bool
+    {
+        return $this->enableCompareProducts;
+    }
+
+    public function setEnableCompareProducts(?bool $enableCompareProducts): static
+    {
+        $this->enableCompareProducts = $enableCompareProducts;
+
+        return $this;
+    }
+
+    public function getFreeShippingThreshold(): float
+    {
+        return $this->freeShippingThreshold;
+    }
+
+    public function setFreeShippingThreshold(float $freeShippingThreshold): static
+    {
+        $this->freeShippingThreshold = $freeShippingThreshold;
+
+        return $this;
+    }
+
+    public function getDefaultShippingMethod(): ?string
+    {
+        return $this->defaultShippingMethod;
+    }
+
+    public function setDefaultShippingMethod(?string $defaultShippingMethod): static
+    {
+        $this->defaultShippingMethod = $defaultShippingMethod;
+
+        return $this;
+    }
+
+    public function getAcceptedPaymentMethods(): ?array
+    {
+        return $this->acceptedPaymentMethods;
+    }
+
+    public function setAcceptedPaymentMethods(?array $acceptedPaymentMethods): static
+    {
+        $this->acceptedPaymentMethods = $acceptedPaymentMethods;
+
+        return $this;
+    }
+
+    public function isGdprComplianceEnabled(): ?bool
+    {
+        return $this->gdprComplianceEnabled;
+    }
+
+    public function setGdprComplianceEnabled(?bool $gdprComplianceEnabled): static
+    {
+        $this->gdprComplianceEnabled = $gdprComplianceEnabled;
+
+        return $this;
+    }
+
+    public function isCookieConsentRequired(): ?bool
+    {
+        return $this->cookieConsentRequired;
+    }
+
+    public function setCookieConsentRequired(?bool $cookieConsentRequired): static
+    {
+        $this->cookieConsentRequired = $cookieConsentRequired;
+
+        return $this;
+    }
+
+    public function isNewsletterEnabled(): ?bool
+    {
+        return $this->newsletterEnabled;
+    }
+
+    public function setNewsletterEnabled(?bool $newsletterEnabled): static
+    {
+        $this->newsletterEnabled = $newsletterEnabled;
+
+        return $this;
+    }
+
+    public function getMaxNewsletterSubscriptions(): ?int
+    {
+        return $this->maxNewsletterSubscriptions;
+    }
+
+    public function setMaxNewsletterSubscriptions(?int $maxNewsletterSubscriptions): static
+    {
+        $this->maxNewsletterSubscriptions = $maxNewsletterSubscriptions;
+
+        return $this;
+    }
+
+    public function isCacheEnabled(): ?bool
+    {
+        return $this->cacheEnabled;
+    }
+
+    public function setCacheEnabled(?bool $cacheEnabled): static
+    {
+        $this->cacheEnabled = $cacheEnabled;
+
+        return $this;
+    }
+
+    public function getCacheDuration(): ?int
+    {
+        return $this->cacheDuration;
+    }
+
+    public function setCacheDuration(?int $cacheDuration): static
+    {
+        $this->cacheDuration = $cacheDuration;
 
         return $this;
     }

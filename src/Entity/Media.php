@@ -18,18 +18,17 @@ class Media
     private ?int $id = null;
 
     #[Vich\UploadableField(mapping: 'media_image', fileNameProperty: 'filename')]
-    #[Assert\NotNull(message: 'Please upload a file')]
     #[Assert\Image(
         maxSize: '5M',
-        mimeTypes: ['image/jpeg', 'image/png', 'image/gif'],
-        mimeTypesMessage: 'Please upload a valid image file (JPEG, PNG, GIF)',
-        maxSizeMessage: 'The file is too large ({{ size }} {{ suffix }}). Maximum allowed size is {{ limit }} {{ suffix }}.',
+        mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+        mimeTypesMessage: 'Veuillez télécharger une image valide (JPEG, PNG, GIF, WEBP)',
+        maxSizeMessage: 'L\'image est trop grande ({{ size }} {{ suffix }}). La taille maximum autorisée est {{ limit }} {{ suffix }}.',
         detectCorrupted: true,
-        corruptedMessage: 'The image file appears to be corrupted. Please try uploading a different file.',
+        corruptedMessage: 'L\'image semble corrompue. Veuillez essayer avec une autre image.',
     )]
     private ?File $imageFile = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $filename = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -50,7 +49,8 @@ class Media
     #[ORM\Column(length: 50)]
     private ?string $type = null;
 
-    #[ORM\ManyToOne(inversedBy: 'media')]
+    #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: 'media')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Product $product = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
@@ -58,6 +58,7 @@ class Media
 
     public function __construct()
     {
+        $this->type = 'image';
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
@@ -72,11 +73,9 @@ class Media
         $this->imageFile = $imageFile;
 
         if (null !== $imageFile) {
-            // C'est nécessaire pour que Doctrine détecte les changements
+            // Il est nécessaire que la propriété updatedAt change pour que Doctrine
+            // détecte les changements à persister
             $this->updatedAt = new \DateTimeImmutable();
-
-            // Mettre à jour le nom du fichier
-            $this->filename = $imageFile->getFilename();
         }
     }
 
@@ -104,7 +103,7 @@ class Media
 
     public function getPath(): ?string
     {
-        return $this->filename;
+        return $this->filename ? '/uploads/images/'.$this->filename : null;
     }
 
     public function getTitle(): ?string

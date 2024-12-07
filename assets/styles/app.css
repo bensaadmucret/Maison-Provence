@@ -1,13 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import './variables.css';
 
 @layer components {
-  .btn-primary {
-    @apply py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75;
-  }
+    .btn-primary {
+        @apply py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75;
+    }
+
+    .product-image {
+        @apply w-full h-64 object-cover transition-transform duration-500;
+    }
+
+    .product-image-container {
+        @apply relative aspect-square bg-gray-100 rounded-lg overflow-hidden;
+    }
+
+    .product-image-placeholder {
+        @apply w-full h-full flex items-center justify-center text-gray-400;
+    }
 }
 
+/* Styles personnalisés */
+.product-image-zoom {
+    transform: scale(1);
+    transition: transform 0.5s ease-in-out;
+}
+
+.product-image-zoom:hover {
+    transform: scale(1.1);
+}
+
+/* Style de base */
 body {
     background-color: skyblue;
 }

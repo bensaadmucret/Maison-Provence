@@ -19,7 +19,7 @@ class ContactController extends AbstractController
     public function index(
         Request $request,
         EntityManagerInterface $entityManager,
-        MailerInterface $mailer
+        MailerInterface $mailer,
     ): Response {
         $contactDTO = new ContactDTO();
         $form = $this->createForm(ContactType::class, $contactDTO);
@@ -32,7 +32,7 @@ class ContactController extends AbstractController
             $contact->setEmail($contactDTO->getEmail());
             $contact->setSubject($contactDTO->getSubject());
             $contact->setMessage($contactDTO->getMessage());
-            
+
             $entityManager->persist($contact);
             $entityManager->flush();
 
@@ -52,7 +52,7 @@ class ContactController extends AbstractController
             $adminEmail = (new TemplatedEmail())
                 ->from($this->getParameter('app.mail_from_address'))
                 ->to($this->getParameter('app.mail_from_address'))
-                ->subject('Nouveau message de contact - ' . $contact->getSubject())
+                ->subject('Nouveau message de contact - '.$contact->getSubject())
                 ->htmlTemplate('emails/contact_notification.html.twig')
                 ->context([
                     'contact' => $contact,

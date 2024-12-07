@@ -253,4 +253,97 @@ class ProductServiceTest extends TestCase
 
         $this->productService->deleteProduct(1);
     }
+
+    public function testGetActiveProductsWithPagination(): void
+    {
+        $products = [];
+        for ($i = 1; $i <= 15; ++$i) {
+            $product = new Product();
+            $product->setName("Product $i");
+            $product->setSlug("product-$i");
+            $product->setIsActive(true);
+            $products[] = $product;
+        }
+
+        $page = 2;
+        $limit = 6;
+        $offset = ($page - 1) * $limit;
+
+        $this->productRepository
+            ->expects(self::once())
+            ->method('findActiveProductsPaginated')
+            ->with($offset, $limit, 'name', 'asc')
+            ->willReturn(array_slice($products, $offset, $limit));
+
+        $result = $this->productService->getActiveProducts($page, $limit, 'name', 'asc');
+
+        self::assertCount($limit, $result);
+        self::assertSame($products[$offset], $result[0]);
+        self::assertSame($products[$offset + $limit - 1], $result[$limit - 1]);
+    }
+
+    public function testSearchProducts(): void
+    {
+        $product1 = new Product();
+        $product1->setName('Savon de Marseille');
+        $product1->setDescription('Savon traditionnel');
+        $product1->setIsActive(true);
+
+        $product2 = new Product();
+        $product2->setName('Huile d\'olive');
+        $product2->setDescription('Huile de Provence');
+        $product2->setIsActive(true);
+
+        $searchTerm = 'savon';
+
+        $this->productRepository
+            ->expects(self::once())
+            ->method('searchProducts')
+            ->with($searchTerm)
+            ->willReturn([$product1]);
+
+        $result = $this->productService->searchProducts($searchTerm);
+
+        self::assertCount(1, $result);
+        self::assertSame($product1, $result[0]);
+    }
+
+    public function testGetTotalActiveProducts(): void
+    {
+        $this->productRepository
+            ->expects(self::once())
+            ->method('count')
+            ->with(['isActive' => true])
+            ->willReturn(42);
+
+        $result = $this->productService->getTotalActiveProducts();
+
+        self::assertSame(42, $result);
+    }
+
+    public function testGetProductsWithLowStock(): void
+    {
+        $product1 = new Product();
+        $product1->setName('Low Stock Product');
+        $product1->setStock(2);
+        $product1->setIsActive(true);
+
+        $this->productRepository
+            ->expects(self::once())
+            ->method('findBy')
+            ->with(
+                ['isActive' => true],
+                null,
+                null,
+                null,
+                ['stock' => 'ASC']
+            )
+            ->willReturn([$product1]);
+
+        $result = $this->productService->getProductsWithLowStock(5);
+
+        self::assertCount(1, $result);
+        self::assertSame($product1, $result[0]);
+        self::assertLessThanOrEqual(5, $product1->getStock());
+    }
 }

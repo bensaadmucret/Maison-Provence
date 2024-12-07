@@ -7,8 +7,9 @@ class ProcessImageMessage
     public function __construct(
         private readonly int $imageId,
         private readonly array $dimensions,
-        private readonly ?string $filter = null
-    ) {}
+        private readonly ?string $filter = null,
+    ) {
+    }
 
     public function getImageId(): int
     {

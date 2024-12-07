@@ -5,9 +5,9 @@ namespace App\MessageHandler;
 use App\Message\ProcessImageMessage;
 use App\Repository\MediaRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Intervention\Image\ImageManager;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class ProcessImageMessageHandler
@@ -16,21 +16,23 @@ class ProcessImageMessageHandler
         private readonly EntityManagerInterface $entityManager,
         private readonly MediaRepository $mediaRepository,
         private readonly string $uploadDirectory,
-        private readonly LoggerInterface $logger
-    ) {}
+        private readonly LoggerInterface $logger,
+    ) {
+    }
 
     public function __invoke(ProcessImageMessage $message): void
     {
         $media = $this->mediaRepository->find($message->getImageId());
-        
+
         if (!$media) {
             $this->logger->error('Media not found', ['id' => $message->getImageId()]);
+
             return;
         }
 
         try {
             $manager = new ImageManager(['driver' => 'gd']);
-            $image = $manager->make($this->uploadDirectory . '/' . $media->getFilename());
+            $image = $manager->make($this->uploadDirectory.'/'.$media->getFilename());
 
             foreach ($message->getDimensions() as $dimension) {
                 $width = $dimension['width'] ?? null;
@@ -63,17 +65,17 @@ class ProcessImageMessageHandler
                     $extension
                 );
 
-                $image->save($this->uploadDirectory . '/resized/' . $newFilename);
+                $image->save($this->uploadDirectory.'/resized/'.$newFilename);
             }
 
             $this->logger->info('Image processed successfully', [
                 'id' => $message->getImageId(),
-                'dimensions' => $message->getDimensions()
+                'dimensions' => $message->getDimensions(),
             ]);
         } catch (\Exception $e) {
             $this->logger->error('Error processing image', [
                 'id' => $message->getImageId(),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
     }

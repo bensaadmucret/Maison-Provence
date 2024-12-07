@@ -1,0 +1,20 @@
+{# Affiche la première image du produit dans la liste #}
+{% if field.value is not empty and field.value|length > 0 %}
+    {% set media = field.value|first %}
+    {% if media.filename %}
+        {# Debug info #}
+        <!-- Debug: {{ media.filename }} -->
+        <!-- Path: {{ vich_uploader_asset(media, 'imageFile') }} -->
+        
+        <img src="{{ vich_uploader_asset(media, 'imageFile') }}" 
+             alt="{{ media.alt|default('') }}"
+             class="img-fluid rounded"
+             style="max-width: 100px; height: auto;"
+             loading="lazy"
+             onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; console.log('Image failed to load:', this.src);">
+    {% else %}
+        <span class="badge badge-warning">Image non disponible (pas de nom de fichier)</span>
+    {% endif %}
+{% else %}
+    <span class="badge badge-secondary">Aucune image</span>
+{% endif %}

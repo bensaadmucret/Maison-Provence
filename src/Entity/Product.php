@@ -31,23 +31,26 @@ class Product
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $slug = null;
 
     #[ORM\Column]
-    private ?bool $isActive = null;
+    private ?bool $isActive = true;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $isFeatured = false;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
 
-    #[ORM\OneToMany(mappedBy: 'product', targetEntity: Media::class)]
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: Media::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $media;
 
     #[ORM\OneToOne(inversedBy: 'product', targetEntity: ProductSEO::class, cascade: ['persist', 'remove'])]
@@ -57,9 +60,10 @@ class Product
     public function __construct()
     {
         $this->media = new ArrayCollection();
-        $this->isActive = true;
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->isActive = true;
+        $this->isFeatured = false;
     }
 
     public function __toString(): string
@@ -180,6 +184,18 @@ class Product
         return $this;
     }
 
+    public function isFeatured(): bool
+    {
+        return $this->isFeatured;
+    }
+
+    public function setIsFeatured(bool $isFeatured): self
+    {
+        $this->isFeatured = $isFeatured;
+
+        return $this;
+    }
+
     public function getCategory(): ?Category
     {
         return $this->category;
@@ -200,24 +216,31 @@ class Product
         return $this->media;
     }
 
-    public function addMedium(Media $medium): static
+    public function addMedia(Media $media): self
     {
-        if (!$this->media->contains($medium)) {
-            $this->media->add($medium);
-            $medium->setProduct($this);
+        if (!$this->media->contains($media)) {
+            $this->media->add($media);
+            $media->setProduct($this);
         }
 
         return $this;
     }
 
-    public function removeMedium(Media $medium): static
+    public function removeMedia(Media $media): self
     {
-        if ($this->media->removeElement($medium)) {
+        if ($this->media->removeElement($media)) {
             // set the owning side to null (unless already changed)
-            if ($medium->getProduct() === $this) {
-                $medium->setProduct(null);
+            if ($media->getProduct() === $this) {
+                $media->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function setMedia(?Collection $media): static
+    {
+        $this->media = $media;
 
         return $this;
     }
@@ -232,10 +255,5 @@ class Product
         $this->seo = $seo;
 
         return $this;
-    }
-
-    public function getMainImage(): ?Media
-    {
-        return $this->media->first() ?: null;
     }
 }

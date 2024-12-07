@@ -3,15 +3,12 @@
 namespace App\Service;
 
 use App\DTO\ProductDTO;
-use App\Entity\Category;
 use App\Entity\Product;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use App\Service\Interface\ProductServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
-use App\Service\LoggingService;
-use App\Service\SlugService;
 
 class ProductService implements ProductServiceInterface
 {
@@ -27,13 +24,53 @@ class ProductService implements ProductServiceInterface
     /**
      * @return Product[]
      */
-    public function getActiveProducts(): array
+    public function getActiveProducts(int $page = 1, int $limit = 12, string $sortBy = 'name', string $order = 'asc', bool $featured = false): array
     {
         $this->loggingService->logProductSearch('active products');
-        $products = $this->productRepository->findBy(['isActive' => true]);
+        $qb = $this->entityManager->createQueryBuilder()
+            ->select('p')
+            ->from(Product::class, 'p')
+            ->where('p.isActive = :active')
+            ->setParameter('active', true);
+
+        if ($featured) {
+            $qb->andWhere('p.isFeatured = :featured')
+               ->setParameter('featured', true);
+        }
+
+        // Ajout du tri
+        switch ($sortBy) {
+            case 'price':
+                $qb->orderBy('p.price', $order);
+                break;
+            case 'name':
+            default:
+                $qb->orderBy('p.name', $order);
+        }
+
+        $products = $qb->setFirstResult(($page - 1) * $limit)
+                 ->setMaxResults($limit)
+                 ->getQuery()
+                 ->getResult();
         $this->loggingService->logProductDetails($products);
-        
+
         return $products;
+    }
+
+    public function getTotalActiveProducts(bool $featured = false): int
+    {
+        $qb = $this->entityManager->createQueryBuilder()
+            ->select('COUNT(p.id)')
+            ->from(Product::class, 'p')
+            ->where('p.isActive = :active')
+            ->setParameter('active', true);
+
+        if ($featured) {
+            $qb->andWhere('p.isFeatured = :featured')
+               ->setParameter('featured', true);
+        }
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -75,6 +112,20 @@ class ProductService implements ProductServiceInterface
         }
 
         return $product;
+    }
+
+    /**
+     * Recherche de produits par terme.
+     *
+     * @return Product[]
+     */
+    public function searchProducts(string $searchTerm): array
+    {
+        $this->loggingService->logProductSearch($searchTerm);
+        $products = $this->productRepository->searchProducts($searchTerm);
+        $this->loggingService->logProductDetails($products);
+
+        return $products;
     }
 
     /**
@@ -121,10 +172,10 @@ class ProductService implements ProductServiceInterface
     {
         $product = new Product();
         $this->updateProductFromDTO($product, $productDTO);
-        
+
         $this->entityManager->persist($product);
         $this->entityManager->flush();
-        
+
         return $product;
     }
 
@@ -156,9 +207,31 @@ class ProductService implements ProductServiceInterface
         $this->entityManager->flush();
     }
 
+    public function getFeaturedProducts(int $limit = 4): array
+    {
+        return $this->productRepository->findFeaturedProducts($limit);
+    }
+
+    public function getGalleryImages(string $mediaUrl): array
+    {
+        $products = $this->productRepository->findGalleryImages();
+        $galleryImages = [];
+
+        foreach ($products as $product) {
+            foreach ($product->getMedia() as $media) {
+                $galleryImages[] = [
+                    'url' => $mediaUrl.'/'.$media->getFilename(),
+                    'alt' => $media->getAlt() ?? $product->getName(),
+                ];
+            }
+        }
+
+        return $galleryImages;
+    }
+
     private function updateProductFromDTO(Product $product, ProductDTO $productDTO): void
     {
-        if ($productDTO->getName() !== null) {
+        if (null !== $productDTO->getName()) {
             $product->setName($productDTO->getName());
             // Generate slug only when name is updated
             if (!$productDTO->getSlug()) {
@@ -166,15 +239,15 @@ class ProductService implements ProductServiceInterface
             }
         }
 
-        if ($productDTO->getDescription() !== null) {
+        if (null !== $productDTO->getDescription()) {
             $product->setDescription($productDTO->getDescription());
         }
 
-        if ($productDTO->getPrice() !== null) {
+        if (null !== $productDTO->getPrice()) {
             $product->setPrice((float) $productDTO->getPrice());
         }
 
-        if ($productDTO->getStock() !== null) {
+        if (null !== $productDTO->getStock()) {
             $product->setStock((int) $productDTO->getStock());
         }
 

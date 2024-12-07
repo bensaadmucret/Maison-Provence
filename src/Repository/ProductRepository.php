@@ -72,4 +72,78 @@ class ProductRepository extends ServiceEntityRepository
             ->enableResultCache(3600, sprintf('product_slug_%s', $slug))
             ->getOneOrNullResult();
     }
+
+    /**
+     * Recherche de produits par terme.
+     *
+     * @return Product[]
+     */
+    public function searchProducts(string $searchTerm): array
+    {
+        $query = $this->createQueryBuilder('p')
+            ->select('p', 'c', 'm')
+            ->leftJoin('p.category', 'c')
+            ->leftJoin('p.media', 'm')
+            ->where('p.isActive = true')
+            ->andWhere('LOWER(p.name) LIKE LOWER(:searchTerm) OR LOWER(p.description) LIKE LOWER(:searchTerm)')
+            ->setParameter('searchTerm', '%'.$searchTerm.'%')
+            ->orderBy('CASE 
+                WHEN LOWER(p.name) LIKE LOWER(:exactTerm) THEN 1
+                WHEN LOWER(p.name) LIKE LOWER(:startTerm) THEN 2
+                ELSE 3
+            END')
+            ->setParameter('exactTerm', strtolower($searchTerm))
+            ->setParameter('startTerm', strtolower($searchTerm).'%')
+            ->getQuery();
+
+        return $query
+            ->enableResultCache(3600, sprintf('search_%s', md5($searchTerm)))
+            ->getResult();
+    }
+
+    public function findActiveProductsPaginated(int $offset, int $limit, string $sortBy = 'name', string $order = 'asc'): array
+    {
+        $allowedSortFields = ['name', 'price', 'createdAt'];
+        $sortBy = in_array($sortBy, $allowedSortFields) ? $sortBy : 'name';
+        $order = 'desc' === strtolower($order) ? 'DESC' : 'ASC';
+
+        $query = $this->createQueryBuilder('p')
+            ->select('p', 'c', 'm')
+            ->leftJoin('p.category', 'c')
+            ->leftJoin('p.media', 'm')
+            ->where('p.isActive = :active')
+            ->setParameter('active', true)
+            ->orderBy('p.'.$sortBy, $order)
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery();
+
+        return $query
+            ->enableResultCache(3600, sprintf('active_products_page_%d_sort_%s_%s', $offset / $limit + 1, $sortBy, $order))
+            ->getResult();
+    }
+
+    public function findFeaturedProducts(int $limit = 4): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.isActive = :active')
+            ->andWhere('p.isFeatured = :featured')
+            ->setParameter('active', true)
+            ->setParameter('featured', true)
+            ->orderBy('p.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findGalleryImages(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p', 'm')
+            ->leftJoin('p.media', 'm')
+            ->where('p.isActive = :active')
+            ->setParameter('active', true)
+            ->getQuery()
+            ->getResult();
+    }
 }

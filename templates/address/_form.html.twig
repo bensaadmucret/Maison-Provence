@@ -1,46 +1,153 @@
-{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
-    <div class="row g-3">
-        <div class="col-12">
-            {{ form_row(form.name) }}
+{{ form_start(form, {'attr': {'class': 'space-y-6', 'novalidate': 'novalidate'}}) }}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="col-span-full">
+            <label for="{{ form.name.vars.id }}" class="block text-sm font-medium text-gray-700">
+                {{ form_label(form.name, 'Nom de l\'adresse') }}
+            </label>
+            <div class="mt-1">
+                {{ form_widget(form.name, {'attr': {
+                    'class': 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
+                    'placeholder': 'Ex: Adresse principale, Maison de vacances'
+                }}) }}
+                {{ form_errors(form.name, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
         </div>
-        <div class="col-md-6">
-            {{ form_row(form.firstName) }}
+
+        <div>
+            <label for="{{ form.firstName.vars.id }}" class="block text-sm font-medium text-gray-700">
+                {{ form_label(form.firstName, 'Prénom') }}
+            </label>
+            <div class="mt-1">
+                {{ form_widget(form.firstName, {'attr': {
+                    'class': 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
+                    'placeholder': 'Votre prénom'
+                }}) }}
+                {{ form_errors(form.firstName, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
         </div>
-        <div class="col-md-6">
-            {{ form_row(form.lastName) }}
+
+        <div>
+            <label for="{{ form.lastName.vars.id }}" class="block text-sm font-medium text-gray-700">
+                {{ form_label(form.lastName, 'Nom de famille') }}
+            </label>
+            <div class="mt-1">
+                {{ form_widget(form.lastName, {'attr': {
+                    'class': 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
+                    'placeholder': 'Votre nom de famille'
+                }}) }}
+                {{ form_errors(form.lastName, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
         </div>
-        <div class="col-12">
-            {{ form_row(form.street) }}
+
+        <div class="col-span-full">
+            <label for="{{ form.street.vars.id }}" class="block text-sm font-medium text-gray-700">
+                {{ form_label(form.street, 'Adresse') }}
+            </label>
+            <div class="mt-1">
+                {{ form_widget(form.street, {'attr': {
+                    'class': 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 address-autocomplete',
+                    'placeholder': 'Numéro et nom de rue'
+                }}) }}
+                {{ form_errors(form.street, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
         </div>
-        <div class="col-12">
-            {{ form_row(form.streetComplement) }}
+
+        <div class="col-span-full">
+            <label for="{{ form.streetComplement.vars.id }}" class="block text-sm font-medium text-gray-700">
+                {{ form_label(form.streetComplement, 'Complément d\'adresse') }}
+            </label>
+            <div class="mt-1">
+                {{ form_widget(form.streetComplement, {'attr': {
+                    'class': 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
+                    'placeholder': 'Appartement, étage, bâtiment (optionnel)'
+                }}) }}
+                {{ form_errors(form.streetComplement, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
         </div>
-        <div class="col-md-4">
-            {{ form_row(form.postalCode) }}
+
+        <div>
+            <label for="{{ form.postalCode.vars.id }}" class="block text-sm font-medium text-gray-700">
+                {{ form_label(form.postalCode, 'Code postal') }}
+            </label>
+            <div class="mt-1">
+                {{ form_widget(form.postalCode, {'attr': {
+                    'class': 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
+                    'placeholder': 'Ex: 75001'
+                }}) }}
+                {{ form_errors(form.postalCode, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
         </div>
-        <div class="col-md-8">
-            {{ form_row(form.city) }}
+
+        <div>
+            <label for="{{ form.city.vars.id }}" class="block text-sm font-medium text-gray-700">
+                {{ form_label(form.city, 'Ville') }}
+            </label>
+            <div class="mt-1">
+                {{ form_widget(form.city, {'attr': {
+                    'class': 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
+                    'placeholder': 'Votre ville'
+                }}) }}
+                {{ form_errors(form.city, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
         </div>
-        <div class="col-md-6">
-            {{ form_row(form.country) }}
+
+        <div>
+            <label for="{{ form.country.vars.id }}" class="block text-sm font-medium text-gray-700">
+                {{ form_label(form.country, 'Pays') }}
+            </label>
+            <div class="mt-1">
+                {{ form_widget(form.country, {'attr': {
+                    'class': 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
+                }}) }}
+                {{ form_errors(form.country, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
         </div>
-        <div class="col-md-6">
-            {{ form_row(form.phone) }}
+
+        <div>
+            <label for="{{ form.phone.vars.id }}" class="block text-sm font-medium text-gray-700">
+                {{ form_label(form.phone, 'Téléphone') }}
+            </label>
+            <div class="mt-1">
+                {{ form_widget(form.phone, {'attr': {
+                    'class': 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
+                    'placeholder': 'Ex: 0612345678'
+                }}) }}
+                {{ form_errors(form.phone, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
         </div>
-        <div class="col-md-6">
-            {{ form_row(form.isDefault) }}
-        </div>
-        <div class="col-md-6">
-            {{ form_row(form.isBilling) }}
+
+        <div class="col-span-full flex items-center space-x-4">
+            <div class="flex items-center">
+                {{ form_widget(form.isDefault, {'attr': {
+                    'class': 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
+                }}) }}
+                <label for="{{ form.isDefault.vars.id }}" class="ml-2 block text-sm text-gray-900">
+                    {{ form_label(form.isDefault, 'Adresse par défaut') }}
+                </label>
+            </div>
+            <div class="flex items-center">
+                {{ form_widget(form.isBilling, {'attr': {
+                    'class': 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
+                }}) }}
+                <label for="{{ form.isBilling.vars.id }}" class="ml-2 block text-sm text-gray-900">
+                    {{ form_label(form.isBilling, 'Adresse de facturation') }}
+                </label>
+            </div>
         </div>
     </div>
 
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-        <a href="{{ path('app_address_index') }}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Retour
+    <div class="mt-6 flex justify-end space-x-4">
+        <a href="{{ path('app_address_index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+            </svg>
+            Retour
         </a>
-        <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save me-2"></i>{{ button_label|default('Enregistrer') }}
+        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg>
+            {{ button_label|default('Enregistrer') }}
         </button>
     </div>
 {{ form_end(form) }}

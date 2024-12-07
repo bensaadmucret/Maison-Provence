@@ -1,0 +1,94 @@
+{% block _product_media_entry_widget %}
+    <div class="media-entry">
+        {{ form_row(form.imageFile) }}
+        {{ form_row(form.alt) }}
+    </div>
+{% endblock %}
+
+{% block _product_media_widget %}
+    {% set attr = attr|merge({class: 'product-media-collection'}) %}
+    <div {{ block('widget_container_attributes') }}>
+        {% if form.vars.prototype is defined %}
+            <div class="collection-actions mb-2">
+                <button type="button" class="btn btn-primary" 
+                        data-action="collection-add"
+                        data-prototype="{{ form_widget(form.vars.prototype)|e('html_attr') }}"
+                        data-index="{{ form|length }}">
+                    <i class="fas fa-plus"></i> Ajouter une image
+                </button>
+            </div>
+        {% endif %}
+        
+        <div class="row media-items" data-prototype-name="{{ prototype_name|default('__name__') }}">
+            {% for media in form %}
+                <div class="col-md-4 mb-3">
+                    {% block form_row %}
+                        {% set row_attr = row_attr|merge({
+                            class: row_attr.class|default('') ~ ' form-group'
+                        }) %}
+
+                        <div {{ block('attributes') }}>
+                            {{- form_label(form) -}}
+                            <div class="media-collection" data-controller="collection-type">
+                                <div class="media-items" 
+                                     data-collection-type-target="container"
+                                     data-prototype="{{ form_widget(form.vars.prototype)|e('html_attr') }}">
+                                    {% for child in form %}
+                                        <div class="media-item card mb-3" data-collection-type-target="item">
+                                            <div class="card-body">
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-3">
+                                                        {% if child.vars.data and child.vars.data.filename %}
+                                                            <img src="{{ vich_uploader_asset(child.vars.data, 'imageFile') }}" 
+                                                                 class="img-fluid rounded" 
+                                                                 alt="{{ child.vars.data.alt|default('') }}"
+                                                                 style="max-height: 150px; width: auto;">
+                                                        {% else %}
+                                                            <div class="text-center p-3 bg-light rounded">
+                                                                <i class="fas fa-image fa-2x text-muted"></i>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        {{ form_row(child.imageFile, {
+                                                            label: 'Image'|trans,
+                                                            attr: { class: 'form-control-file' }
+                                                        }) }}
+                                                        {{ form_row(child.title, {
+                                                            label: 'Titre'|trans,
+                                                            attr: { class: 'form-control' }
+                                                        }) }}
+                                                        {{ form_row(child.alt, {
+                                                            label: 'Texte alternatif'|trans,
+                                                            attr: { class: 'form-control' }
+                                                        }) }}
+                                                        {{ form_row(child.position, {
+                                                            label: 'Position'|trans,
+                                                            attr: { class: 'form-control' }
+                                                        }) }}
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <button type="button" 
+                                                                class="btn btn-danger" 
+                                                                data-action="collection-type#removeItem">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button type="button" 
+                                        class="btn btn-success mt-2" 
+                                        data-action="collection-type#addItem">
+                                    <i class="fas fa-plus"></i> {{ 'Ajouter une image'|trans }}
+                                </button>
+                            </div>
+                        </div>
+                    {% endblock %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

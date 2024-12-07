@@ -4,111 +4,138 @@ namespace App\Service;
 
 use App\Entity\Cart;
 use App\Entity\Product;
+use App\Service\Interface\LoggingServiceInterface;
 use Psr\Log\LoggerInterface;
 
-class LoggingService
+class LoggingService implements LoggingServiceInterface
 {
     public function __construct(
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
     ) {
     }
 
     // Product logging methods
-    public function logProductSearch(string $slug): void
+    public function logProductSearch(string $slug, array $context = []): void
     {
-        $this->logger->info('=== Recherche de produit par slug ===');
-        $this->logger->info('Slug recherché : ' . $slug);
+        $this->logger->info('Product search by slug', [
+            'slug' => $slug,
+            'action' => 'product_search',
+            ...$context,
+        ]);
     }
 
-    public function logProductFound(Product $product): void
+    public function logProductFound(Product $product, array $context = []): void
     {
-        $this->logger->info(sprintf(
-            'Produit trouvé - ID: %d, Nom: %s, Slug: %s, Actif: %s',
-            $product->getId(),
-            $product->getName(),
-            $product->getSlug(),
-            $product->isActive() ? 'oui' : 'non'
-        ));
+        $this->logger->info('Product found', [
+            'product_id' => $product->getId(),
+            'name' => $product->getName(),
+            'slug' => $product->getSlug(),
+            'active' => $product->isActive(),
+            'action' => 'product_found',
+            ...$context,
+        ]);
     }
 
-    public function logProductNotFound(string $slug): void
+    public function logProductNotFound(string $slug, array $context = []): void
     {
-        $this->logger->warning('Aucun produit actif trouvé avec le slug: ' . $slug);
+        $this->logger->warning('No active product found', [
+            'slug' => $slug,
+            'action' => 'product_not_found',
+            ...$context,
+        ]);
     }
 
-    public function logProductUpdate(int $id): void
+    public function logProductUpdate(int $id, array $context = []): void
     {
-        $this->logger->info('=== Mise à jour du produit ' . $id . ' ===');
+        $this->logger->info('Product update initiated', [
+            'product_id' => $id,
+            'action' => 'product_update_start',
+            ...$context,
+        ]);
     }
 
-    public function logProductUpdated(Product $product): void
+    public function logProductUpdated(Product $product, array $context = []): void
     {
-        $this->logger->info(sprintf(
-            'Produit mis à jour - ID: %d, Nom: %s, Slug: %s',
-            $product->getId(),
-            $product->getName(),
-            $product->getSlug()
-        ));
+        $this->logger->info('Product updated', [
+            'product_id' => $product->getId(),
+            'name' => $product->getName(),
+            'slug' => $product->getSlug(),
+            'action' => 'product_updated',
+            ...$context,
+        ]);
     }
 
-    public function logProductDeletion(int $id): void
+    public function logProductDeletion(int $id, array $context = []): void
     {
-        $this->logger->info('=== Suppression du produit ' . $id . ' ===');
+        $this->logger->info('Product deletion initiated', [
+            'product_id' => $id,
+            'action' => 'product_deletion_start',
+            ...$context,
+        ]);
     }
 
-    public function logProductDeleted(): void
+    public function logProductDeleted(array $context = []): void
     {
-        $this->logger->info('Produit supprimé avec succès');
+        $this->logger->info('Product deleted', [
+            'action' => 'product_deleted',
+            ...$context,
+        ]);
     }
 
-    public function logDatabaseConnection(bool $success, ?\Exception $exception = null): void
+    public function logProductDetails(array $products, array $context = []): void
+    {
+        $productDetails = array_map(fn (Product $product) => [
+            'id' => $product->getId(),
+            'name' => $product->getName(),
+            'slug' => $product->getSlug(),
+            'active' => $product->isActive(),
+        ], $products);
+
+        $this->logger->info('Product details', [
+            'products' => $productDetails,
+            'count' => count($products),
+            'action' => 'product_details',
+            ...$context,
+        ]);
+    }
+
+    public function logDatabaseConnection(bool $success, ?\Exception $exception = null, array $context = []): void
     {
         if ($success) {
-            $this->logger->info('Connexion à la base de données OK');
+            $this->logger->info('Database connection successful', [
+                'action' => 'database_connection_success',
+                ...$context,
+            ]);
         } else {
-            $this->logger->error('Erreur de connexion à la base de données : ' . $exception?->getMessage());
-        }
-    }
-
-    public function logProductDetails(array $products): void
-    {
-        $this->logger->info('Nombre total de produits : ' . count($products));
-        foreach ($products as $product) {
-            $this->logger->info(sprintf(
-                'Produit - ID: %d, Nom: %s, Slug: %s, Actif: %s',
-                $product->getId(),
-                $product->getName(),
-                $product->getSlug(),
-                $product->isActive() ? 'oui' : 'non'
-            ));
+            $this->logger->error('Database connection failed', [
+                'error' => $exception?->getMessage(),
+                'action' => 'database_connection_failure',
+                ...$context,
+            ]);
         }
     }
 
     // Cart logging methods
-    public function logCartUpdate(Cart $cart): void
+    public function logCartOperation(string $operation, Cart $cart, array $context = []): void
     {
-        $this->logger->info(sprintf(
-            'Panier mis à jour - ID: %d, Nombre d\'articles: %d, Total: %.2f€',
-            $cart->getId(),
-            $cart->getItems()->count(),
-            $cart->getTotal()
-        ));
+        $this->logger->info('Cart operation: '.$operation, [
+            'operation' => $operation,
+            'cart_id' => $cart->getId(),
+            'user_id' => $cart->getUser()?->getId(),
+            'total_items' => $cart->getItems()->count(),
+            'total_price' => $cart->getTotalPrice(),
+            'action' => 'cart_operation',
+            ...$context,
+        ]);
     }
 
-    public function logCartCleared(Cart $cart): void
+    public function logCartError(?Cart $cart, ?\Throwable $exception = null, array $context = []): void
     {
-        $this->logger->info(sprintf(
-            'Panier vidé - ID: %d',
-            $cart->getId()
-        ));
-    }
-
-    public function logCartError(string $message, ?\Exception $exception = null): void
-    {
-        $this->logger->error('Erreur panier : ' . $message);
-        if ($exception) {
-            $this->logger->error('Exception : ' . $exception->getMessage());
-            $this->logger->debug('Stack trace : ' . $exception->getTraceAsString());
-        }
+        $this->logger->error('Cart operation error', [
+            'cart_id' => $cart?->getId(),
+            'exception' => $exception?->getMessage(),
+            'action' => 'cart_error',
+            ...$context,
+        ]);
     }
 }

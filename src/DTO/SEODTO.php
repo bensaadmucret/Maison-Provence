@@ -2,10 +2,16 @@
 
 namespace App\DTO;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 class SEODTO
 {
+    #[Assert\Length(max: 60, maxMessage: 'Le titre meta ne doit pas dépasser {{ limit }} caractères')]
     private ?string $metaTitle = null;
+
+    #[Assert\Length(max: 160, maxMessage: 'La description meta ne doit pas dépasser {{ limit }} caractères')]
     private ?string $metaDescription = null;
+
     private ?string $metaKeywords = null;
     private ?bool $indexable = true;
     private ?bool $followable = true;
@@ -19,6 +25,7 @@ class SEODTO
     public function setMetaTitle(?string $metaTitle): self
     {
         $this->metaTitle = $metaTitle;
+
         return $this;
     }
 
@@ -30,6 +37,7 @@ class SEODTO
     public function setMetaDescription(?string $metaDescription): self
     {
         $this->metaDescription = $metaDescription;
+
         return $this;
     }
 
@@ -38,9 +46,20 @@ class SEODTO
         return $this->metaKeywords;
     }
 
-    public function setMetaKeywords(?string $metaKeywords): self
+    public function setMetaKeywords(?array $metaKeywords): self
     {
+        if (null !== $metaKeywords) {
+            // Convertir le tableau en chaîne
+            $metaKeywords = implode(', ', array_filter($metaKeywords));
+        }
+
+        if (null !== $metaKeywords) {
+            // Nettoyage des espaces superflus
+            $metaKeywords = preg_replace('/\s*,\s*/', ', ', trim($metaKeywords));
+        }
+
         $this->metaKeywords = $metaKeywords;
+
         return $this;
     }
 
@@ -52,6 +71,7 @@ class SEODTO
     public function setIndexable(?bool $indexable): self
     {
         $this->indexable = $indexable;
+
         return $this;
     }
 
@@ -63,6 +83,7 @@ class SEODTO
     public function setFollowable(?bool $followable): self
     {
         $this->followable = $followable;
+
         return $this;
     }
 
@@ -74,6 +95,7 @@ class SEODTO
     public function setCanonicalUrl(?string $canonicalUrl): self
     {
         $this->canonicalUrl = $canonicalUrl;
+
         return $this;
     }
 }

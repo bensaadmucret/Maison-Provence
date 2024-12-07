@@ -1,11 +1,18 @@
 framework:
     asset_mapper:
-        # The paths to make available to the asset mapper.
         paths:
             - assets/
+        excluded_patterns:
+            - '*/.*'
+        extensions:
+            - .js
+            - .css
+        importmap_path: importmap.php
         missing_import_mode: strict
+        server: true
 
 when@prod:
     framework:
         asset_mapper:
             missing_import_mode: warn
+            server: false

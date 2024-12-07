@@ -19,16 +19,16 @@ class MediaTest extends TestCase
 
     public function testInitialState(): void
     {
-        $this->assertNull($this->media->getId());
-        $this->assertNull($this->media->getFilename());
-        $this->assertNull($this->media->getTitle());
-        $this->assertNull($this->media->getAlt());
-        $this->assertNull($this->media->getPosition());
-        $this->assertNull($this->media->getType());
-        $this->assertNull($this->media->getProduct());
-        $this->assertNull($this->media->getCollection());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $this->media->getCreatedAt());
-        $this->assertInstanceOf(\DateTimeImmutable::class, $this->media->getUpdatedAt());
+        $media = new Media();
+
+        self::assertNull($media->getId());
+        self::assertNull($media->getFilename());
+        self::assertNull($media->getTitle());
+        self::assertNull($media->getAlt());
+        self::assertNull($media->getPosition());
+        self::assertNull($media->getProduct());
+        self::assertInstanceOf(\DateTimeImmutable::class, $media->getCreatedAt());
+        self::assertInstanceOf(\DateTimeImmutable::class, $media->getUpdatedAt());
     }
 
     public function testImageFileUpload(): void

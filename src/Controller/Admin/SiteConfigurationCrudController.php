@@ -61,9 +61,9 @@ class SiteConfigurationCrudController extends AbstractCrudController
             ->setUploadedFileNamePattern('[timestamp]-[randomhash].[extension]')
             ->setFormTypeOptions([
                 'attr' => [
-                    'accept' => 'image/png,image/jpeg,image/svg+xml'
+                    'accept' => 'image/png,image/jpeg,image/svg+xml',
                 ],
-                'data_class' => null
+                'data_class' => null,
             ])
             ->setColumns(6)
             ->setHelp('Le logo qui apparaîtra dans la barre de navigation et le pied de page. Format recommandé : PNG ou SVG avec fond transparent.')
@@ -75,9 +75,9 @@ class SiteConfigurationCrudController extends AbstractCrudController
             ->setUploadedFileNamePattern('[timestamp]-[randomhash].[extension]')
             ->setFormTypeOptions([
                 'attr' => [
-                    'accept' => 'image/x-icon,image/png,image/jpeg,image/vnd.microsoft.icon'
+                    'accept' => 'image/x-icon,image/png,image/jpeg,image/vnd.microsoft.icon',
                 ],
-                'data_class' => null
+                'data_class' => null,
             ])
             ->setColumns(6)
             ->setHelp('Le favicon est la petite icône qui s\'affiche dans l\'onglet du navigateur, les favoris et sur mobile. Format recommandé : .ico ou .png de 32x32 pixels.')

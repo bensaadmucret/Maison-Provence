@@ -4,6 +4,9 @@ namespace App\Controller\Admin;
 
 use App\Entity\Media;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -37,8 +40,8 @@ class MediaCrudController extends AbstractCrudController
                 ])
                 ->onlyOnForms(),
             ImageField::new('filename', 'Image')
-                ->setBasePath('uploads/media')
-                ->hideOnForm(),
+                ->setBasePath('uploads/images')
+                ->onlyOnIndex(),
             TextField::new('title', 'Titre')->setRequired(false),
             TextField::new('alt', 'Texte alternatif')->setRequired(false),
             IntegerField::new('position', 'Position')->setRequired(false),
@@ -61,6 +64,42 @@ class MediaCrudController extends AbstractCrudController
         ];
     }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
+                return $action->setIcon('fa fa-plus')->addCssClass('btn btn-primary');
+            })
+            ->update(Crud::PAGE_INDEX, Action::EDIT, function (Action $action) {
+                return $action->setIcon('fa fa-edit');
+            })
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
+                return $action->setIcon('fa fa-eye');
+            })
+            ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
+                return $action->setIcon('fa fa-trash');
+            })
+            ->update(Crud::PAGE_EDIT, Action::SAVE_AND_RETURN, function (Action $action) {
+                return $action->setIcon('fa fa-save')->addCssClass('btn btn-primary');
+            })
+            ->update(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE, function (Action $action) {
+                return $action->setIcon('fa fa-save-and-continue')->addCssClass('btn btn-secondary');
+            });
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('Média')
+            ->setEntityLabelInPlural('Médias')
+            ->setPageTitle('index', 'Liste des médias')
+            ->setPageTitle('new', 'Ajouter un média')
+            ->setPageTitle('edit', 'Modifier le média')
+            ->setPageTitle('detail', 'Détails du média')
+            ->setDefaultSort(['createdAt' => 'DESC']);
+    }
+
     public function createEntity(string $entityFqcn)
     {
         $media = new Media();
@@ -79,12 +118,15 @@ class MediaCrudController extends AbstractCrudController
 
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
+        if ($entityInstance instanceof Media) {
+            $entityInstance->setCreatedAt(new \DateTimeImmutable());
+            $entityInstance->setUpdatedAt(new \DateTimeImmutable());
+        }
+
         try {
             parent::persistEntity($entityManager, $entityInstance);
         } catch (\Exception $e) {
-            // Log the error if needed
-            // Return to form with error message
-            return;
+            throw new \RuntimeException('Erreur lors de la sauvegarde du média : '.$e->getMessage());
         }
     }
 }

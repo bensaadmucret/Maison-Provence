@@ -32,7 +32,7 @@ class MediaService
         #[Autowire('%kernel.project_dir%')]
         string $projectDir,
     ) {
-        $this->uploadDir = $projectDir . '/public/uploads/media';
+        $this->uploadDir = $projectDir.'/public/uploads/media';
     }
 
     public function uploadMedia(
@@ -81,7 +81,7 @@ class MediaService
         $dimensions = [
             ['width' => 800, 'height' => 600],  // Version standard
             ['width' => 300, 'height' => 300],  // Version thumbnail
-            ['width' => 1200, 'height' => null] // Version large
+            ['width' => 1200, 'height' => null], // Version large
         ];
 
         $this->messageBus->dispatch(
@@ -124,14 +124,14 @@ class MediaService
     private function delete(Media $media): void
     {
         $filename = $media->getFilename();
-        $filepath = $this->uploadDir . '/' . $filename;
+        $filepath = $this->uploadDir.'/'.$filename;
 
         if (file_exists($filepath)) {
             unlink($filepath);
         }
 
         // Supprimer aussi les versions redimensionnées
-        $pattern = $this->uploadDir . '/resized/' . pathinfo($filename, PATHINFO_FILENAME) . '_*';
+        $pattern = $this->uploadDir.'/resized/'.pathinfo($filename, PATHINFO_FILENAME).'_*';
         array_map('unlink', glob($pattern));
 
         $this->mediaRepository->remove($media, true);

@@ -1,65 +1,89 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nos Produits - {{ site_configuration.siteName }}
-{% endblock %}
+{% block title %}Nos Produits - {{ site_config.siteName }}{% endblock %}
 
 {% block body %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Nos Produits</h1>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for product in products %}
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden group relative flex flex-col">
-                <a href="{{ path('app_product_show', {slug: product.slug}) }}" class="block flex-grow">
-                    <div class="relative aspect-video">
-                        {% if product.media is not empty %}
-                            {% set mainMedia = product.media.first %}
-                            <img src="{{ vich_uploader_asset(mainMedia, 'imageFile') }}" 
-                                 alt="{{ mainMedia.alt|default(product.name) }}" 
-                                 title="{{ mainMedia.title|default(product.name) }}"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        {% else %}
-                            <div class="w-full h-full bg-gray-100 flex items-center justify-center">
-                                <span class="text-gray-400">Aucune image disponible</span>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="p-4">
-                        <h2 class="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">{{ product.name }}</h2>
-                        <p class="text-gray-600 mb-4">{{ product.description|striptags|slice(0, 100) }}...</p>
-                    </div>
+<div class="container mx-auto px-4 py-8 flex flex-col space-y-8">
+    <!-- Section de recherche et tri -->
+    <div>
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-4">
+            {% if searchTerm is defined and searchTerm is not empty %}
+                Résultats de recherche pour "{{ searchTerm }}"
+            {% else %}
+                Nos Produits
+            {% endif %}
+        </h1>
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <!-- Champ de recherche -->
+            <form action="{{ path('app_product_search_products') }}" method="GET" class="relative w-full md:w-1/2">
+                <input type="text" name="q" placeholder="Rechercher un produit..."
+                       value="{{ searchTerm ?? '' }}"
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-primary/50 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </form>
+            <!-- Options de tri -->
+            <div class="flex items-center space-x-4">
+                <select onchange="window.location.href=this.value" class="border border-gray-300 rounded-lg px-3 py-2">
+                    <option value="{{ path('app_product_index', {'sort': 'name', 'order': 'asc'}) }}" {% if sortBy == 'name' and order == 'asc' %}selected{% endif %}>Nom (A-Z)</option>
+                    <option value="{{ path('app_product_index', {'sort': 'name', 'order': 'desc'}) }}" {% if sortBy == 'name' and order == 'desc' %}selected{% endif %}>Nom (Z-A)</option>
+                    <option value="{{ path('app_product_index', {'sort': 'price', 'order': 'asc'}) }}" {% if sortBy == 'price' and order == 'asc' %}selected{% endif %}>Prix croissant</option>
+                    <option value="{{ path('app_product_index', {'sort': 'price', 'order': 'desc'}) }}" {% if sortBy == 'price' and order == 'desc' %}selected{% endif %}>Prix décroissant</option>
+                </select>
+                <a href="{{ path('app_product_index', {featured: not featured}) }}" 
+                   class="inline-flex items-center px-4 py-2 rounded-lg {{ featured ? 'bg-primary text-white' : 'bg-white text-primary border-2 border-primary' }} hover:opacity-90 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                    {{ featured ? 'Tous les produits' : 'Produits phares' }}
                 </a>
-                <div class="p-4 pt-0 mt-auto">
-                    <div class="flex justify-between items-center gap-2">
-                        <span class="text-xl font-bold text-primary">{{ product.price|number_format(2, ',', ' ') }} €</span>
-                        <div class="flex gap-2">
-                            {% if product.stock > 0 %}
-                                <button class="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                                    </svg>
-                                    <span class="hidden sm:inline">Ajouter</span>
-                                </button>
-                            {% else %}
-                                <span class="text-red-600 text-sm">Rupture de stock</span>
-                            {% endif %}
-                            <a href="{{ path('app_product_show', {slug: product.slug}) }}" 
-                               class="bg-gray-100 text-gray-700 px-4 py-2 rounded hover:bg-gray-200 transition flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                                </svg>
-                                <span class="hidden sm:inline">Détails</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section galerie de produits -->
+    <div>
+        {% if searchTerm is defined and searchTerm is not empty and products|length == 0 %}
+            <div class="text-center py-16 bg-gray-50 rounded-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto text-gray-400 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 005.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-2xl font-semibold text-gray-600 mb-4">Aucun produit trouvé</p>
+                <p class="text-gray-500">Votre recherche "{{ searchTerm }}" n'a donné aucun résultat.</p>
+                <a href="{{ path('app_product_index') }}" class="inline-block mt-4 px-6 py-3 bg-primary text-white rounded-full hover:bg-primary-dark transition">
+                    Retour à tous les produits
+                </a>
             </div>
         {% else %}
-            <div class="col-span-full text-center py-8">
-                <p class="text-gray-600">Aucun produit disponible pour le moment.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for product in products %}
+                    {{ include('components/_product_card.html.twig', {product: product}) }}
+                {% endfor %}
             </div>
-        {% endfor %}
+        {% endif %}
     </div>
+
+    <!-- Section pagination -->
+    {% if maxPages > 1 %}
+        <div class="flex justify-center space-x-2">
+            {% if currentPage > 1 %}
+                <a href="{{ path('app_product_index', {'page': currentPage - 1, 'sort': sortBy, 'order': order}) }}" 
+                   class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Précédent</a>
+            {% endif %}
+            
+            {% for i in max(1, currentPage - 2)..min(maxPages, currentPage + 2) %}
+                <a href="{{ path('app_product_index', {'page': i, 'sort': sortBy, 'order': order}) }}" 
+                   class="px-4 py-2 border {% if currentPage == i %}bg-primary text-white{% else %}border-gray-300 hover:bg-gray-50{% endif %} rounded-lg">
+                    {{ i }}
+                </a>
+            {% endfor %}
+            
+            {% if currentPage < maxPages %}
+                <a href="{{ path('app_product_index', {'page': currentPage + 1, 'sort': sortBy, 'order': order}) }}" 
+                   class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Suivant</a>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

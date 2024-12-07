@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Votre panier - {{ site_configuration.siteName }}{% endblock %}
+{% block title %}Votre panier - {{ site_config.siteName }}{% endblock %}
 
 {% block body %}
 <div class="container mx-auto px-4 py-8">
@@ -63,7 +63,7 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <form action="{{ path('app_cart_update', {itemId: item.id}) }}" 
+                                        <form action="{{ path('cart_update', {itemId: item.id}) }}" 
                                               method="POST" 
                                               class="flex justify-center items-center space-x-2">
                                             <select name="quantity" 
@@ -84,7 +84,7 @@
                                         {{ item.subtotal|number_format(2, ',', ' ') }} €
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        <form action="{{ path('app_cart_remove', {itemId: item.id}) }}" 
+                                        <form action="{{ path('cart_remove', {itemId: item.id}) }}" 
                                               method="POST" 
                                               onsubmit="return confirm('Êtes-vous sûr de vouloir retirer ce produit ?')">
                                             <button type="submit" 
@@ -126,7 +126,7 @@
                             </a>
                         </div>
                         <div class="text-center pt-4">
-                            <form action="{{ path('app_cart_clear') }}" 
+                            <form action="{{ path('cart_clear') }}" 
                                   method="POST" 
                                   class="inline-block"
                                   onsubmit="return confirm('Êtes-vous sûr de vouloir vider votre panier ?')">

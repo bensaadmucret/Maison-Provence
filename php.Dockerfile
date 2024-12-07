@@ -10,12 +10,13 @@ RUN apk add --no-cache \
     icu-dev \
     freetype-dev \
     libjpeg-turbo-dev \
-    libpng-dev
+    libpng-dev \
+    mariadb-dev
 
 # Installation des extensions PHP
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
-    pdo_pgsql \
+    pdo_mysql \
     intl \
     zip \
     gd
@@ -24,6 +25,6 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Configuration de PHP
-RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+RUN mv "/usr/local/etc/php/php.ini-development" "/usr/local/etc/php/php.ini"
 
 WORKDIR /var/www/html

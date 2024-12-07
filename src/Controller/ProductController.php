@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Product;
 use App\Service\ProductService;
+use App\Service\SiteConfigurationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,16 +20,31 @@ class ProductController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly SerializerInterface $serializer,
         private readonly ValidatorInterface $validator,
+        private readonly SiteConfigurationService $siteConfigurationService,
     ) {
     }
 
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $products = $this->productService->getActiveProducts();
+        $page = max(1, $request->query->getInt('page', 1));
+        $sortBy = $request->query->get('sort', 'name');
+        $order = $request->query->get('order', 'asc');
+        $featured = $request->query->getBoolean('featured', false);
+        $limit = 12;
+
+        $products = $this->productService->getActiveProducts($page, $limit, $sortBy, $order, $featured);
+        $totalProducts = $this->productService->getTotalActiveProducts($featured);
+        $maxPages = ceil($totalProducts / $limit);
 
         return $this->render('product/index.html.twig', [
             'products' => $products,
+            'currentPage' => $page,
+            'maxPages' => $maxPages,
+            'sortBy' => $sortBy,
+            'order' => $order,
+            'featured' => $featured,
+            'media_url' => $this->getParameter('media_url'),
         ]);
     }
 
@@ -53,12 +68,31 @@ class ProductController extends AbstractController
                 'similarProducts' => $similarProducts,
                 'previousProduct' => $previousProduct,
                 'nextProduct' => $nextProduct,
+                'media_url' => $this->getParameter('media_url'),
             ]);
         } catch (\Exception $e) {
             error_log('Erreur dans show() : '.$e->getMessage());
             error_log($e->getTraceAsString());
             throw $e;
         }
+    }
+
+    #[Route('/search', name: 'search_products', methods: ['GET'])]
+    public function search(Request $request): Response
+    {
+        $searchTerm = $request->query->get('q', '');
+
+        if (empty($searchTerm)) {
+            return $this->redirectToRoute('app_product_index');
+        }
+
+        $products = $this->productService->searchProducts($searchTerm);
+
+        return $this->render('product/index.html.twig', [
+            'products' => $products,
+            'searchTerm' => $searchTerm,
+            'media_url' => $this->getParameter('media_url'),
+        ]);
     }
 
     #[Route('', name: 'create', methods: ['POST'])]

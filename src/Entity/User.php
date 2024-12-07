@@ -45,6 +45,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(message: 'Le nom est obligatoire')]
     private ?string $lastName = null;
 
+    #[ORM\Column(length: 20, nullable: true)]
+    #[Assert\Regex(
+        pattern: '/^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/',
+        message: 'Le numéro de téléphone n\'est pas valide'
+    )]
+    private ?string $phone = null;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -82,6 +89,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $phone;
 
         return $this;
     }
@@ -290,5 +309,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this->getDefaultAddress();
+    }
+
+    public function __toString(): string
+    {
+        return $this->firstName.' '.$this->lastName.' ('.$this->email.')';
     }
 }

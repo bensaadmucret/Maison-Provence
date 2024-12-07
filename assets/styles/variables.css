@@ -1,0 +1,56 @@
+:root {
+    /* Couleurs de fond */
+    --bg-main: #f5f3f2;          /* Fond principal gris très clair */
+    --bg-white: #ffffff;         /* Fond blanc pour les cartes */
+    --bg-sidebar: #1a1a2e;       /* Fond de la barre latérale - bleu foncé */
+    
+    /* Couleurs des cartes */
+    --card-pink: #ffd9d9;        /* Fond rose pâle (IT & Software) */
+    --card-peach: #ffe8d9;       /* Fond pêche (Business) */
+    --card-purple: #e8e3ff;      /* Fond violet clair (Media Training) */
+    --card-mint: #d9fff0;        /* Fond vert menthe (Interior) */
+    
+    /* Couleurs de texte */
+    --text-primary: #1a1a1a;     /* Texte principal noir */
+    --text-secondary: #666666;   /* Texte secondaire gris */
+    --text-muted: #999999;       /* Texte atténué gris clair */
+    
+    /* Couleurs d'accent */
+    --accent-primary: #7c3aed;   /* Violet principal pour les éléments actifs */
+    --accent-secondary: #f472b6;  /* Rose pour les accents secondaires */
+    
+    /* Couleurs des états */
+    --hover-bg: #f3f4f6;         /* Fond au survol */
+    --active-bg: #e5e7eb;        /* Fond actif */
+    
+    /* Couleurs des bordures */
+    --border-light: #e5e7eb;     /* Bordures légères */
+    --border-dark: #d1d5db;      /* Bordures plus foncées */
+    
+    /* Ombres */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+
+.card {
+    background-color: var(--bg-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.card.it-software {
+    background-color: var(--card-pink);
+}
+
+.card.business {
+    background-color: var(--card-peach);
+}
+
+.card.media {
+    background-color: var(--card-purple);
+}
+
+.card.interior {
+    background-color: var(--card-mint);
+}

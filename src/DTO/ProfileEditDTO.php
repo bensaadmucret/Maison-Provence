@@ -39,6 +39,7 @@ class ProfileEditDTO
     public function setFirstName(?string $firstName): self
     {
         $this->firstName = $firstName;
+
         return $this;
     }
 
@@ -50,6 +51,7 @@ class ProfileEditDTO
     public function setLastName(?string $lastName): self
     {
         $this->lastName = $lastName;
+
         return $this;
     }
 
@@ -61,6 +63,7 @@ class ProfileEditDTO
     public function setEmail(?string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 

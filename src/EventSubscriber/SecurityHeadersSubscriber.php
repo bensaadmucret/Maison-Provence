@@ -2,10 +2,10 @@
 
 namespace App\EventSubscriber;
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class SecurityHeadersSubscriber implements EventSubscriberInterface
@@ -33,11 +33,11 @@ class SecurityHeadersSubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        
+
         // Ne pas appliquer les en-têtes de sécurité pour le profiler en mode dev
-        if ($this->kernel->isDebug() && 
-            (str_starts_with($request->getPathInfo(), '/_profiler') || 
-             str_starts_with($request->getPathInfo(), '/_wdt'))) {
+        if ($this->kernel->isDebug()
+            && (str_starts_with($request->getPathInfo(), '/_profiler')
+             || str_starts_with($request->getPathInfo(), '/_wdt'))) {
             return;
         }
 

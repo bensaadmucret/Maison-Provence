@@ -91,60 +91,70 @@ class AddressDTO
     public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
     public function setFirstName(?string $firstName): self
     {
         $this->firstName = $firstName;
+
         return $this;
     }
 
     public function setLastName(?string $lastName): self
     {
         $this->lastName = $lastName;
+
         return $this;
     }
 
     public function setStreet(?string $street): self
     {
         $this->street = $street;
+
         return $this;
     }
 
     public function setStreetComplement(?string $streetComplement): self
     {
         $this->streetComplement = $streetComplement;
+
         return $this;
     }
 
     public function setZipCode(?string $zipCode): self
     {
         $this->zipCode = $zipCode;
+
         return $this;
     }
 
     public function setCity(?string $city): self
     {
         $this->city = $city;
+
         return $this;
     }
 
     public function setCountry(?string $country): self
     {
         $this->country = $country;
+
         return $this;
     }
 
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+
         return $this;
     }
 
     public function setIsDefault(bool $isDefault): self
     {
         $this->isDefault = $isDefault;
+
         return $this;
     }
 }

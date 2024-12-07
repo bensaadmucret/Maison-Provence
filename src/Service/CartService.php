@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Entity\Cart;
 use App\Entity\CartItem;
-use App\Entity\Product;
 use App\Repository\CartItemRepository;
 use App\Repository\CartRepository;
 use App\Repository\ProductRepository;
@@ -22,13 +21,13 @@ class CartService implements CartServiceInterface
         private readonly CartItemRepository $cartItemRepository,
         private readonly ProductRepository $productRepository,
         private readonly RequestStack $requestStack,
-        private readonly LoggingService $loggingService
+        private readonly LoggingService $loggingService,
     ) {
     }
 
     public function getCart(): Cart
     {
-        if ($this->cart === null) {
+        if (null === $this->cart) {
             $session = $this->requestStack->getSession();
             $cartId = $session->get('cart_id');
 
@@ -41,6 +40,7 @@ class CartService implements CartServiceInterface
                 $this->cart->setSessionId($session->getId());
                 $this->entityManager->persist($this->cart);
                 $this->entityManager->flush();
+                $this->loggingService->logCartOperation('update', $this->cart);
                 $session->set('cart_id', $this->cart->getId());
             }
         }
@@ -66,7 +66,7 @@ class CartService implements CartServiceInterface
         $cart = $this->getCart();
         $cartItem = $this->cartItemRepository->findOneBy([
             'cart' => $cart,
-            'product' => $product
+            'product' => $product,
         ]);
 
         if ($cartItem) {
@@ -85,7 +85,7 @@ class CartService implements CartServiceInterface
         }
 
         $this->entityManager->flush();
-        $this->loggingService->logCartUpdate($cart);
+        $this->loggingService->logCartOperation('update', $cartItem->getCart());
     }
 
     public function updateQuantity(int $itemId, int $quantity): void
@@ -106,7 +106,7 @@ class CartService implements CartServiceInterface
 
         $cartItem->setQuantity($quantity);
         $this->entityManager->flush();
-        $this->loggingService->logCartUpdate($cartItem->getCart());
+        $this->loggingService->logCartOperation('update', $cartItem->getCart());
     }
 
     public function removeItem(int $itemId): void
@@ -119,7 +119,7 @@ class CartService implements CartServiceInterface
         $cart = $cartItem->getCart();
         $this->entityManager->remove($cartItem);
         $this->entityManager->flush();
-        $this->loggingService->logCartUpdate($cart);
+        $this->loggingService->logCartOperation('update', $cart);
     }
 
     public function clear(): void

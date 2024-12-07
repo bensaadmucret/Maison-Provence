@@ -4,7 +4,7 @@
     "@symfony\/ux-chartjs\/controller.js": "\/assets\/@symfony\/ux-chartjs\/controller-ca19c6fa17c0c7a61a47fa5cd49a8137.js",
     "@symfony\/ux-turbo\/turbo_controller.js": "\/assets\/@symfony\/ux-turbo\/turbo_controller-ce5e32dafdec0b7752f02e3e2cb25751.js",
     "@symfony\/ux-turbo\/turbo_stream_controller.js": "\/assets\/@symfony\/ux-turbo\/turbo_stream_controller-50eae293c1db68bd470da3c229c44f7a.js",
-    "app.js": "\/assets\/app-c743e61f42f748df04d382514d8c04f7.js",
+    "app.js": "\/assets\/app-591d48b6a77efc1f6e455097e1d6b303.js",
     "bootstrap.js": "\/assets\/bootstrap-c423b8bbc1f9cae218c105ca8ca9f767.js",
     "bundles\/easyadmin\/app.16e44df6.css": "\/assets\/bundles\/easyadmin\/app.16e44df6-cf9bf0b8d3d8d81d7fe5bd4845bdc523.css",
     "bundles\/easyadmin\/app.3048ce28.js": "\/assets\/bundles\/easyadmin\/app.3048ce28-d98c90b52cdba9f0acd40d94c62b1647.js",
@@ -684,8 +684,14 @@
     "bundles\/fosckeditor\/styles.js": "\/assets\/bundles\/fosckeditor\/styles-26bacd9c52a72dd5643f47914848f76f.js",
     "bundles\/fosckeditor\/vendor\/promise.js": "\/assets\/bundles\/fosckeditor\/vendor\/promise-f8411939fb66bc704bd762548160cfc5.js",
     "controllers\/hello_controller.js": "\/assets\/controllers\/hello_controller-55882fcad241d2bea50276ea485583bc.js",
-    "styles\/app.css": "\/assets\/styles\/app-5b275237a7270f0247314f969cb17819.css",
+    "js\/alpine.js": "\/assets\/js\/alpine-d5e3121e87140ef024bf61e4a03e8528.js",
+    "styles\/app.css": "\/assets\/styles\/app-1c3d6ec60a20d3d903c49f974fdbf2cb.css",
+    "styles\/variables.css": "\/assets\/styles\/variables-9f18d581214bf35c7186454b1664a4db.css",
+    "vendor\/@alpinejs\/collapse\/collapse.index.js": "\/assets\/vendor\/@alpinejs\/collapse\/collapse.index-3cb765b9b7383e5b9372959d5885274e.js",
     "vendor\/@hotwired\/stimulus\/stimulus.index.js": "\/assets\/vendor\/@hotwired\/stimulus\/stimulus.index-b5b1d00e42695b8959b4a1e94e3bc92a.js",
-    "vendor\/@hotwired\/turbo\/turbo.index.js": "\/assets\/vendor\/@hotwired\/turbo\/turbo.index-810f44ef1a202a441e4866b7a4c72d11.js",
-    "vendor\/chart.js\/chart.js.index.js": "\/assets\/vendor\/chart.js\/chart.js.index-5ef6f3c0a946679607ea18943aa445ea.js"
+    "vendor\/@hotwired\/turbo\/turbo.index.js": "\/assets\/vendor\/@hotwired\/turbo\/turbo.index-57ab2adf076a10f2234da506ad1d5a0d.js",
+    "vendor\/@kurkle\/color\/color.index.js": "\/assets\/vendor\/@kurkle\/color\/color.index-15dc01ec03463c3507129702239a2722.js",
+    "vendor\/alpinejs\/alpinejs.index.js": "\/assets\/vendor\/alpinejs\/alpinejs.index-0a0915d0fdf28586e6e7c64b00231fb2.js",
+    "vendor\/chart.js\/auto.js": "\/assets\/vendor\/chart.js\/auto-5b49cc2d8058561f851b2601468b1f49.js",
+    "vendor\/chart.js\/chart.js.index.js": "\/assets\/vendor\/chart.js\/chart.js.index-674d8af85eff0b4cb5f28aac73f764c8.js"
 }

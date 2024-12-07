@@ -13,7 +13,7 @@ class AddressService
     public function __construct(
         private EntityManagerInterface $entityManager,
         private AddressRepository $addressRepository,
-        private Security $security
+        private Security $security,
     ) {
     }
 
@@ -23,7 +23,7 @@ class AddressService
         string $postalCode,
         string $country,
         bool $isDefault = false,
-        bool $isBillingAddress = false
+        bool $isBillingAddress = false,
     ): Address {
         /** @var User $user */
         $user = $this->security->getUser();
@@ -58,7 +58,7 @@ class AddressService
         string $postalCode,
         string $country,
         bool $isDefault = false,
-        bool $isBillingAddress = false
+        bool $isBillingAddress = false,
     ): Address {
         /** @var User $user */
         $user = $this->security->getUser();

@@ -57,7 +57,7 @@ class OrderCrudController extends AbstractCrudController
             ->setCurrency('EUR')
             ->setStoredAsCents(false);
         yield AssociationField::new('user', 'Client');
-        yield AssociationField::new('items', 'Articles')
+        yield AssociationField::new('orderItems', 'Articles')
             ->hideOnIndex();
         yield DateTimeField::new('createdAt', 'Date de commande')
             ->hideOnForm();

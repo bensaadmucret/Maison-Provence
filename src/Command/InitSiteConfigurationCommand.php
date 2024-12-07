@@ -28,11 +28,12 @@ class InitSiteConfigurationCommand extends Command
         try {
             if ($this->configService->hasConfiguration()) {
                 $io->warning('Site configuration already exists.');
+
                 return Command::SUCCESS;
             }
 
             $config = $this->configService->createDefaultConfiguration();
-            
+
             $io->success('Site configuration has been initialized successfully.');
             $io->table(
                 ['Setting', 'Value'],
@@ -46,7 +47,8 @@ class InitSiteConfigurationCommand extends Command
 
             return Command::SUCCESS;
         } catch (\Exception $e) {
-            $io->error('An error occurred while initializing the site configuration: ' . $e->getMessage());
+            $io->error('An error occurred while initializing the site configuration: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }

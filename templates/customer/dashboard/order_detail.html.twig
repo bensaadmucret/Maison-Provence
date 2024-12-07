@@ -1,0 +1,114 @@
+{% extends 'customer/dashboard/layout.html.twig' %}
+
+{% block title %}Commande {{ order.reference }} - {{ parent() }}{% endblock %}
+
+{% block dashboard_content %}
+    <div class="space-y-6">
+        {# En-tête #}
+        <div>
+            <div class="sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900">Commande {{ order.reference }}</h1>
+                    <p class="mt-2 text-sm text-gray-700">
+                        Commandée le {{ order.createdAt|date('d/m/Y') }}
+                    </p>
+                </div>
+                <div class="mt-4 sm:mt-0">
+                    <span class="inline-flex rounded-full px-3 py-1 text-sm font-semibold 
+                        {% if order.status == 'completed' %}
+                            bg-green-100 text-green-800
+                        {% elseif order.status == 'processing' %}
+                            bg-blue-100 text-blue-800
+                        {% elseif order.status == 'cancelled' %}
+                            bg-red-100 text-red-800
+                        {% else %}
+                            bg-gray-100 text-gray-800
+                        {% endif %}">
+                        {{ order.status|trans }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        {# Informations de livraison #}
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Adresse de livraison</h3>
+                <div class="mt-4 text-sm text-gray-600">
+                    <p>{{ order.shippingAddress.firstName }} {{ order.shippingAddress.lastName }}</p>
+                    <p>{{ order.shippingAddress.street }}</p>
+                    <p>{{ order.shippingAddress.zipcode }} {{ order.shippingAddress.city }}</p>
+                    <p>{{ order.shippingAddress.country }}</p>
+                    {% if order.shippingAddress.phone %}
+                        <p class="mt-2">Tél : {{ order.shippingAddress.phone }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# Détails de la commande #}
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Détails de la commande</h3>
+                <div class="mt-4">
+                    <table class="min-w-full divide-y divide-gray-300">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Produit</th>
+                                <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Quantité</th>
+                                <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Prix unitaire</th>
+                                <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for item in order.items %}
+                                <tr>
+                                    <td class="py-4 pl-4 pr-3 text-sm sm:pl-0">
+                                        <div class="font-medium text-gray-900">{{ item.product.name }}</div>
+                                        {% if item.product.reference %}
+                                            <div class="text-gray-500">Réf : {{ item.product.reference }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-3 py-4 text-sm text-right text-gray-500">{{ item.quantity }}</td>
+                                    <td class="px-3 py-4 text-sm text-right text-gray-500">
+                                        {{ item.unitPrice|format_currency('EUR', locale='fr') }}
+                                    </td>
+                                    <td class="px-3 py-4 text-sm text-right text-gray-900">
+                                        {{ item.total|format_currency('EUR', locale='fr') }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th scope="row" colspan="3" class="pl-4 pr-3 pt-6 text-right text-sm font-normal text-gray-500 sm:pl-0">Sous-total</th>
+                                <td class="pl-3 pr-4 pt-6 text-right text-sm text-gray-900 sm:pr-0">
+                                    {{ order.subtotal|format_currency('EUR', locale='fr') }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row" colspan="3" class="pl-4 pr-3 pt-4 text-right text-sm font-normal text-gray-500 sm:pl-0">Livraison</th>
+                                <td class="pl-3 pr-4 pt-4 text-right text-sm text-gray-900 sm:pr-0">
+                                    {{ order.shippingCost|format_currency('EUR', locale='fr') }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row" colspan="3" class="pl-4 pr-3 pt-4 text-right text-sm font-semibold text-gray-900 sm:pl-0">Total</th>
+                                <td class="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0">
+                                    {{ order.total|format_currency('EUR', locale='fr') }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {# Bouton retour #}
+        <div class="mt-6">
+            <a href="{{ path('app_customer_orders') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                ← Retour à mes commandes
+            </a>
+        </div>
+    </div>
+{% endblock %}

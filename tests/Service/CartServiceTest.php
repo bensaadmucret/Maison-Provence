@@ -34,7 +34,7 @@ class CartServiceTest extends TestCase
         $this->cartItemRepository = $this->createMock(CartItemRepository::class);
         $this->productRepository = $this->createMock(ProductRepository::class);
         $this->loggingService = $this->createMock(LoggingService::class);
-        
+
         $this->requestStack = new RequestStack();
         $this->session = $this->createMock(SessionInterface::class);
         $this->session->method('getId')->willReturn('test_session_id');
@@ -198,7 +198,7 @@ class CartServiceTest extends TestCase
         $item2 = new CartItem();
         $item2->setQuantity(1);
         $item2->setPrice(2000);
-        
+
         $cart->addItem($item1);
         $cart->addItem($item2);
 
@@ -215,7 +215,7 @@ class CartServiceTest extends TestCase
         $item1->setQuantity(2);
         $item2 = new CartItem();
         $item2->setQuantity(3);
-        
+
         $cart->addItem($item1);
         $cart->addItem($item2);
 
@@ -228,7 +228,7 @@ class CartServiceTest extends TestCase
     public function testIsEmptyReturnsTrueForEmptyCart(): void
     {
         $cart = new Cart();
-        
+
         $this->session->method('get')->willReturn(1);
         $this->cartRepository->method('find')->willReturn($cart);
 

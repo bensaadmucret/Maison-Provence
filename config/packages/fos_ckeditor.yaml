@@ -21,4 +21,12 @@ fos_ck_editor:
                 { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
                 { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
             ]
+        category_description:
+            toolbar: 'full'
+            language: fr
+            uiColor: "#ffffff"
+            height: 300
+            toolbar_full: [
+                { name: 'styles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Blockquote', '-', 'Link', '-', 'RemoveFormat', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'Styles', 'Format', 'Font', 'FontSize', '-', 'TextColor', 'BGColor', 'Source'] }
+            ]
     default_config: product_description

@@ -2,27 +2,25 @@
 
 namespace App\Controller\Admin;
 
+use App\Admin\Field\ProductImageField;
 use App\Entity\Product;
 use App\Entity\ProductSEO;
+use App\Form\MediaType;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
-use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -64,12 +62,13 @@ class ProductCrudController extends AbstractCrudController
         $seo->setIndexable(true)
             ->setFollowable(true)
             ->setMetaKeywords([])
+            ->setMetaTitle('')
+            ->setMetaDescription('')
             ->setOpenGraphData([]);
 
         $product->setSeo($seo);
         $seo->setProduct($product);
 
-        // Persister explicitement l'entité SEO
         $this->entityManager->persist($seo);
 
         return $product;
@@ -77,80 +76,65 @@ class ProductCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        // Section Informations Générales
-        yield FormField::addTab('Informations Générales');
-        yield IdField::new('id')->hideOnForm();
-        yield TextField::new('name', 'Nom');
-        yield SlugField::new('slug')
-            ->setTargetFieldName('name')
-            ->hideOnIndex();
-        yield TextEditorField::new('description')
-            ->hideOnIndex()
-            ->setFormType(CKEditorType::class)
-            ->setFormTypeOptions([
-                'config_name' => 'product_description',
-            ]);
-        yield MoneyField::new('price', 'Prix')
-            ->setCurrency('EUR')
-            ->setStoredAsCents(false);
-        yield NumberField::new('stock', 'Stock');
-        yield AssociationField::new('category', 'Catégorie');
-        yield BooleanField::new('isActive', 'Actif');
-        yield ImageField::new('image', 'Image')
-            ->setBasePath('/uploads/images')
-            ->setUploadDir('public/uploads/images')
-            ->setUploadedFileNamePattern('[randomhash].[extension]')
-            ->setFormTypeOptions([
-                'required' => false,
-                'attr' => [
-                    'accept' => 'image/*',
-                ],
-            ])
-            ->onlyOnForms();
-        yield DateTimeField::new('createdAt', 'Créé le')
-            ->hideOnForm();
-        yield DateTimeField::new('updatedAt', 'Mis à jour le')
-            ->hideOnForm();
+        return [
+            FormField::addTab('Général'),
+            TextField::new('name', 'Nom')
+                ->setRequired(true),
+            SlugField::new('slug')
+                ->setTargetFieldName('name')
+                ->hideOnIndex(),
+            TextEditorField::new('description', 'Description')
+                ->hideOnIndex(),
+            MoneyField::new('price', 'Prix')
+                ->setCurrency('EUR')
+                ->setStoredAsCents(false),
+            BooleanField::new('isActive', 'Actif'),
+            AssociationField::new('category', 'Catégorie'),
 
-        // Section Médias
-        yield FormField::addTab('Médias');
-        yield CollectionField::new('media', 'Images')
-            ->useEntryCrudForm()
-            ->setFormTypeOption('by_reference', false)
-            ->onlyOnForms();
-
-        if (Crud::PAGE_NEW === $pageName || Crud::PAGE_EDIT === $pageName) {
-            // Section SEO
-            yield FormField::addTab('SEO');
-            yield FormField::addPanel('Métadonnées SEO');
-
-            yield TextField::new('seo.metaTitle', 'Titre meta')
-                ->setHelp('Maximum 60 caractères')
-                ->setColumns('col-md-12');
-
-            yield TextEditorField::new('seo.metaDescription', 'Description meta')
-                ->setHelp('Maximum 160 caractères')
-                ->setColumns('col-md-12')
-                ->setFormType(CKEditorType::class)
+            FormField::addTab('Images'),
+            CollectionField::new('media', 'Images')
+                ->setEntryType(MediaType::class)
                 ->setFormTypeOptions([
-                    'config_name' => 'seo_description',
-                ]);
+                    'by_reference' => false,
+                    'allow_add' => true,
+                    'allow_delete' => true,
+                    'error_bubbling' => false,
+                ])
+                ->onlyOnForms()
+                ->addJsFiles('build/collection.js'),
+            ProductImageField::new('media', 'Images')
+                ->onlyOnIndex(),
 
-            yield UrlField::new('seo.canonicalUrl', 'URL canonique')
-                ->setColumns('col-md-12')
-                ->setRequired(false);
-
-            yield CollectionField::new('seo.metaKeywords', 'Mots-clés')
+            FormField::addTab('SEO'),
+            TextField::new('seo.metaTitle', 'Titre SEO')
+                ->onlyOnForms()
+                ->setColumns(12),
+            TextEditorField::new('seo.metaDescription', 'Description SEO')
+                ->onlyOnForms()
+                ->setColumns(12)
+                ->setNumOfRows(3),
+            CollectionField::new('seo.metaKeywords', 'Mots-clés SEO')
+                ->onlyOnForms()
+                ->setColumns(12)
+                ->allowAdd()
+                ->allowDelete(),
+            BooleanField::new('seo.indexable', 'Indexable')
+                ->onlyOnForms()
+                ->setColumns(6),
+            BooleanField::new('seo.followable', 'Followable')
+                ->onlyOnForms()
+                ->setColumns(6),
+            UrlField::new('seo.canonicalUrl', 'URL Canonique')
+                ->onlyOnForms()
+                ->setColumns(12),
+            ArrayField::new('seo.openGraphData', 'Open Graph Data')
+                ->onlyOnForms()
+                ->setColumns(12)
+                ->setHelp('Format : clé = valeur (ex: og:title = Mon Titre)')
                 ->setFormTypeOption('allow_add', true)
                 ->setFormTypeOption('allow_delete', true)
-                ->setColumns('col-md-12');
-
-            yield BooleanField::new('seo.indexable', 'Indexable')
-                ->setColumns('col-md-6');
-
-            yield BooleanField::new('seo.followable', 'Followable')
-                ->setColumns('col-md-6');
-        }
+                ->setFormTypeOption('delete_empty', true),
+        ];
     }
 
     public function configureActions(Actions $actions): Actions
@@ -171,25 +155,61 @@ class ProductCrudController extends AbstractCrudController
             });
     }
 
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        // Si l'entité est un Product
+        if ($entityInstance instanceof Product) {
+            // S'assurer que l'entité SEO existe
+            if (!$entityInstance->getSeo()) {
+                $seo = new ProductSEO();
+                $seo->setProduct($entityInstance);
+                $seo->setIndexable(true)
+                    ->setFollowable(true)
+                    ->setMetaKeywords([])
+                    ->setMetaTitle('')
+                    ->setMetaDescription('')
+                    ->setOpenGraphData([]);
+                $entityInstance->setSeo($seo);
+                $entityManager->persist($seo);
+            }
+
+            // Parcourir les médias et définir le produit pour chaque média
+            foreach ($entityInstance->getMedia() as $media) {
+                $media->setProduct($entityInstance);
+                $entityManager->persist($media);
+            }
+        }
+
+        // Persister l'entité principale
+        parent::persistEntity($entityManager, $entityInstance);
+    }
+
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        if (!$entityInstance instanceof Product) {
-            return;
+        // Si l'entité est un Product
+        if ($entityInstance instanceof Product) {
+            // S'assurer que l'entité SEO existe
+            if (!$entityInstance->getSeo()) {
+                $seo = new ProductSEO();
+                $seo->setProduct($entityInstance);
+                $seo->setIndexable(true)
+                    ->setFollowable(true)
+                    ->setMetaKeywords([])
+                    ->setMetaTitle('')
+                    ->setMetaDescription('')
+                    ->setOpenGraphData([]);
+                $entityInstance->setSeo($seo);
+                $entityManager->persist($seo);
+            }
+
+            // Parcourir les médias et définir le produit pour chaque média
+            foreach ($entityInstance->getMedia() as $media) {
+                $media->setProduct($entityInstance);
+                $entityManager->persist($media);
+            }
         }
 
-        if (!$entityInstance->getSeo()) {
-            $seo = new ProductSEO();
-            $seo->setIndexable(true)
-                ->setFollowable(true)
-                ->setMetaKeywords([])
-                ->setOpenGraphData([]);
-            $entityInstance->setSeo($seo);
-            $seo->setProduct($entityInstance);
-            $entityManager->persist($seo);
-        }
-
-        $entityInstance->setUpdatedAt(new \DateTimeImmutable());
-        $entityManager->persist($entityInstance);
-        $entityManager->flush();
+        // Mettre à jour l'entité principale
+        parent::updateEntity($entityManager, $entityInstance);
     }
 }

@@ -5,10 +5,10 @@ namespace App\Controller\Admin;
 use App\Entity\TeamMember;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class TeamMemberCrudController extends AbstractCrudController
@@ -28,7 +28,7 @@ class TeamMemberCrudController extends AbstractCrudController
             ->setPageTitle('new', 'Ajouter un membre')
             ->setPageTitle('edit', 'Modifier un membre')
             ->setFormOptions([
-                'validation_groups' => ['Default']
+                'validation_groups' => ['Default'],
             ])
         ;
     }
@@ -39,21 +39,21 @@ class TeamMemberCrudController extends AbstractCrudController
             TextField::new('firstname', 'Prénom')
                 ->setHelp('Prénom du membre de l\'équipe')
                 ->setColumns(6),
-                
+
             TextField::new('name', 'Nom')
                 ->setHelp('Nom de famille du membre de l\'équipe')
                 ->setColumns(6),
-                
+
             TextField::new('role', 'Rôle')
                 ->setHelp('Fonction ou rôle dans l\'équipe')
                 ->setColumns(6),
-                
+
             TextareaField::new('description', 'Description')
                 ->setHelp('Description détaillée du rôle et de l\'expérience')
                 ->setColumns(12)
                 ->hideOnIndex()
                 ->setNumOfRows(5),
-                
+
             TextField::new('photoFile', 'Photo')
                 ->setFormType(VichImageType::class)
                 ->setFormTypeOptions([
@@ -65,11 +65,11 @@ class TeamMemberCrudController extends AbstractCrudController
                 ])
                 ->onlyOnForms()
                 ->setColumns(12),
-                
+
             ImageField::new('photo', 'Photo')
                 ->setBasePath('/uploads/team')
                 ->onlyOnIndex(),
-                
+
             IntegerField::new('position', 'Position')
                 ->setHelp('Ordre d\'affichage (plus petit nombre = apparaît en premier)')
                 ->setColumns(6),

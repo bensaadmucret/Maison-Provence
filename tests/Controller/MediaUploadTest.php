@@ -4,9 +4,9 @@ namespace App\Tests\Controller;
 
 use App\Entity\Media;
 use App\Repository\MediaRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Doctrine\ORM\EntityManagerInterface;
 
 class MediaUploadTest extends WebTestCase
 {

@@ -11,8 +11,8 @@ import { startStimulusApp } from '@symfony/stimulus-bundle';
 import { registerChart } from '@symfony/ux-chartjs';
 import '@hotwired/turbo';
 
+// Stimulus configuration
 registerChart();
-
 export const app = startStimulusApp();
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+console.log('This log comes from assets/app.js - welcome to AssetMapper! ');

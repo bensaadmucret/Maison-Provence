@@ -59,6 +59,7 @@ class Client
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
+
         return $this;
     }
 
@@ -70,6 +71,7 @@ class Client
     public function setPrenom(string $prenom): static
     {
         $this->prenom = $prenom;
+
         return $this;
     }
 
@@ -81,6 +83,7 @@ class Client
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -92,6 +95,7 @@ class Client
     public function setTelephone(?string $telephone): static
     {
         $this->telephone = $telephone;
+
         return $this;
     }
 
@@ -103,6 +107,7 @@ class Client
     public function setAdresse(?string $adresse): static
     {
         $this->adresse = $adresse;
+
         return $this;
     }
 
@@ -114,6 +119,7 @@ class Client
     public function setCodePostal(?string $codePostal): static
     {
         $this->codePostal = $codePostal;
+
         return $this;
     }
 
@@ -125,6 +131,7 @@ class Client
     public function setVille(?string $ville): static
     {
         $this->ville = $ville;
+
         return $this;
     }
 
@@ -136,6 +143,7 @@ class Client
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -147,6 +155,7 @@ class Client
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 }

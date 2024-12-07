@@ -11,17 +11,7 @@
   ),
   '@hotwired/turbo' => 
   array (
-    'version' => '7.3.0',
-    'dependencies' => 
-    array (
-    ),
-    'extraFiles' => 
-    array (
-    ),
-  ),
-  'chart.js' => 
-  array (
-    'version' => '3.9.1',
+    'version' => '8.0.12',
     'dependencies' => 
     array (
     ),
@@ -31,7 +21,49 @@
   ),
   'chart.js/auto' => 
   array (
-    'version' => '3.9.1',
+    'version' => '4.4.7',
+    'dependencies' => 
+    array (
+      0 => '@kurkle/color',
+    ),
+    'extraFiles' => 
+    array (
+    ),
+  ),
+  'chart.js' => 
+  array (
+    'version' => '4.4.7',
+    'dependencies' => 
+    array (
+      0 => '@kurkle/color',
+    ),
+    'extraFiles' => 
+    array (
+    ),
+  ),
+  '@kurkle/color' => 
+  array (
+    'version' => '0.3.4',
+    'dependencies' => 
+    array (
+    ),
+    'extraFiles' => 
+    array (
+    ),
+  ),
+  'alpinejs' => 
+  array (
+    'version' => '3.14.6',
+    'dependencies' => 
+    array (
+    ),
+    'extraFiles' => 
+    array (
+    ),
+  ),
+  '@alpinejs/collapse' => 
+  array (
+    'version' => '3.14.6',
     'dependencies' => 
     array (
     ),

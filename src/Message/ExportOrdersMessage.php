@@ -5,7 +5,7 @@ namespace App\Message;
 class ExportOrdersMessage
 {
     public function __construct(
-        private readonly array $criteria = []
+        private readonly array $criteria = [],
     ) {
     }
 

@@ -23,7 +23,7 @@ class CartController extends AbstractController
         return $this->render('cart/show.html.twig', [
             'cart' => $this->cartService->getCart(),
             'total' => $this->cartService->getTotal(),
-            'itemCount' => $this->cartService->getItemCount()
+            'itemCount' => $this->cartService->getItemCount(),
         ]);
     }
 
@@ -36,22 +36,22 @@ class CartController extends AbstractController
         try {
             $this->cartService->addProduct($productId, $quantity);
             $this->addFlash('success', 'Produit ajouté au panier avec succès');
-            
+
             if ($request->isXmlHttpRequest()) {
                 return new JsonResponse([
                     'success' => true,
                     'message' => 'Produit ajouté au panier',
                     'cartTotal' => $this->cartService->getTotal(),
-                    'cartCount' => $this->cartService->getItemCount()
+                    'cartCount' => $this->cartService->getItemCount(),
                 ]);
             }
         } catch (\InvalidArgumentException $e) {
             $this->addFlash('error', $e->getMessage());
-            
+
             if ($request->isXmlHttpRequest()) {
                 return new JsonResponse([
                     'success' => false,
-                    'message' => $e->getMessage()
+                    'message' => $e->getMessage(),
                 ], Response::HTTP_BAD_REQUEST);
             }
         }
@@ -71,7 +71,7 @@ class CartController extends AbstractController
                     'success' => true,
                     'message' => 'Produit retiré du panier',
                     'cartTotal' => $this->cartService->getTotal(),
-                    'cartCount' => $this->cartService->getItemCount()
+                    'cartCount' => $this->cartService->getItemCount(),
                 ]);
             }
         } catch (\InvalidArgumentException $e) {
@@ -80,7 +80,7 @@ class CartController extends AbstractController
             if ($request->isXmlHttpRequest()) {
                 return new JsonResponse([
                     'success' => false,
-                    'message' => $e->getMessage()
+                    'message' => $e->getMessage(),
                 ], Response::HTTP_BAD_REQUEST);
             }
         }
@@ -102,7 +102,7 @@ class CartController extends AbstractController
                     'success' => true,
                     'message' => 'Quantité mise à jour',
                     'cartTotal' => $this->cartService->getTotal(),
-                    'cartCount' => $this->cartService->getItemCount()
+                    'cartCount' => $this->cartService->getItemCount(),
                 ]);
             }
         } catch (\InvalidArgumentException $e) {
@@ -111,7 +111,7 @@ class CartController extends AbstractController
             if ($request->isXmlHttpRequest()) {
                 return new JsonResponse([
                     'success' => false,
-                    'message' => $e->getMessage()
+                    'message' => $e->getMessage(),
                 ], Response::HTTP_BAD_REQUEST);
             }
         }
@@ -130,7 +130,7 @@ class CartController extends AbstractController
                 'success' => true,
                 'message' => 'Panier vidé',
                 'cartTotal' => 0,
-                'cartCount' => 0
+                'cartCount' => 0,
             ]);
         }
 
@@ -142,7 +142,7 @@ class CartController extends AbstractController
     {
         return new JsonResponse([
             'count' => $this->cartService->getItemCount(),
-            'total' => $this->cartService->getTotal()
+            'total' => $this->cartService->getTotal(),
         ]);
     }
 }

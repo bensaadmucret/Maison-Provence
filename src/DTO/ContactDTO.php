@@ -46,6 +46,7 @@ class ContactDTO
     public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -57,6 +58,7 @@ class ContactDTO
     public function setEmail(?string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -68,6 +70,7 @@ class ContactDTO
     public function setSubject(?string $subject): self
     {
         $this->subject = $subject;
+
         return $this;
     }
 
@@ -79,6 +82,7 @@ class ContactDTO
     public function setMessage(?string $message): self
     {
         $this->message = $message;
+
         return $this;
     }
 }

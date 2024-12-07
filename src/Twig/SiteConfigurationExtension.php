@@ -9,7 +9,7 @@ use Twig\Extension\GlobalsInterface;
 class SiteConfigurationExtension extends AbstractExtension implements GlobalsInterface
 {
     public function __construct(
-        private SiteConfigurationService $configurationService
+        private SiteConfigurationService $configurationService,
     ) {
     }
 

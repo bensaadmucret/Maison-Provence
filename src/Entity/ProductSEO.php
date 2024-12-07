@@ -35,6 +35,7 @@ class ProductSEO extends SEO
         $openGraphData = $this->getOpenGraphData();
         $openGraphData['image'] = $ogImage;
         $this->setOpenGraphData($openGraphData);
+
         return $this;
     }
 }
