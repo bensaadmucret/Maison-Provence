@@ -46,6 +46,10 @@ services:
         arguments:
             $uploadDirectory: '%media_directory%'
 
+    App\Service\PexelsImageService:
+        public: true
+        autowire: true
+
     Symfony\Component\Filesystem\Filesystem:
         public: true
         autowire: true

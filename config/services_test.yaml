@@ -9,8 +9,11 @@ services:
 
     App\Tests\:
         resource: '../tests/*'
-        exclude: '../tests/{bootstrap.php}'
+        exclude: 
+            - '../tests/bootstrap.php'
+            - '../tests/Fixtures/*'  # Exclure explicitement les fixtures
 
     # Correction de la casse pour GenerateTestImage
     App\Tests\Fixtures\GenerateTestImage:
         public: true
+        autowire: false
