@@ -16,6 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -76,65 +77,89 @@ class ProductCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
-            FormField::addTab('Général'),
-            TextField::new('name', 'Nom')
-                ->setRequired(true),
-            SlugField::new('slug')
-                ->setTargetFieldName('name')
-                ->hideOnIndex(),
-            TextEditorField::new('description', 'Description')
-                ->hideOnIndex(),
-            MoneyField::new('price', 'Prix')
+        $fields = [];
+
+        if (Crud::PAGE_INDEX === $pageName) {
+            // Configuration spécifique pour la page d'index
+            $fields[] = TextField::new('name', 'Nom');
+            $fields[] = MoneyField::new('price', 'Prix')
                 ->setCurrency('EUR')
-                ->setStoredAsCents(false),
-            BooleanField::new('isActive', 'Actif'),
-            AssociationField::new('category', 'Catégorie'),
+                ->setStoredAsCents(false);
+            $fields[] = IntegerField::new('stock', 'Stock');
+            $fields[] = BooleanField::new('isActive', 'Actif');
+            $fields[] = BooleanField::new('isFeatured', 'Mis en avant');
+            $fields[] = AssociationField::new('category', 'Catégorie');
+            
+            return $fields;
+        }
 
-            FormField::addTab('Images'),
-            CollectionField::new('media', 'Images')
-                ->setEntryType(MediaType::class)
-                ->setFormTypeOptions([
-                    'by_reference' => false,
-                    'allow_add' => true,
-                    'allow_delete' => true,
-                    'error_bubbling' => false,
-                ])
-                ->onlyOnForms()
-                ->addJsFiles('build/collection.js'),
-            ProductImageField::new('media', 'Images')
-                ->onlyOnIndex(),
+        // Onglet Général
+        $fields[] = FormField::addTab('Général');
+        $fields[] = TextField::new('name', 'Nom')
+            ->setRequired(true);
+        
+        $fields[] = SlugField::new('slug')
+            ->setTargetFieldName('name')
+            ->hideOnIndex();
+        
+        $fields[] = TextEditorField::new('description', 'Description')
+            ->hideOnIndex()
+            ->setRequired(false);
+        
+        $fields[] = MoneyField::new('price', 'Prix')
+            ->setCurrency('EUR')
+            ->setStoredAsCents(false)
+            ->setRequired(true);
+        
+        $fields[] = IntegerField::new('stock', 'Stock')
+            ->setRequired(true)
+            ->setHelp('Nombre d\'unités disponibles');
 
-            FormField::addTab('SEO'),
-            TextField::new('seo.metaTitle', 'Titre SEO')
-                ->onlyOnForms()
-                ->setColumns(12),
-            TextEditorField::new('seo.metaDescription', 'Description SEO')
-                ->onlyOnForms()
-                ->setColumns(12)
-                ->setNumOfRows(3),
-            CollectionField::new('seo.metaKeywords', 'Mots-clés SEO')
-                ->onlyOnForms()
-                ->setColumns(12)
-                ->allowAdd()
-                ->allowDelete(),
-            BooleanField::new('seo.indexable', 'Indexable')
-                ->onlyOnForms()
-                ->setColumns(6),
-            BooleanField::new('seo.followable', 'Followable')
-                ->onlyOnForms()
-                ->setColumns(6),
-            UrlField::new('seo.canonicalUrl', 'URL Canonique')
-                ->onlyOnForms()
-                ->setColumns(12),
-            ArrayField::new('seo.openGraphData', 'Open Graph Data')
-                ->onlyOnForms()
-                ->setColumns(12)
-                ->setHelp('Format : clé = valeur (ex: og:title = Mon Titre)')
-                ->setFormTypeOption('allow_add', true)
-                ->setFormTypeOption('allow_delete', true)
-                ->setFormTypeOption('delete_empty', true),
-        ];
+        // Onglet Visibilité et Mise en avant
+        $fields[] = FormField::addTab('Visibilité');
+        
+        $fields[] = BooleanField::new('isActive', 'Produit actif')
+            ->setRequired(false)
+            ->setHelp('Cochez pour rendre le produit visible sur le site');
+        
+        $fields[] = BooleanField::new('isFeatured', 'Produit mis en avant')
+            ->setRequired(false)
+            ->setHelp('Cochez pour mettre en avant ce produit sur la page d\'accueil');
+
+        $fields[] = AssociationField::new('category', 'Catégorie')
+            ->setRequired(false)
+            ->setFormTypeOption('placeholder', 'Sélectionnez une catégorie (optionnel)');
+
+        // Onglet Images
+        $fields[] = FormField::addTab('Images');
+        $fields[] = CollectionField::new('media', 'Images')
+            ->setEntryType(MediaType::class)
+            ->setFormTypeOptions([
+                'by_reference' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'error_bubbling' => false,
+            ])
+            ->setRequired(false);
+
+        // Onglet SEO
+        $fields[] = FormField::addTab('SEO');
+        $fields[] = TextField::new('seo.metaTitle', 'Titre Meta')
+            ->setRequired(false);
+        
+        $fields[] = TextEditorField::new('seo.metaDescription', 'Description Meta')
+            ->setRequired(false);
+
+        $fields[] = UrlField::new('seo.canonicalUrl', 'URL Canonique')
+            ->setRequired(false);
+
+        $fields[] = ArrayField::new('seo.metaKeywords', 'Mots-clés Meta')
+            ->setRequired(false);
+
+        $fields[] = ArrayField::new('seo.openGraphData', 'Données Open Graph')
+            ->setRequired(false);
+
+        return $fields;
     }
 
     public function configureActions(Actions $actions): Actions

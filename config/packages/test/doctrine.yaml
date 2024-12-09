@@ -1,0 +1,19 @@
+doctrine:
+    dbal:
+        driver: 'pdo_mysql'
+        url: '%env(resolve:DATABASE_URL)%'
+        # Supprimer le suffixe de test automatique
+        dbname_suffix: ''
+    orm:
+        auto_generate_proxy_classes: true
+        enable_lazy_ghost_objects: true
+        metadata_cache_driver:
+            type: pool
+            pool: doctrine.system_cache_pool
+        # Forcer la création des schémas de base de données
+        mappings:
+            App:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App

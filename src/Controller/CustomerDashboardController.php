@@ -182,4 +182,12 @@ final class CustomerDashboardController extends AbstractController
             'invoices' => $invoices,
         ]);
     }
+
+    #[Route('/addresses', name: 'app_customer_addresses')]
+    public function addresses(): Response
+    {
+        return $this->render('customer/dashboard/addresses.html.twig', [
+            'user' => $this->getUser(),
+        ]);
+    }
 }

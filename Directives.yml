@@ -1,0 +1,80 @@
+# 🤖 Directives pour le Développement Symfony 7
+
+## 🎯 Principes Fondamentaux
+- Respect strict des bonnes pratiques Symfony 7
+- Approche méthodologique et rigoureuse
+- Qualité et maintenabilité du code comme priorité absolue
+
+## 🚦 Règles de Développement
+- Demander systématiquement une validation avant toute modification de code
+- Tests approfondis et exhaustifs, jamais de solutions de facilité
+- Utilisation systématique des conteneurs Docker pour la base de données
+
+## 📐 Standards de Codage
+- Suivre les recommandations de Symfony et PHP-FIG
+- Utilisation des attributs Symfony
+- Typage strict
+- Gestion explicite des dépendances
+
+## 🧪 Stratégie de Test
+- Tests unitaires et fonctionnels complets
+- Couverture de tous les cas de figure
+- Vérification de l'intégrité des données
+- Tests indépendants de l'environnement
+
+## 🔒 Sécurité et Performance
+- Validation et sanitization des données
+- Optimisation des requêtes
+- Gestion des erreurs et exceptions
+- Performances et scalabilité
+
+## 🐳 Gestion des Conteneurs
+- Considérer systématiquement l'environnement conteneurisé
+- Tests adaptés à l'infrastructure Docker
+- Portabilité et reproducibilité
+- utilise docker compose 
+- le fichier de configuration est compose.yaml
+
+## 📦 Gestion des Dépendances
+- Utilisation de Composer
+- Versions explicites
+- Mise à jour régulière
+
+## 📝 Documentation
+development:
+  database:
+    type: mariadb
+    version: 10.11
+    test_database: 
+      name: maison_provence_test
+      user: app
+      password: app
+
+  symfony:
+    version: 7.x
+    environment: dev
+    test_environment: test
+
+  project:
+    name: Maison Provence
+    description: E-commerce Platform for Lavender Products
+
+testing:
+  strategy:
+    - unit_tests
+    - integration_tests
+    - entity_relationship_tests
+
+  focus_areas:
+    - product_entity
+    - category_relationships
+    - seo_metadata
+    - database_configurations
+
+deployment:
+  container_strategy: docker-compose
+  services:
+    - php
+    - mariadb
+    - nginx
+    - mailpit

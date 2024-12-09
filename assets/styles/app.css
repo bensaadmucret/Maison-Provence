@@ -31,7 +31,81 @@
     transform: scale(1.1);
 }
 
-/* Style de base */
-body {
-    background-color: skyblue;
+/* Page Transitions */
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out forwards;
 }
+
+.animate-fade-out {
+    animation: fadeOut 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* Ensure smooth transitions */
+.turbo-progress-bar {
+    background: linear-gradient(to right, #4F46E5, #818CF8);
+}
+
+/* Dark mode styles */
+:root {
+    --primary-color: #4F46E5;
+    --background-color: #ffffff;
+    --text-color: #1F2937;
+    --card-background: #ffffff;
+    --border-color: #E5E7EB;
+    --hover-color: #F3F4F6;
+}
+
+.dark {
+    --primary-color: #818CF8;
+    --background-color: #111827;
+    --text-color: #F9FAFB;
+    --card-background: #1F2937;
+    --border-color: #374151;
+    --hover-color: #374151;
+}
+
+/* Apply CSS variables */
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.card {
+    background-color: var(--card-background);
+    border-color: var(--border-color);
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+}
+
+/* Theme toggle button animation */
+.theme-toggle-icon {
+    transition: transform 0.5s ease-in-out;
+}
+
+.theme-toggle-icon.dark {
+    transform: rotate(360deg);
+}
+
+/* Style de base */

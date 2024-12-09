@@ -8,8 +8,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CategorySEORepository::class)]
 class CategorySEO extends SEO
 {
-    #[ORM\OneToOne(inversedBy: 'seo', targetEntity: Category::class)]
-    #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true)]
+    #[ORM\OneToOne(
+        mappedBy: 'seo', 
+        targetEntity: Category::class, 
+        cascade: ['persist', 'remove']
+    )]
     private ?Category $category = null;
 
     public function getCategory(): ?Category

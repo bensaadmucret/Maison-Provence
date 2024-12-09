@@ -78,8 +78,8 @@ class SiteConfiguration
     #[ORM\Column(type: 'boolean', nullable: true)]
     private ?bool $enableCompareProducts = true;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
-    private float $freeShippingThreshold = 100.00;
+    #[ORM\Column(type: 'string', length: 20, options: ['default' => '100.00'])]
+    private string $freeShippingThreshold = '100.00';
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $defaultShippingMethod = 'standard';
@@ -345,13 +345,12 @@ class SiteConfiguration
 
     public function getFreeShippingThreshold(): float
     {
-        return $this->freeShippingThreshold;
+        return floatval($this->freeShippingThreshold);
     }
 
     public function setFreeShippingThreshold(float $freeShippingThreshold): static
     {
-        $this->freeShippingThreshold = $freeShippingThreshold;
-
+        $this->freeShippingThreshold = (string)$freeShippingThreshold;
         return $this;
     }
 

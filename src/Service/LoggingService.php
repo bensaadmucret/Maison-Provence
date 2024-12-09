@@ -74,9 +74,10 @@ class LoggingService implements LoggingServiceInterface
         ]);
     }
 
-    public function logProductDeleted(array $context = []): void
+    public function logProductDeleted(int $id, array $context = []): void
     {
         $this->logger->info('Product deleted', [
+            'product_id' => $id,
             'action' => 'product_deleted',
             ...$context,
         ]);
@@ -118,13 +119,21 @@ class LoggingService implements LoggingServiceInterface
     // Cart logging methods
     public function logCartOperation(string $operation, Cart $cart, array $context = []): void
     {
-        $this->logger->info('Cart operation: '.$operation, [
-            'operation' => $operation,
+        $this->logger->info('Cart operation', [
             'cart_id' => $cart->getId(),
-            'user_id' => $cart->getUser()?->getId(),
-            'total_items' => $cart->getItems()->count(),
-            'total_price' => $cart->getTotalPrice(),
-            'action' => 'cart_operation',
+            'operation' => $operation,
+            'total' => $cart->getTotal(),
+            'item_count' => $cart->getItemsCount(),
+            ...$context,
+        ]);
+    }
+
+    public function logCartCleared(Cart $cart, array $context = []): void
+    {
+        $this->logger->info('Cart cleared', [
+            'cart_id' => $cart->getId(),
+            'previous_total' => $cart->getTotal(),
+            'previous_item_count' => $cart->getItemsCount(),
             ...$context,
         ]);
     }

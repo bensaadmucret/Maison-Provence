@@ -2,6 +2,7 @@ import typography from '@tailwindcss/typography';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class', // Enable dark mode with class strategy
   content: [
     "./assets/**/*.js",
     "./templates/**/*.twig",
@@ -53,8 +54,13 @@ export default {
           800: '#115e59',
           900: '#134e4a',
           950: '#042f2e',
-        }
-      }
+        },
+        background: 'var(--background-color)',
+        text: 'var(--text-color)',
+        card: 'var(--card-background)',
+        border: 'var(--border-color)',
+        hover: 'var(--hover-color)',
+      },
     },
   },
   plugins: [

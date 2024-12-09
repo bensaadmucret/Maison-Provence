@@ -1,0 +1,78 @@
+{#
+    Composant de formulaire pour un média
+    Paramètres:
+    - form: Le formulaire du média
+#}
+
+<div class="space-y-4" 
+     x-data="{ 
+        preview: null,
+        updatePreview(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => this.preview = e.target.result;
+                reader.readAsDataURL(file);
+            }
+        }
+     }">
+    {# Aperçu de l'image #}
+    <div class="mb-4">
+        {% if form.vars.data and form.vars.data.filename %}
+            {{ include('admin/components/_media_preview.html.twig', {
+                media: form.vars.data,
+                size: 'medium'
+            }) }}
+        {% else %}
+            <div x-show="!preview" class="flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg h-32">
+                <i class="fas fa-image text-gray-400 text-3xl"></i>
+            </div>
+            <img x-show="preview" 
+                 :src="preview" 
+                 class="rounded-lg object-cover h-32 w-full" 
+                 alt="Aperçu">
+        {% endif %}
+    </div>
+
+    {# Champs du formulaire #}
+    <div class="grid grid-cols-1 gap-4">
+        <div class="col-span-1">
+            {{ form_row(form.imageFile, {
+                label: 'Image'|trans,
+                attr: {
+                    class: 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100',
+                    '@change': 'updatePreview($event)'
+                }
+            }) }}
+        </div>
+
+        <div class="col-span-1">
+            {{ form_row(form.title, {
+                label: 'Titre'|trans,
+                attr: {
+                    class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+                }
+            }) }}
+        </div>
+
+        <div class="col-span-1">
+            {{ form_row(form.alt, {
+                label: 'Texte alternatif'|trans,
+                attr: {
+                    class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+                }
+            }) }}
+        </div>
+
+        {% if form.position is defined %}
+            <div class="col-span-1">
+                {{ form_row(form.position, {
+                    label: 'Position'|trans,
+                    attr: {
+                        class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+                    }
+                }) }}
+            </div>
+        {% endif %}
+    </div>
+</div>

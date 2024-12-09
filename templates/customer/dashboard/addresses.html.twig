@@ -1,0 +1,52 @@
+{% extends 'customer/dashboard/layout.html.twig' %}
+
+{% block title %}Mes adresses - {{ parent() }}{% endblock %}
+
+{% block dashboard_content %}
+    <div class="p-4 sm:p-6 lg:p-8">
+        <div class="sm:flex sm:items-center">
+            <div class="sm:flex-auto">
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Mes adresses</h1>
+                <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                    Gérez vos adresses de livraison et de facturation.
+                </p>
+            </div>
+            <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                <button type="button"
+                        class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    Ajouter une adresse
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-8 flow-root">
+            <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+                {% if user.addresses|length > 0 %}
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 p-4">
+                        {% for address in user.addresses %}
+                            <div class="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400">
+                                <div class="min-w-0 flex-1">
+                                    <span class="absolute inset-0" aria-hidden="true"></span>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ address.fullName }}</p>
+                                    <p class="truncate text-sm text-gray-500 dark:text-gray-400">
+                                        {{ address.street }}<br>
+                                        {{ address.postalCode }} {{ address.city }}<br>
+                                        {{ address.country }}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">Aucune adresse</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Commencez par ajouter une nouvelle adresse.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

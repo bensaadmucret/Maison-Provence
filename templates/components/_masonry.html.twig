@@ -2,12 +2,12 @@
     <div class="columns-1 sm:columns-2 md:columns-{{ collection.settings.columns }} gap-{{ collection.settings.gap/4 }} space-y-{{ collection.settings.gap/4 }}">
         {% for media in collection.media %}
             <div class="relative group break-inside-avoid">
-                <img src="{{ vich_uploader_asset(media, 'imageFile') }}"
+                <img src="{{ media.url }}"
                      class="w-full h-auto rounded-lg transition-all duration-300 group-hover:brightness-90"
                      alt="{{ media.alt }}"
-                     title="{{ media.title }}">
+                     {% if media.title is defined %}title="{{ media.title }}"{% endif %}>
                 
-                {% if media.title %}
+                {% if media.title is defined and media.title %}
                     <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity duration-300 flex items-end justify-start p-4 rounded-lg">
                         <h3 class="text-white text-lg font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             {{ media.title }}
@@ -16,6 +16,7 @@
                 {% endif %}
 
                 {# Modal pour l'image en grand format #}
+                {% if media.id is defined %}
                 <div id="masonry-modal-{{ media.id }}" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div class="relative w-full max-w-4xl max-h-full">
                         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -30,43 +31,14 @@
                                     <span class="sr-only">Fermer</span>
                                 </button>
                             </div>
-                            <div class="p-4 md:p-5 space-y-4">
-                                <img src="{{ vich_uploader_asset(media, 'imageFile') }}"
-                                     class="w-full h-auto"
-                                     alt="{{ media.alt }}">
-                                {% if media.alt %}
-                                    <p class="text-gray-500 dark:text-gray-400">{{ media.alt }}</p>
-                                {% endif %}
+                            <div class="p-4 md:p-5">
+                                <img src="{{ media.url }}" alt="{{ media.alt }}" class="w-full h-auto">
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {# Bouton pour ouvrir le modal #}
-                <button type="button" 
-                        data-modal-target="masonry-modal-{{ media.id }}" 
-                        data-modal-toggle="masonry-modal-{{ media.id }}"
-                        class="absolute inset-0 w-full h-full cursor-zoom-in rounded-lg">
-                </button>
+                {% endif %}
             </div>
         {% endfor %}
     </div>
-
-    {# Script pour Masonry.js (optionnel pour un meilleur rendu) #}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const masonryGrid = document.querySelector('#masonry-{{ collection.id }}');
-            const masonry = new Masonry(masonryGrid, {
-                itemSelector: '.masonry-item',
-                columnWidth: '.masonry-item',
-                percentPosition: true,
-                gutter: {{ collection.settings.gap }}
-            });
-
-            // Recalculer la disposition après le chargement des images
-            imagesLoaded(masonryGrid).on('progress', function() {
-                masonry.layout();
-            });
-        });
-    </script>
 {% endif %}

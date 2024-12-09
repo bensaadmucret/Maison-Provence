@@ -8,4 +8,9 @@ if (file_exists(dirname(__DIR__).'/config/bootstrap.php')) {
     require dirname(__DIR__).'/config/bootstrap.php';
 } elseif (method_exists(Dotenv::class, 'bootEnv')) {
     (new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+    (new Dotenv())->bootEnv(dirname(__DIR__).'/.env.test');
 }
+
+// Explicitly set test database name
+$_ENV['DATABASE_URL'] = 'mysql://app:app@127.0.0.1:3306/maison_provence_test?serverVersion=mariadb-10.11.4';
+putenv('DATABASE_URL=mysql://app:app@127.0.0.1:3306/maison_provence_test?serverVersion=mariadb-10.11.4');

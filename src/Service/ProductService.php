@@ -6,19 +6,26 @@ use App\DTO\ProductDTO;
 use App\Entity\Product;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
+use App\Service\CategoryService;
 use App\Service\Interface\ProductServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
+use Psr\Log\LoggerInterface;
 
 class ProductService implements ProductServiceInterface
 {
+    private $logger;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ProductRepository $productRepository,
         private readonly CategoryRepository $categoryRepository,
         private readonly SlugService $slugService,
         private readonly LoggingService $loggingService,
+        private readonly CategoryService $categoryService,
+        LoggerInterface $logger,
     ) {
+        $this->logger = $logger;
     }
 
     /**
@@ -202,9 +209,23 @@ class ProductService implements ProductServiceInterface
     {
         $this->loggingService->logProductDeletion($id);
 
-        $product = $this->getProduct($id);
-        $this->entityManager->remove($product);
-        $this->entityManager->flush();
+        try {
+            $product = $this->getProduct($id);
+
+            // Détacher le produit de sa catégorie si elle existe
+            if ($product->getCategory()) {
+                $product->setCategory(null);
+            }
+
+            // Supprimer le produit
+            $this->entityManager->remove($product);
+            $this->entityManager->flush();
+
+            $this->loggingService->logProductDeleted($id);
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de la suppression du produit : ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function getFeaturedProducts(int $limit = 4): array
@@ -227,6 +248,40 @@ class ProductService implements ProductServiceInterface
         }
 
         return $galleryImages;
+    }
+
+    public function createProductWithDefaultCategory(ProductDTO $productDTO): Product
+    {
+        // Ensure we have an Uncategorized category
+        $defaultCategory = $this->categoryService->ensureUncategorizedCategory();
+
+        $product = new Product();
+        $product->setCategory($defaultCategory);
+        
+        // Set other product details from DTO
+        $product->setName($productDTO->getName());
+        $product->setDescription($productDTO->getDescription());
+        $product->setPrice($productDTO->getPrice());
+        $product->setStock($productDTO->getStock());
+        
+        // Set timestamps
+        $now = new \DateTimeImmutable();
+        $product->setCreatedAt($now);
+        $product->setUpdatedAt($now);
+
+        // Generate slug
+        $slug = $this->slugService->generateSlug($product->getName());
+        $product->setSlug($slug);
+
+        // Set default active and featured status
+        $product->setIsActive(true);
+        $product->setIsFeatured(false);
+
+        // Persist the product
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+
+        return $product;
     }
 
     private function updateProductFromDTO(Product $product, ProductDTO $productDTO): void
@@ -257,11 +312,50 @@ class ProductService implements ProductServiceInterface
             $product->setSlug($productDTO->getSlug());
         }
 
-        if ($productDTO->getCategoryId()) {
-            $category = $this->categoryRepository->find($productDTO->getCategoryId());
-            if ($category) {
-                $product->setCategory($category);
+        // Gestion explicite de la catégorie
+        try {
+            if (!$productDTO->getCategoryId()) {
+                // Trouver une catégorie existante
+                $defaultCategory = $this->categoryRepository->findOneBy([]);
+                
+                if (!$defaultCategory) {
+                    // Créer une catégorie par défaut si aucune n'existe
+                    $defaultCategory = $this->createDefaultCategory();
+                }
+                
+                $product->setCategory($defaultCategory);
+            } else {
+                $category = $this->categoryRepository->find($productDTO->getCategoryId());
+                if ($category) {
+                    $product->setCategory($category);
+                } else {
+                    // Si la catégorie spécifiée n'existe pas, utiliser la catégorie par défaut
+                    $defaultCategory = $this->categoryRepository->findOneBy([]) 
+                        ?? $this->createDefaultCategory();
+                    $product->setCategory($defaultCategory);
+                }
             }
+        } catch (\Exception $e) {
+            // Log de l'erreur
+            $this->logger->error('Erreur lors de l\'assignation de la catégorie : ' . $e->getMessage());
+            
+            // Assignation forcée d'une catégorie par défaut
+            $defaultCategory = $this->createDefaultCategory();
+            $product->setCategory($defaultCategory);
         }
+    }
+
+    private function createDefaultCategory(): Category
+    {
+        $defaultCategory = new Category();
+        $defaultCategory->setName('Divers');
+        $defaultCategory->setSlug('divers');
+        $defaultCategory->setDescription('Catégorie par défaut');
+        $defaultCategory->setCreatedAt(new \DateTimeImmutable());
+        $defaultCategory->setUpdatedAt(new \DateTimeImmutable());
+        
+        $this->categoryRepository->save($defaultCategory, true);
+        
+        return $defaultCategory;
     }
 }

@@ -6,22 +6,33 @@
 - [ ] Tests d'intégration pour la gestion de configuration
 - [ ] Tests E2E pour le parcours utilisateur complet
 - [ ] Tests de performance pour l'optimisation des requêtes
+- [x] Tests des entités Product, Category, et leurs relations
+- [x] Tests du système de commandes et panier
+- [x] Tests du système SEO des produits
 
 ## E-commerce
 ### Back Office Client
-- [ ] Création d'un espace client dédié
-  - [ ] Tableau de bord client
-  - [ ] Historique des commandes
-  - [ ] Gestion des adresses de livraison
+- [x] Création d'un espace client dédié
+  - [x] Tableau de bord client (via /account)
+  - [x] Historique des commandes (OrderController avec historique)
+  - [x] Gestion des adresses de livraison (AddressController complet)
+    - [x] Ajout/modification d'adresse
+    - [x] Adresse par défaut
+    - [x] Adresse de facturation
   - [ ] Gestion des moyens de paiement
-  - [ ] Suivi des commandes en cours
+  - [x] Suivi des commandes en cours (via OrderController)
+    - [x] Système de statut des commandes (pending, paid, shipped, delivered, cancelled)
+    - [x] Référence unique pour chaque commande
 
 ### Gestion des Produits
-- [ ] Création des entités
-  - [ ] Product
-  - [ ] Category
+- [x] Création des entités
+  - [x] Product
+  - [x] Category
   - [ ] ProductVariant (tailles, couleurs, etc.)
   - [ ] ProductImage
+- [x] Gestion des relations Product-Category
+- [x] Système de slug pour les produits
+- [x] Système SEO pour les produits
 - [ ] Interface d'administration des produits
   - [ ] CRUD complet
   - [ ] Gestion des stocks

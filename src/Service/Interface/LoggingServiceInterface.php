@@ -20,4 +20,6 @@ interface LoggingServiceInterface
     public function logProductDetails(array $products, array $context = []): void;
 
     public function logCartOperation(string $operation, Cart $cart, array $context = []): void;
+
+    public function logCartCleared(Cart $cart, array $context = []): void;
 }

@@ -1,0 +1,29 @@
+{#
+    Composant de carte de statistiques
+    Paramètres:
+    - icon: Nom de l'icône FontAwesome (ex: 'shopping-cart')
+    - color: Couleur du thème (ex: 'amber', 'blue', 'green', 'purple')
+    - label: Libellé de la statistique
+    - value: Valeur à afficher
+    - format: Format de la valeur (optionnel, 'currency' pour les montants)
+#}
+
+{% set format = format|default('') %}
+
+<div class="bg-gradient-to-r from-white to-gray-50 rounded-lg shadow-md p-6 hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+    <div class="flex items-center">
+        <div class="p-4 rounded-full bg-{{ color }}-100 text-{{ color }}-500 shadow-inner">
+            <i class="fas fa-{{ icon }} fa-2x" loading="lazy"></i>
+        </div>
+        <div class="ml-4">
+            <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">{{ label }}</p>
+            <p class="text-3xl font-bold text-gray-800">
+                {% if format == 'currency' %}
+                    {{ value|number_format(2, ',', ' ') }} €
+                {% else %}
+                    {{ value }}
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>

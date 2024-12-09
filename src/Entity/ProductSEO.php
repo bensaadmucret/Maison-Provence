@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class ProductSEO extends SEO
 {
-    #[ORM\OneToOne(mappedBy: 'seo', targetEntity: Product::class, cascade: ['persist'])]
+    #[ORM\OneToOne(mappedBy: 'seo', targetEntity: Product::class)]
     private ?Product $product = null;
 
     public function getProduct(): ?Product
@@ -15,26 +15,20 @@ class ProductSEO extends SEO
         return $this->product;
     }
 
-    public function setProduct(?Product $product): static
+    public function setProduct(?Product $product): self
     {
-        if (null === $product && null !== $this->product) {
-            $this->product->setSeo(null);
+        // Désassocier l'ancien produit si existant
+        if (null !== $this->product && $this->product !== $product) {
+            $oldProduct = $this->product;
+            $this->product = null;
+            $oldProduct->setSeo(null);
         }
 
+        // Associer le nouveau produit
+        $this->product = $product;
         if (null !== $product && $product->getSeo() !== $this) {
             $product->setSeo($this);
         }
-
-        $this->product = $product;
-
-        return $this;
-    }
-
-    public function setOgImage(?string $ogImage): self
-    {
-        $openGraphData = $this->getOpenGraphData();
-        $openGraphData['image'] = $ogImage;
-        $this->setOpenGraphData($openGraphData);
 
         return $this;
     }

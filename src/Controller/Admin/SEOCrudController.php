@@ -13,7 +13,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -53,47 +52,58 @@ class SEOCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield TextField::new('metaTitle', 'Titre meta')
+        $fields = [];
+
+        $fields[] = TextField::new('metaTitle', 'Titre meta')
             ->setHelp('Maximum 60 caractères')
-            ->setColumns('col-md-12');
+            ->setColumns('col-md-12')
+            ->setRequired(true);
 
-        yield TextEditorField::new('metaDescription', 'Description meta')
+        $fields[] = TextEditorField::new('metaDescription', 'Description meta')
             ->setHelp('Maximum 160 caractères')
-            ->setColumns('col-md-12');
+            ->setColumns('col-md-12')
+            ->setRequired(true);
 
-        yield UrlField::new('canonicalUrl', 'URL canonique')
+        $fields[] = UrlField::new('canonicalUrl', 'URL canonique')
             ->setColumns('col-md-12')
             ->setRequired(false);
 
-        yield ArrayField::new('metaKeywords', 'Mots-clés')
+        $fields[] = ArrayField::new('metaKeywords', 'Mots-clés')
             ->setHelp('Liste des mots-clés')
-            ->setColumns('col-md-12');
+            ->setColumns('col-md-12')
+            ->setRequired(false);
 
-        yield BooleanField::new('indexable', 'Indexable')
+        $fields[] = BooleanField::new('indexable', 'Indexable')
             ->setHelp('Autoriser l\'indexation par les moteurs de recherche')
-            ->setColumns('col-md-6');
+            ->setColumns('col-md-6')
+            ->setRequired(false);
 
-        yield BooleanField::new('followable', 'Followable')
+        $fields[] = BooleanField::new('followable', 'Followable')
             ->setHelp('Autoriser le suivi des liens par les moteurs de recherche')
-            ->setColumns('col-md-6');
+            ->setColumns('col-md-6')
+            ->setRequired(false);
 
         $entity = $this->getContext()?->getEntity()->getInstance();
 
         if ($entity instanceof ProductSEO) {
-            yield AssociationField::new('product', 'Produit')
+            $fields[] = TextField::new('productName', 'Produit')
                 ->setFormTypeOptions([
-                    'class' => Product::class,
-                    'choice_label' => 'name',
+                    'disabled' => true,
+                    'mapped' => false,
                 ])
+                ->setValue($entity->getProduct()?->getName())
                 ->setColumns('col-md-12');
         } elseif ($entity instanceof CategorySEO) {
-            yield AssociationField::new('category', 'Catégorie')
+            $fields[] = TextField::new('categoryName', 'Catégorie')
                 ->setFormTypeOptions([
-                    'class' => Category::class,
-                    'choice_label' => 'name',
+                    'disabled' => true,
+                    'mapped' => false,
                 ])
+                ->setValue($entity->getCategory()?->getName())
                 ->setColumns('col-md-12');
         }
+
+        return $fields;
     }
 
     public function createEntity(string $entityFqcn)

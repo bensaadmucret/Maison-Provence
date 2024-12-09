@@ -1,94 +1,131 @@
-{% block _product_media_entry_widget %}
-    <div class="media-entry">
-        {{ form_row(form.imageFile) }}
-        {{ form_row(form.alt) }}
-    </div>
-{% endblock %}
-
+{# Template principal pour la collection de médias #}
 {% block _product_media_widget %}
-    {% set attr = attr|merge({class: 'product-media-collection'}) %}
-    <div {{ block('widget_container_attributes') }}>
+    <div class="product-media-collection"
+         x-data="{ 
+            items: [],
+            draggedItem: null,
+            isDragging: false,
+            
+            init() {
+                this.items = Array.from(this.$el.querySelectorAll('[data-media-item]'));
+                this.initSortable();
+            },
+            
+            initSortable() {
+                this.items.forEach(item => {
+                    item.setAttribute('draggable', true);
+                    item.addEventListener('dragstart', e => this.dragStart(e));
+                    item.addEventListener('dragend', e => this.dragEnd(e));
+                    item.addEventListener('dragover', e => this.dragOver(e));
+                });
+            },
+            
+            dragStart(e) {
+                this.isDragging = true;
+                this.draggedItem = e.target;
+                e.target.classList.add('opacity-50');
+            },
+            
+            dragEnd(e) {
+                this.isDragging = false;
+                e.target.classList.remove('opacity-50');
+                this.updatePositions();
+            },
+            
+            dragOver(e) {
+                e.preventDefault();
+                if (!this.isDragging) return;
+                
+                const item = e.target.closest('[data-media-item]');
+                if (!item || item === this.draggedItem) return;
+                
+                const rect = item.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+                
+                if (e.clientY < midY && this.draggedItem.previousElementSibling !== item) {
+                    item.parentNode.insertBefore(this.draggedItem, item);
+                } else if (e.clientY >= midY && this.draggedItem.nextElementSibling !== item) {
+                    item.parentNode.insertBefore(this.draggedItem, item.nextElementSibling);
+                }
+            },
+            
+            updatePositions() {
+                this.items = Array.from(this.$el.querySelectorAll('[data-media-item]'));
+                this.items.forEach((item, index) => {
+                    const positionInput = item.querySelector('[name$=\"[position]\"]');
+                    if (positionInput) positionInput.value = index;
+                });
+            }
+         }">
+        
+        {# Bouton d'ajout #}
         {% if form.vars.prototype is defined %}
-            <div class="collection-actions mb-2">
-                <button type="button" class="btn btn-primary" 
-                        data-action="collection-add"
-                        data-prototype="{{ form_widget(form.vars.prototype)|e('html_attr') }}"
-                        data-index="{{ form|length }}">
-                    <i class="fas fa-plus"></i> Ajouter une image
+            <div class="mb-6">
+                <button type="button"
+                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        x-data="{ index: {{ form|length }} }"
+                        @click="$dispatch('add-media', { prototype: '{{ form_widget(form.vars.prototype)|e('html_attr') }}', index: index++ })">
+                    <i class="fas fa-plus -ml-1 mr-2"></i>
+                    Ajouter une image
                 </button>
             </div>
         {% endif %}
         
-        <div class="row media-items" data-prototype-name="{{ prototype_name|default('__name__') }}">
+        {# Liste des médias #}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
+             data-media-container>
             {% for media in form %}
-                <div class="col-md-4 mb-3">
-                    {% block form_row %}
-                        {% set row_attr = row_attr|merge({
-                            class: row_attr.class|default('') ~ ' form-group'
-                        }) %}
-
-                        <div {{ block('attributes') }}>
-                            {{- form_label(form) -}}
-                            <div class="media-collection" data-controller="collection-type">
-                                <div class="media-items" 
-                                     data-collection-type-target="container"
-                                     data-prototype="{{ form_widget(form.vars.prototype)|e('html_attr') }}">
-                                    {% for child in form %}
-                                        <div class="media-item card mb-3" data-collection-type-target="item">
-                                            <div class="card-body">
-                                                <div class="row align-items-center">
-                                                    <div class="col-md-3">
-                                                        {% if child.vars.data and child.vars.data.filename %}
-                                                            <img src="{{ vich_uploader_asset(child.vars.data, 'imageFile') }}" 
-                                                                 class="img-fluid rounded" 
-                                                                 alt="{{ child.vars.data.alt|default('') }}"
-                                                                 style="max-height: 150px; width: auto;">
-                                                        {% else %}
-                                                            <div class="text-center p-3 bg-light rounded">
-                                                                <i class="fas fa-image fa-2x text-muted"></i>
-                                                            </div>
-                                                        {% endif %}
-                                                    </div>
-                                                    <div class="col-md-8">
-                                                        {{ form_row(child.imageFile, {
-                                                            label: 'Image'|trans,
-                                                            attr: { class: 'form-control-file' }
-                                                        }) }}
-                                                        {{ form_row(child.title, {
-                                                            label: 'Titre'|trans,
-                                                            attr: { class: 'form-control' }
-                                                        }) }}
-                                                        {{ form_row(child.alt, {
-                                                            label: 'Texte alternatif'|trans,
-                                                            attr: { class: 'form-control' }
-                                                        }) }}
-                                                        {{ form_row(child.position, {
-                                                            label: 'Position'|trans,
-                                                            attr: { class: 'form-control' }
-                                                        }) }}
-                                                    </div>
-                                                    <div class="col-md-1">
-                                                        <button type="button" 
-                                                                class="btn btn-danger" 
-                                                                data-action="collection-type#removeItem">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                <button type="button" 
-                                        class="btn btn-success mt-2" 
-                                        data-action="collection-type#addItem">
-                                    <i class="fas fa-plus"></i> {{ 'Ajouter une image'|trans }}
-                                </button>
-                            </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4"
+                     data-media-item>
+                    {# Barre d'outils #}
+                    <div class="flex justify-end mb-2">
+                        <button type="button" 
+                                class="text-red-600 hover:text-red-800"
+                                @click="$el.closest('[data-media-item]').remove()">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <div class="ml-2 cursor-move">
+                            <i class="fas fa-grip-vertical text-gray-400"></i>
                         </div>
-                    {% endblock %}
+                    </div>
+                    
+                    {# Formulaire du média #}
+                    {{ include('admin/components/_media_form.html.twig', {
+                        form: media
+                    }) }}
                 </div>
             {% endfor %}
+        </div>
+        
+        {# Modal de prévisualisation #}
+        <div x-data="{ 
+                show: false, 
+                imageUrl: '', 
+                imageTitle: '' 
+             }"
+             @open-modal.window="show = true; imageUrl = $event.detail.url; imageTitle = $event.detail.title"
+             x-show="show"
+             class="fixed inset-0 z-50 overflow-y-auto"
+             x-cloak>
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity" 
+                     aria-hidden="true"
+                     @click="show = false">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full"
+                     @click.away="show = false">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" x-text="imageTitle"></h3>
+                                <img :src="imageUrl" class="w-full h-auto rounded-lg" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

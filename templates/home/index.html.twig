@@ -30,19 +30,25 @@
     </div>
 </section>
 
-   
-
-    {# Features Section #}
-    {{ include('components/_features.html.twig') }}
-
-    <section class="py-16 bg-gray-50">
+{# Collection Section #}
+    <section class="py-16">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-extrabold text-gray-900 mb-4">Notre Collection</h2>
                 <p class="text-xl text-gray-600">Découvrez nos produits authentiques de Provence</p>
             </div>
-            {{ include('components/_masonry_gallery.html.twig', {
-                images: galleryImages
+
+            {# Masonry Gallery #}
+            {% set masonry_collection = {
+                settings: {
+                    columns: 3,
+                    gap: 16
+                },
+                media: galleryImages
+            } %}
+
+            {{ include('components/_masonry.html.twig', {
+                collection: masonry_collection
             }) }}
         </div>
     </section>

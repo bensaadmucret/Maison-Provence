@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,7 +52,7 @@ class ProductControllerTest extends TestCase
         $this->container->method('has')
             ->willReturnCallback(function ($id) {
                 return match ($id) {
-                    'twig', 'router', 'serializer' => true,
+                    'twig', 'router', 'serializer', 'parameter_bag' => true,
                     default => false,
                 };
             });
@@ -61,6 +62,7 @@ class ProductControllerTest extends TestCase
                     'twig' => $this->twig,
                     'router' => $this->urlGenerator,
                     'serializer' => $this->serializer,
+                    'parameter_bag' => $this->createMock(ParameterBagInterface::class),
                     default => null,
                 };
             });
@@ -120,6 +122,7 @@ class ProductControllerTest extends TestCase
                     'similarProducts' => [],
                     'previousProduct' => null,
                     'nextProduct' => null,
+                    'media_url' => null
                 ]
             )
             ->willReturn('rendered template');
