@@ -350,7 +350,8 @@ class SiteConfiguration
 
     public function setFreeShippingThreshold(float $freeShippingThreshold): static
     {
-        $this->freeShippingThreshold = (string)$freeShippingThreshold;
+        $this->freeShippingThreshold = (string) $freeShippingThreshold;
+
         return $this;
     }
 

@@ -2,7 +2,6 @@
 
 namespace App\Controller\Admin;
 
-use App\Admin\Field\ProductImageField;
 use App\Entity\Product;
 use App\Entity\ProductSEO;
 use App\Form\MediaType;
@@ -89,7 +88,7 @@ class ProductCrudController extends AbstractCrudController
             $fields[] = BooleanField::new('isActive', 'Actif');
             $fields[] = BooleanField::new('isFeatured', 'Mis en avant');
             $fields[] = AssociationField::new('category', 'Catégorie');
-            
+
             return $fields;
         }
 
@@ -97,31 +96,31 @@ class ProductCrudController extends AbstractCrudController
         $fields[] = FormField::addTab('Général');
         $fields[] = TextField::new('name', 'Nom')
             ->setRequired(true);
-        
+
         $fields[] = SlugField::new('slug')
             ->setTargetFieldName('name')
             ->hideOnIndex();
-        
+
         $fields[] = TextEditorField::new('description', 'Description')
             ->hideOnIndex()
             ->setRequired(false);
-        
+
         $fields[] = MoneyField::new('price', 'Prix')
             ->setCurrency('EUR')
             ->setStoredAsCents(false)
             ->setRequired(true);
-        
+
         $fields[] = IntegerField::new('stock', 'Stock')
             ->setRequired(true)
             ->setHelp('Nombre d\'unités disponibles');
 
         // Onglet Visibilité et Mise en avant
         $fields[] = FormField::addTab('Visibilité');
-        
+
         $fields[] = BooleanField::new('isActive', 'Produit actif')
             ->setRequired(false)
             ->setHelp('Cochez pour rendre le produit visible sur le site');
-        
+
         $fields[] = BooleanField::new('isFeatured', 'Produit mis en avant')
             ->setRequired(false)
             ->setHelp('Cochez pour mettre en avant ce produit sur la page d\'accueil');
@@ -146,7 +145,7 @@ class ProductCrudController extends AbstractCrudController
         $fields[] = FormField::addTab('SEO');
         $fields[] = TextField::new('seo.metaTitle', 'Titre Meta')
             ->setRequired(false);
-        
+
         $fields[] = TextEditorField::new('seo.metaDescription', 'Description Meta')
             ->setRequired(false);
 

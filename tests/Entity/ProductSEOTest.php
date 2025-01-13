@@ -75,7 +75,7 @@ class ProductSEOTest extends TestCase
             'og:title' => 'Awesome Product',
             'og:type' => 'product',
             'og:url' => 'https://example.com/product',
-            'og:image' => 'https://example.com/product-image.jpg'
+            'og:image' => 'https://example.com/product-image.jpg',
         ];
 
         $this->productSEO->setOpenGraphData($ogData);
@@ -145,7 +145,7 @@ class ProductSEOTest extends TestCase
         // Tester l'ajout, la modification et la suppression de données Open Graph
         $initialData = [
             'og:title' => 'Initial Title',
-            'og:type' => 'product'
+            'og:type' => 'product',
         ];
 
         $this->productSEO->setOpenGraphData($initialData);
@@ -171,7 +171,7 @@ class ProductSEOTest extends TestCase
             'https://example.com/product',
             'http://test.com/page',
             '/relative/path',
-            ''  // URL vide
+            '',  // URL vide
         ];
 
         foreach ($validUrls as $url) {
@@ -193,8 +193,8 @@ class ProductSEOTest extends TestCase
         $this->assertContains('nouveau', $this->productSEO->getMetaKeywords());
 
         // Supprimer un mot-clé en recréant le tableau
-        $filteredKeywords = array_filter($updatedKeywords, function($keyword) {
-            return $keyword !== 'test';
+        $filteredKeywords = array_filter($updatedKeywords, function ($keyword) {
+            return 'test' !== $keyword;
         });
         $this->productSEO->setMetaKeywords($filteredKeywords);
         $this->assertNotContains('test', $this->productSEO->getMetaKeywords());
@@ -203,15 +203,15 @@ class ProductSEOTest extends TestCase
     public function testMetaKeywordsEdgeCases(): void
     {
         // Tester les cas limites des mots-clés
-        $longKeywords = array_map(function($i) { 
-            return str_repeat('A', 50) . $i; 
+        $longKeywords = array_map(function ($i) {
+            return str_repeat('A', 50).$i;
         }, range(1, 20));
 
         $this->productSEO->setMetaKeywords($longKeywords);
-        
+
         // Vérifier que le nombre de mots-clés reste raisonnable
         $this->assertLessThanOrEqual(20, count($this->productSEO->getMetaKeywords()));
-        
+
         // Vérifier la longueur des mots-clés
         foreach ($this->productSEO->getMetaKeywords() as $keyword) {
             $this->assertLessThanOrEqual(52, strlen($keyword));
@@ -224,7 +224,7 @@ class ProductSEOTest extends TestCase
             'title' => 'Produit Fantastique',
             'description' => 'Une description courte',
             'image' => 'https://example.com/image.jpg',
-            'type' => 'product'
+            'type' => 'product',
         ];
 
         $this->productSEO->setOpenGraphData($validOpenGraphData);

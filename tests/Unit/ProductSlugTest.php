@@ -33,7 +33,7 @@ class ProductSlugTest extends TestCase
     {
         $input = 'Chaise Élégante & Confortable';
         $slug = $this->createSlug($input);
-        
+
         $this->assertEquals('chaise-elegante-confortable', $slug);
         $this->assertStringNotContainsString('Élégante', $slug);
         $this->assertStringNotContainsString('&', $slug);
@@ -44,7 +44,7 @@ class ProductSlugTest extends TestCase
         $product = new Product();
         $product->setDescription('Produit sans nom');
 
-        $expectedSlug = 'produit-' . uniqid();
+        $expectedSlug = 'produit-'.uniqid();
         $product->setSlug($expectedSlug);
 
         $this->assertStringStartsWith('produit-', $product->getSlug());
@@ -59,7 +59,7 @@ class ProductSlugTest extends TestCase
         $product2->setName('Canapé Design');
 
         $slug1 = $this->createSlug($product1->getName());
-        $slug2 = $this->createSlug($product2->getName()) . '-1';
+        $slug2 = $this->createSlug($product2->getName()).'-1';
 
         $this->assertNotEquals($slug1, $slug2);
     }

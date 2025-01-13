@@ -2,8 +2,8 @@
 
 namespace App\Tests\Integration;
 
-use App\Entity\Product;
 use App\Entity\Category;
+use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -23,7 +23,7 @@ class ProductPersistenceTest extends KernelTestCase
         // Supprimer le schéma existant
         $connection = $this->entityManager->getConnection();
         $platform = $connection->getDatabasePlatform();
-        
+
         // Récupérer le schéma
         $schemaTool = new SchemaTool($this->entityManager);
         $classes = $this->entityManager->getMetadataFactory()->getAllMetadata();
@@ -39,7 +39,7 @@ class ProductPersistenceTest extends KernelTestCase
         $connection = $this->entityManager->getConnection();
         $connection->executeStatement('DELETE FROM product');
         $connection->executeStatement('DELETE FROM category');
-        
+
         $this->entityManager->close();
         $this->entityManager = null;
     }
@@ -49,10 +49,10 @@ class ProductPersistenceTest extends KernelTestCase
         $category = new Category();
         $category->setName('Meubles de Salon');
         $category->setDescription('Catégorie de meubles pour salon');
-        
+
         $this->entityManager->persist($category);
         $this->entityManager->flush();
-        
+
         return $category;
     }
 

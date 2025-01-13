@@ -9,8 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 class CategorySEO extends SEO
 {
     #[ORM\OneToOne(
-        mappedBy: 'seo', 
-        targetEntity: Category::class, 
+        mappedBy: 'seo',
+        targetEntity: Category::class,
         cascade: ['persist', 'remove']
     )]
     private ?Category $category = null;

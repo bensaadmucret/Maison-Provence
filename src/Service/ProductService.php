@@ -6,7 +6,6 @@ use App\DTO\ProductDTO;
 use App\Entity\Product;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
-use App\Service\CategoryService;
 use App\Service\Interface\ProductServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
@@ -223,7 +222,7 @@ class ProductService implements ProductServiceInterface
 
             $this->loggingService->logProductDeleted($id);
         } catch (\Exception $e) {
-            $this->logger->error('Erreur lors de la suppression du produit : ' . $e->getMessage());
+            $this->logger->error('Erreur lors de la suppression du produit : '.$e->getMessage());
             throw $e;
         }
     }
@@ -257,13 +256,13 @@ class ProductService implements ProductServiceInterface
 
         $product = new Product();
         $product->setCategory($defaultCategory);
-        
+
         // Set other product details from DTO
         $product->setName($productDTO->getName());
         $product->setDescription($productDTO->getDescription());
         $product->setPrice($productDTO->getPrice());
         $product->setStock($productDTO->getStock());
-        
+
         // Set timestamps
         $now = new \DateTimeImmutable();
         $product->setCreatedAt($now);
@@ -317,12 +316,12 @@ class ProductService implements ProductServiceInterface
             if (!$productDTO->getCategoryId()) {
                 // Trouver une catégorie existante
                 $defaultCategory = $this->categoryRepository->findOneBy([]);
-                
+
                 if (!$defaultCategory) {
                     // Créer une catégorie par défaut si aucune n'existe
                     $defaultCategory = $this->createDefaultCategory();
                 }
-                
+
                 $product->setCategory($defaultCategory);
             } else {
                 $category = $this->categoryRepository->find($productDTO->getCategoryId());
@@ -330,15 +329,15 @@ class ProductService implements ProductServiceInterface
                     $product->setCategory($category);
                 } else {
                     // Si la catégorie spécifiée n'existe pas, utiliser la catégorie par défaut
-                    $defaultCategory = $this->categoryRepository->findOneBy([]) 
+                    $defaultCategory = $this->categoryRepository->findOneBy([])
                         ?? $this->createDefaultCategory();
                     $product->setCategory($defaultCategory);
                 }
             }
         } catch (\Exception $e) {
             // Log de l'erreur
-            $this->logger->error('Erreur lors de l\'assignation de la catégorie : ' . $e->getMessage());
-            
+            $this->logger->error('Erreur lors de l\'assignation de la catégorie : '.$e->getMessage());
+
             // Assignation forcée d'une catégorie par défaut
             $defaultCategory = $this->createDefaultCategory();
             $product->setCategory($defaultCategory);
@@ -353,9 +352,9 @@ class ProductService implements ProductServiceInterface
         $defaultCategory->setDescription('Catégorie par défaut');
         $defaultCategory->setCreatedAt(new \DateTimeImmutable());
         $defaultCategory->setUpdatedAt(new \DateTimeImmutable());
-        
+
         $this->categoryRepository->save($defaultCategory, true);
-        
+
         return $defaultCategory;
     }
 }

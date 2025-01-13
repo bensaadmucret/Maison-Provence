@@ -2,11 +2,10 @@
 
 namespace App\Tests\Entity;
 
-use App\Entity\Product;
 use App\Entity\Category;
+use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class ProductSlugTest extends KernelTestCase
 {
@@ -28,7 +27,7 @@ class ProductSlugTest extends KernelTestCase
         $connection = $this->entityManager->getConnection();
         $connection->executeStatement('DELETE FROM product');
         $connection->executeStatement('DELETE FROM category');
-        
+
         $this->entityManager->clear();
         parent::tearDown();
     }
@@ -158,7 +157,7 @@ class ProductSlugTest extends KernelTestCase
     public function testEmptyNameSlugGeneration()
     {
         $product = new Product();
-        $product->setName('Produit sans Nom');  
+        $product->setName('Produit sans Nom');
         $product->setDescription('Produit sans nom');
         $product->setPrice(999.99);
         $product->setStock(3);

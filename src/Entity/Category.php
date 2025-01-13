@@ -33,7 +33,7 @@ class Category
     #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank(message: 'Le slug est obligatoire')]
     #[Assert\Regex(
-        pattern: '/^[a-z0-9-]+$/', 
+        pattern: '/^[a-z0-9-]+$/',
         message: 'Le slug ne peut contenir que des lettres minuscules, des chiffres et des traits d\'union'
     )]
     private ?string $slug = null;
@@ -45,8 +45,8 @@ class Category
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\OneToMany(
-        mappedBy: 'category', 
-        targetEntity: Product::class, 
+        mappedBy: 'category',
+        targetEntity: Product::class,
         fetch: 'LAZY',
         cascade: ['persist', 'remove'],
         orphanRemoval: false
@@ -55,21 +55,21 @@ class Category
     private Collection $products;
 
     #[ORM\ManyToOne(
-        targetEntity: self::class, 
+        targetEntity: self::class,
         inversedBy: 'children',
         fetch: 'LAZY'
     )]
     #[ORM\JoinColumn(
-        name: 'parent_id', 
-        referencedColumnName: 'id', 
+        name: 'parent_id',
+        referencedColumnName: 'id',
         nullable: true,
         onDelete: 'SET NULL'
     )]
     private ?self $parent = null;
 
     #[ORM\OneToMany(
-        mappedBy: 'parent', 
-        targetEntity: self::class, 
+        mappedBy: 'parent',
+        targetEntity: self::class,
         fetch: 'LAZY',
         orphanRemoval: false
     )]
@@ -80,8 +80,8 @@ class Category
     private int $level = 0;
 
     #[ORM\OneToOne(
-        inversedBy: 'category', 
-        targetEntity: CategorySEO::class, 
+        inversedBy: 'category',
+        targetEntity: CategorySEO::class,
         cascade: ['persist', 'remove']
     )]
     #[ORM\JoinColumn(name: 'seo_id', referencedColumnName: 'id')]
@@ -174,6 +174,7 @@ class Category
             $this->products->add($product);
             $product->setCategory($this);
         }
+
         return $this;
     }
 
@@ -184,6 +185,7 @@ class Category
                 $product->setCategory(null);
             }
         }
+
         return $this;
     }
 
@@ -227,6 +229,7 @@ class Category
             $this->children->add($child);
             $child->setParent($this);
         }
+
         return $this;
     }
 
@@ -237,6 +240,7 @@ class Category
                 $child->setParent(null);
             }
         }
+
         return $this;
     }
 

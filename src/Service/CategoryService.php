@@ -12,14 +12,15 @@ class CategoryService
     public function __construct(
         private EntityManagerInterface $entityManager,
         private CategoryRepository $categoryRepository,
-        private SluggerInterface $slugger
-    ) {}
+        private SluggerInterface $slugger,
+    ) {
+    }
 
     public function ensureUncategorizedCategory(): Category
     {
         // Try to find existing Uncategorized category
         $uncategorizedCategory = $this->categoryRepository->findOneBy(['name' => 'Uncategorized']);
-        
+
         if ($uncategorizedCategory) {
             return $uncategorizedCategory;
         }
@@ -28,7 +29,7 @@ class CategoryService
         $uncategorizedCategory = new Category();
         $uncategorizedCategory->setName('Uncategorized');
         $uncategorizedCategory->setDescription('Default category for products without a specific category');
-        
+
         // Generate slug
         $slug = $this->slugger->slug(strtolower($uncategorizedCategory->getName()))->toString();
         $uncategorizedCategory->setSlug($slug);

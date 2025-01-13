@@ -58,7 +58,7 @@ class Product
     #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank(message: 'Le slug est obligatoire')]
     #[Assert\Regex(
-        pattern: '/^[a-z0-9-]+$/', 
+        pattern: '/^[a-z0-9-]+$/',
         message: 'Le slug ne peut contenir que des lettres minuscules, des chiffres et des traits d\'union'
     )]
     private string $slug;
@@ -74,9 +74,9 @@ class Product
     private ?Category $category = null;
 
     #[ORM\OneToMany(
-        mappedBy: 'product', 
-        targetEntity: Media::class, 
-        cascade: ['persist', 'remove'], 
+        mappedBy: 'product',
+        targetEntity: Media::class,
+        cascade: ['persist', 'remove'],
         orphanRemoval: true,
         indexBy: 'id'
     )]
@@ -84,15 +84,15 @@ class Product
     private Collection $media;
 
     #[ORM\OneToOne(
-        targetEntity: ProductSEO::class, 
-        inversedBy: 'product', 
+        targetEntity: ProductSEO::class,
+        inversedBy: 'product',
         cascade: ['persist', 'remove'],
         fetch: 'LAZY'
     )]
     #[ORM\JoinColumn(
-        name: 'seo_id', 
-        referencedColumnName: 'id', 
-        nullable: true, 
+        name: 'seo_id',
+        referencedColumnName: 'id',
+        nullable: true,
         unique: true,
         onDelete: 'SET NULL'
     )]
@@ -101,7 +101,7 @@ class Product
     private ?EntityManagerInterface $entityManager = null;
 
     public function __construct(
-        ?EntityManagerInterface $entityManager = null
+        ?EntityManagerInterface $entityManager = null,
     ) {
         $this->media = new ArrayCollection();
         $this->isActive = true;
@@ -116,7 +116,7 @@ class Product
     public function prePersist(PrePersistEventArgs $args): void
     {
         $entityManager = $args->getEntityManager();
-        
+
         // Définir la date de création
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
@@ -131,7 +131,7 @@ class Product
     public function preUpdate(PreUpdateEventArgs $args): void
     {
         $entityManager = $args->getObjectManager();
-        
+
         // Mettre à jour le timestamp
         $this->updatedAt = new \DateTimeImmutable();
 
@@ -152,7 +152,7 @@ class Product
 
         // Si le slug est vide, générer un slug par défaut
         if (empty($cleanSlug)) {
-            $cleanSlug = 'produit-' . bin2hex(random_bytes(4));
+            $cleanSlug = 'produit-'.bin2hex(random_bytes(4));
         }
 
         // Vérifier l'unicité du slug via DQL
@@ -161,35 +161,35 @@ class Product
 
         while (true) {
             // Construire une requête DQL pour compter les slugs existants
-            $dql = "SELECT COUNT(p.id) FROM " . self::class . " p WHERE p.slug = :slug";
+            $dql = 'SELECT COUNT(p.id) FROM '.self::class.' p WHERE p.slug = :slug';
             $currentId = $this->getId();
 
             // Ajouter une condition pour exclure l'entité courante si elle existe
-            if ($currentId !== null) {
-                $dql .= " AND p.id != :currentId";
+            if (null !== $currentId) {
+                $dql .= ' AND p.id != :currentId';
             }
 
             $query = $entityManager->createQuery($dql);
             $query->setParameter('slug', $cleanSlug);
 
-            if ($currentId !== null) {
+            if (null !== $currentId) {
                 $query->setParameter('currentId', $currentId);
             }
 
             // Exécuter la requête et vérifier le nombre de slugs existants
             $slugCount = $query->getSingleScalarResult();
 
-            if ($slugCount === 0) {
+            if (0 === $slugCount) {
                 break;
             }
 
             // Générer un nouveau slug avec un suffixe
             $cleanSlug = sprintf('%s-%d', $originalSlug, $counter);
-            $counter++;
+            ++$counter;
 
             // Limiter le nombre de tentatives pour éviter une boucle infinie
             if ($counter > 100) {
-                $cleanSlug .= '-' . bin2hex(random_bytes(4));
+                $cleanSlug .= '-'.bin2hex(random_bytes(4));
                 break;
             }
         }
@@ -202,17 +202,18 @@ class Product
         // Nettoyer le slug proposé
         $slugger = new AsciiSlugger();
         $this->slug = $slug ? $slugger->slug(strtolower($slug))->toString() : null;
+
         return $this;
     }
 
     public function setName(?string $name): static
     {
         $this->name = $name;
-        
+
         // Régénérer le slug si le nom change
         $slugger = new AsciiSlugger();
         $this->slug = $slugger->slug(strtolower($name))->toString();
-        
+
         return $this;
     }
 
@@ -342,7 +343,7 @@ class Product
         // Gérer la relation bidirectionnelle
         if ($this->category !== $category) {
             // Supprimer le produit de l'ancienne catégorie
-            if ($this->category !== null) {
+            if (null !== $this->category) {
                 $this->category->removeProduct($this);
             }
 
@@ -350,7 +351,7 @@ class Product
             $this->category = $category;
 
             // Ajouter le produit à la nouvelle catégorie si nécessaire
-            if ($category !== null) {
+            if (null !== $category) {
                 $category->addProduct($this);
             }
         }
@@ -421,6 +422,7 @@ class Product
     public function setEntityManager(?EntityManagerInterface $entityManager): self
     {
         $this->entityManager = $entityManager;
+
         return $this;
     }
 }

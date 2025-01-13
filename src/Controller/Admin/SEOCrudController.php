@@ -2,9 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Category;
 use App\Entity\CategorySEO;
-use App\Entity\Product;
 use App\Entity\ProductSEO;
 use App\Entity\SEO;
 use Doctrine\ORM\EntityManagerInterface;

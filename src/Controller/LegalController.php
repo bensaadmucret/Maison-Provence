@@ -10,8 +10,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class LegalController extends AbstractController
 {
     public function __construct(
-        private readonly LegalPageRepository $legalPageRepository
-    ) {}
+        private readonly LegalPageRepository $legalPageRepository,
+    ) {
+    }
 
     #[Route('/mentions-legales', name: 'app_legal_mentions')]
     public function mentions(): Response
@@ -23,7 +24,7 @@ class LegalController extends AbstractController
         }
 
         return $this->render('legal/mentions.html.twig', [
-            'page' => $legalPage
+            'page' => $legalPage,
         ]);
     }
 }

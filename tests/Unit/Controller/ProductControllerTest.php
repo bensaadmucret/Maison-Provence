@@ -122,7 +122,7 @@ class ProductControllerTest extends TestCase
                     'similarProducts' => [],
                     'previousProduct' => null,
                     'nextProduct' => null,
-                    'media_url' => null
+                    'media_url' => null,
                 ]
             )
             ->willReturn('rendered template');

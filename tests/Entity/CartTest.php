@@ -3,9 +3,9 @@
 namespace App\Tests\Entity;
 
 use App\Entity\Cart;
-use App\Entity\User;
 use App\Entity\CartItem;
 use App\Entity\Product;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class CartTest extends KernelTestCase
@@ -27,7 +27,7 @@ class CartTest extends KernelTestCase
         $connection->executeStatement('TRUNCATE TABLE `user`');
         $connection->executeStatement('TRUNCATE TABLE product');
         $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
-        
+
         $this->entityManager->clear();
         parent::tearDown();
     }
@@ -36,7 +36,7 @@ class CartTest extends KernelTestCase
     {
         // Créer un utilisateur
         $user = new User();
-        $user->setEmail('cart_test_' . uniqid() . '@example.com');
+        $user->setEmail('cart_test_'.uniqid().'@example.com');
         $user->setPassword('password123');
         $user->setFirstName('John');
         $user->setLastName('Doe');
@@ -65,7 +65,7 @@ class CartTest extends KernelTestCase
     {
         // Créer un utilisateur
         $user = new User();
-        $user->setEmail('cart_item_test_' . uniqid() . '@example.com');
+        $user->setEmail('cart_item_test_'.uniqid().'@example.com');
         $user->setPassword('password123');
         $user->setFirstName('Jane');
         $user->setLastName('Smith');
@@ -76,7 +76,7 @@ class CartTest extends KernelTestCase
         $product->setDescription('Description du produit de test');
         $product->setPrice(49.99);
         $product->setStock(10);
-        $product->setSlug('produit-de-test-' . uniqid());
+        $product->setSlug('produit-de-test-'.uniqid());
         $product->setCategory(null);  // Explicitement définir la catégorie comme null
 
         // Créer un panier
